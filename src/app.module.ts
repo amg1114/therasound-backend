@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_CONFIG_SCHEMA, appConfig } from './app.config';
+import { ChatbotModule } from './modules/chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { APP_CONFIG_SCHEMA, appConfig } from './app.config';
         abortEarly: true,
       },
     }),
+    ChatbotModule,
   ],
   controllers: [],
   providers: [],

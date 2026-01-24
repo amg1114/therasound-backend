@@ -1,0 +1,11 @@
+{
+    "editor.formatOnSave": true,
+    "python.analysis.enableTroubleshootMissingImports": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "editor.foldingImportsByDefault": true,
+    "javascript.preferences.organizeImports": {
+        "removeUnusedImports": true,
+        "sortImports": true,
+        "typeOrder": "auto"
+    }
+}

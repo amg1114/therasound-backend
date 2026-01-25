@@ -7,5 +7,9 @@
         "removeUnusedImports": true,
         "sortImports": true,
         "typeOrder": "auto"
-    }
+    },
+    "cSpell.words": [
+        "openrouter",
+        "Therasound"
+    ]
 }

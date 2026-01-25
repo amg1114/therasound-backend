@@ -34,9 +34,10 @@ async function bootstrap() {
   );
 
   setupSwagger(app);
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(port);
 
   Logger.log(`Application is running on: http://localhost:${port}/api`);
   Logger.log(`Swagger docs available at: http://localhost:${port}/docs`);
 }
-bootstrap();
+
+void bootstrap();

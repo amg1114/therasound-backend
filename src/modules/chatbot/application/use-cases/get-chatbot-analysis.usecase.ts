@@ -3,8 +3,9 @@ import {
   type IChatbotService,
 } from '@modules/chatbot/infrastructure/services/chatbot-service.interface';
 import { GetChatbotAnalysisDto } from '@modules/chatbot/presentation/dto/requests/analysis-request.dto';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class GetChatbotAnalysisUseCase {
   constructor(
     @Inject(CHATBOT_SERVICE_TOKEN)

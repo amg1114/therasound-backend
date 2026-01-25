@@ -23,5 +23,5 @@ export class IHistoryMessage {
 export interface IChatbotService {
   getResponse(payload: IConversationMessage[]): Promise<string>;
 
-  getEmotionAnalysis(text: IHistoryMessage[]): Promise<string>;
+  getEmotionAnalysis(history: IHistoryMessage[]): Promise<string>;
 }

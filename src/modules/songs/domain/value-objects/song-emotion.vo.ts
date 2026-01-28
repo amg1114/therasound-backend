@@ -1,0 +1,21 @@
+import { BadRequestException } from '@nestjs/common';
+
+export class SongEmotionVO {
+  public static SONG_EMOTIONS = ['happy', 'sad', 'energetic', 'calm'] as const;
+
+  private constructor(private readonly value: SongEmotionType) {}
+
+  public static create(emotion: string): SongEmotionVO {
+    if (!this.SONG_EMOTIONS.includes(emotion as SongEmotionType)) {
+      throw new BadRequestException(`Invalid song emotion: ${emotion}`);
+    }
+
+    return new SongEmotionVO(emotion as SongEmotionType);
+  }
+
+  getValue(): SongEmotionType {
+    return this.value;
+  }
+}
+
+type SongEmotionType = (typeof SongEmotionVO.SONG_EMOTIONS)[number];

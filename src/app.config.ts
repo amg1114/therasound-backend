@@ -5,6 +5,7 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   OPENROUTER_API_KEY: Joi.string().required(),
   DATABASE_URI: Joi.string().required(),
   DATABASE_NAME: Joi.string().required(),
+  JWT_SECRET: Joi.string().default('default_jwt_secret'),
 });
 
 export const appConfig = () => ({
@@ -18,5 +19,8 @@ export const appConfig = () => ({
   database: {
     uri: process.env.DATABASE_URI,
     name: process.env.DATABASE_NAME,
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'default_jwt_secret',
   },
 });

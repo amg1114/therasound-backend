@@ -4,7 +4,7 @@ import { UserEntityORM } from '../entities/user-entity.orm';
 import { UserEntity } from '@modules/users/domain/entities/user.entity';
 import { Model } from 'mongoose';
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -41,7 +41,7 @@ export class UserRepositoryImpl implements IUserRepository {
         err.code === 11000 &&
         (err.keyPattern?.email || err.keyValue?.email)
       ) {
-        throw new BadRequestException('User with this email already exists');
+        throw new ConflictException('User with this email already exists');
       }
 
       throw error;
@@ -79,7 +79,7 @@ export class UserRepositoryImpl implements IUserRepository {
       });
 
       if (existingUser) {
-        throw new BadRequestException('User with this email already exists');
+        throw new ConflictException('User with this email already exists');
       }
     }
 

@@ -1,0 +1,35 @@
+import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
+import { Prop, Schema } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+
+@Schema({
+  collection: 'songs',
+  timestamps: true,
+})
+export class SongEntityORM extends Document {
+  declare _id: Types.ObjectId;
+
+  @Prop({ required: true })
+  title: string;
+
+  @Prop({ required: true })
+  artist: string;
+
+  @Prop({ required: true, enum: SongEmotionVO.SONG_EMOTIONS })
+  emotion: string;
+
+  @Prop({ required: true })
+  durationMs: number;
+
+  @Prop({ required: true })
+  spotifyUrl: string;
+
+  @Prop({ required: true, type: [String] })
+  genres: string[];
+
+  @Prop({ required: true })
+  imageUrl: string;
+
+  @Prop({ required: true })
+  releaseDate: Date;
+}

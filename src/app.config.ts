@@ -3,6 +3,8 @@ import * as Joi from 'joi';
 export const APP_CONFIG_SCHEMA = Joi.object({
   PORT: Joi.number().default(3000),
   OPENROUTER_API_KEY: Joi.string().required(),
+  DATABASE_URI: Joi.string().required(),
+  DATABASE_NAME: Joi.string().required(),
 });
 
 export const appConfig = () => ({
@@ -12,5 +14,9 @@ export const appConfig = () => ({
   },
   openrouter: {
     apiKey: process.env.OPENROUTER_API_KEY,
+  },
+  database: {
+    uri: process.env.DATABASE_URI,
+    name: process.env.DATABASE_NAME,
   },
 });

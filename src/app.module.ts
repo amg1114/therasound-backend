@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_CONFIG_SCHEMA, appConfig } from './app.config';
 import { ChatbotModule } from './modules/chatbot/chatbot.module';
+import { SongsModule } from './modules/songs/songs.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -13,7 +15,15 @@ import { ChatbotModule } from './modules/chatbot/chatbot.module';
         abortEarly: true,
       },
     }),
+    MongooseModule.forRootAsync({
+      useFactory: (config: ConfigService) => ({
+        uri: config.get<string>('database.uri'),
+        dbName: config.get<string>('database.name'),
+      }),
+      inject: [ConfigService],
+    }),
     ChatbotModule,
+    SongsModule,
   ],
   controllers: [],
   providers: [],

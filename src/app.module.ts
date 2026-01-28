@@ -5,6 +5,7 @@ import { ChatbotModule } from './modules/chatbot/chatbot.module';
 import { SongsModule } from './modules/songs/songs.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UsersModule } from './modules/users/users.module';
     ChatbotModule,
     SongsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

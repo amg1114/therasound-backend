@@ -9,6 +9,10 @@ import {
   USER_REPOSITORY,
   type IUserRepository,
 } from '@modules/users/domain/repositories/user-repository.interface';
+import {
+  USER_PREFERENCES_REPOSITORY,
+  type IUserPreferencesRepository,
+} from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
 
 @Injectable()
@@ -16,6 +20,8 @@ export class LoginUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(USER_PREFERENCES_REPOSITORY)
+    private readonly userPreferencesRepository: IUserPreferencesRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -34,10 +40,20 @@ export class LoginUserUseCase {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const userPreferences = await this.userPreferencesRepository.findByUserId(
+      user.id!,
+    );
+
     const payload: IJwtPayload = {
       sub: user.id!,
       email: user.email,
       name: user.name,
+      userPreferences: {
+        likedSongs: userPreferences?.likedSongs || [],
+        dislikedSongs: userPreferences?.dislikedSongs || [],
+        dislikedGenres: userPreferences?.dislikedGenres || [],
+        dislikedArtists: userPreferences?.dislikedArtists || [],
+      },
     };
 
     return {

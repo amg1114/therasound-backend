@@ -10,6 +10,7 @@ import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { CreateUserPreferencesUseCase } from '@modules/users/application/use-cases/create-user-preferences.usecase';
 
 @Injectable()
 export class RegisterUserUseCase {
@@ -17,6 +18,7 @@ export class RegisterUserUseCase {
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
     private readonly jwtService: JwtService,
+    private readonly createUserPreferencesUseCase: CreateUserPreferencesUseCase,
   ) {}
 
   async execute(dto: RegisterRequestDto): Promise<AuthResponseDto> {
@@ -37,10 +39,21 @@ export class RegisterUserUseCase {
 
     const user = await this.userRepository.create(userData);
 
+    // Create default user preferences
+    const userPreferences = await this.createUserPreferencesUseCase.execute(
+      user.id!,
+    );
+
     const payload: IJwtPayload = {
       sub: user.id!,
       email: user.email,
       name: user.name,
+      userPreferences: {
+        likedSongs: userPreferences.likedSongs,
+        dislikedSongs: userPreferences.dislikedSongs,
+        dislikedGenres: userPreferences.dislikedGenres,
+        dislikedArtists: userPreferences.dislikedArtists,
+      },
     };
 
     return {

@@ -11,6 +11,7 @@ import { EmotionMappingService } from './application/services/emotion-mapping.se
 import { ChatbotModule } from '@modules/chatbot/chatbot.module';
 import { SongsModule } from '@modules/songs/songs.module';
 import { UsersModule } from '@modules/users/users.module';
+import { PlaylistsController } from './presentation/controllers/playlists.controller';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UsersModule } from '@modules/users/users.module';
     SongsModule,
     UsersModule,
   ],
+  controllers: [PlaylistsController],
   providers: [
     {
       provide: PLAYLIST_REPOSITORY,

@@ -21,6 +21,8 @@ import { EmotionMappingService } from '../services/emotion-mapping.service';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { FetchAndRegisterSongsUseCase } from '@modules/songs/application/use-cases/fetch-and-register-songs.usecase';
+import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
+import { PlaylistResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-response.dto';
 
 const MIN_DURATION_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
 const MIN_SONGS_THRESHOLD = 20; // Minimum songs needed before fetching more
@@ -45,7 +47,7 @@ export class GeneratePlaylistUseCase {
   async execute(
     userId: string,
     dto: GeneratePlaylistRequestDto,
-  ): Promise<PlaylistEntity> {
+  ): Promise<PlaylistResponseDto> {
     // 1. Analyze emotion from conversation history
     const emotionAnalysis = await this.chatbotService.getEmotionAnalysis(
       dto.conversationHistory,
@@ -144,7 +146,8 @@ export class GeneratePlaylistUseCase {
     });
 
     // 10. Save and return
-    return await this.playlistRepository.create(playlist);
+    const createdPlaylist = await this.playlistRepository.create(playlist);
+    return PlaylistMapper.toResponseDto(createdPlaylist);
   }
 
   /**

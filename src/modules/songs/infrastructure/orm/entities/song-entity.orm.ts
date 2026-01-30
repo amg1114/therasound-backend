@@ -1,5 +1,5 @@
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 @Schema({
@@ -33,3 +33,5 @@ export class SongEntityORM extends Document {
   @Prop({ required: true })
   releaseDate: Date;
 }
+
+export const SongSchema = SchemaFactory.createForClass(SongEntityORM);

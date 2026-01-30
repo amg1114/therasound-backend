@@ -18,5 +18,13 @@ export interface ISongRepository {
 
   findById(id: string): Promise<SongEntity | null>;
 
+  findBySpotifyId(spotifyId: string): Promise<SongEntity | null>;
+
+  findBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]>;
+
   findMany(ids: string[]): Promise<SongEntity[]>;
+
+  create(song: Partial<SongEntity>): Promise<SongEntity>;
+
+  createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]>;
 }

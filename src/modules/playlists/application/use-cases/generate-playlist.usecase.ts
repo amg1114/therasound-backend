@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   CHATBOT_SERVICE_TOKEN,
   type IChatbotService,
@@ -20,11 +20,15 @@ import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.enti
 import { EmotionMappingService } from '../services/emotion-mapping.service';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { FetchAndRegisterSongsUseCase } from '@modules/songs/application/use-cases/fetch-and-register-songs.usecase';
 
 const MIN_DURATION_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
+const MIN_SONGS_THRESHOLD = 20; // Minimum songs needed before fetching more
 
 @Injectable()
 export class GeneratePlaylistUseCase {
+  private readonly logger = new Logger(GeneratePlaylistUseCase.name);
+
   constructor(
     @Inject(CHATBOT_SERVICE_TOKEN)
     private readonly chatbotService: IChatbotService,
@@ -35,6 +39,7 @@ export class GeneratePlaylistUseCase {
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: IUserPreferencesRepository,
     private readonly emotionMappingService: EmotionMappingService,
+    private readonly fetchAndRegisterSongsUseCase: FetchAndRegisterSongsUseCase,
   ) {}
 
   async execute(
@@ -55,13 +60,55 @@ export class GeneratePlaylistUseCase {
       await this.userPreferencesRepository.findByUserId(userId);
 
     // 4. Get available songs with filters applied
-    const availableSongs = userPreferences
+    let availableSongs = userPreferences
       ? await this.songRepository.findByEmotionWithFilters(songEmotion, {
           excludedSongIds: userPreferences.dislikedSongs,
           excludedArtistIds: userPreferences.dislikedArtists,
           excludedGenres: userPreferences.dislikedGenres,
         })
       : await this.songRepository.findByEmotion(songEmotion);
+
+    this.logger.log(
+      `Found ${availableSongs.length} available songs for emotion: ${songEmotion}`,
+    );
+
+    // 4.1. If not enough songs, fetch and register new ones from external APIs
+    if (availableSongs.length < MIN_SONGS_THRESHOLD) {
+      this.logger.log(
+        `Not enough songs (${availableSongs.length} < ${MIN_SONGS_THRESHOLD}), fetching from external APIs`,
+      );
+
+      try {
+        const newSongs = await this.fetchAndRegisterSongsUseCase.execute(
+          userId,
+          songEmotion,
+          50,
+        );
+
+        this.logger.log(
+          `Fetched ${newSongs.length} new songs from external APIs`,
+        );
+
+        // Re-fetch available songs after registration
+        availableSongs = userPreferences
+          ? await this.songRepository.findByEmotionWithFilters(songEmotion, {
+              excludedSongIds: userPreferences.dislikedSongs,
+              excludedArtistIds: userPreferences.dislikedArtists,
+              excludedGenres: userPreferences.dislikedGenres,
+            })
+          : await this.songRepository.findByEmotion(songEmotion);
+
+        this.logger.log(
+          `Now have ${availableSongs.length} available songs after fetching new ones`,
+        );
+      } catch (error) {
+        this.logger.error(
+          `Failed to fetch new songs from external APIs: ${error.message}`,
+          error.stack,
+        );
+        // Continue with available songs even if fetching fails
+      }
+    }
 
     // 5. Get last playlist for this user and emotion
     const lastPlaylist =

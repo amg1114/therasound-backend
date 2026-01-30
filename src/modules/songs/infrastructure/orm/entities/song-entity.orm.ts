@@ -9,6 +9,9 @@ import { Document, Types } from 'mongoose';
 export class SongEntityORM extends Document {
   declare _id: Types.ObjectId;
 
+  @Prop({ required: true, unique: true, index: true })
+  spotifyId: string;
+
   @Prop({ required: true })
   title: string;
 

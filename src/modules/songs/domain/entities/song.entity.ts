@@ -2,6 +2,7 @@ import { SongEmotionVO } from '../value-objects/song-emotion.vo';
 
 export class SongEntity {
   id: string;
+  spotifyId: string;
   title: string;
   artist: string;
   emotion: SongEmotionVO;

@@ -52,8 +52,33 @@ export class SongRepositoryImpl implements ISongRepository {
     return SongMapper.toEntity(song);
   }
 
+  async findBySpotifyId(spotifyId: string): Promise<SongEntity | null> {
+    const song = await this.model.findOne({ spotifyId });
+    if (!song) return null;
+    return SongMapper.toEntity(song);
+  }
+
+  async findBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]> {
+    const songs = await this.model.find({ spotifyId: { $in: spotifyIds } });
+    return songs.map((song) => SongMapper.toEntity(song));
+  }
+
   async findMany(ids: string[]): Promise<SongEntity[]> {
     const songs = await this.model.find({ _id: { $in: ids } });
     return songs.map((song) => SongMapper.toEntity(song));
+  }
+
+  async create(song: Partial<SongEntity>): Promise<SongEntity> {
+    const ormData = SongMapper.toORM(song);
+    const createdSong = await this.model.create(ormData);
+    return SongMapper.toEntity(createdSong);
+  }
+
+  async createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]> {
+    const createdSongs: SongEntity[] = [];
+    for (const song of songs) {
+      createdSongs.push(await this.create(song));
+    }
+    return createdSongs;
   }
 }

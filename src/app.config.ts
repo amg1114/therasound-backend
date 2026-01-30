@@ -6,6 +6,8 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   DATABASE_URI: Joi.string().required(),
   DATABASE_NAME: Joi.string().required(),
   JWT_SECRET: Joi.string().default('default_jwt_secret'),
+  SOUNDCHARTS_APP_ID: Joi.string().required(),
+  SOUNDCHARTS_API_KEY: Joi.string().required(),
 });
 
 export const appConfig = () => ({
@@ -22,5 +24,9 @@ export const appConfig = () => ({
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'default_jwt_secret',
+  },
+  soundcharts: {
+    appId: process.env.SOUNDCHARTS_APP_ID,
+    apiKey: process.env.SOUNDCHARTS_API_KEY,
   },
 });

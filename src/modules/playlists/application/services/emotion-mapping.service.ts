@@ -1,3 +1,4 @@
+import { SongEmotionType } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { Injectable } from '@nestjs/common';
 
 /**
@@ -15,46 +16,14 @@ export class EmotionMappingService {
     const normalized = analyzedEmotion.toLowerCase().trim();
 
     // Mapping patterns for different emotions
-    const emotionMap: Record<string, string> = {
-      // Happy mappings
-      feliz: 'happy',
-      alegre: 'happy',
-      contento: 'happy',
-      happy: 'happy',
+    const emotionMap: Record<string, SongEmotionType> = {
       joy: 'happy',
-      excited: 'happy',
-      optimista: 'happy',
-      positivo: 'happy',
-
-      // Sad mappings
-      triste: 'sad',
-      melancólico: 'sad',
-      deprimido: 'sad',
-      sad: 'sad',
-      depressed: 'sad',
-      down: 'sad',
-      nostálgico: 'sad',
-      solo: 'sad',
-
-      // Energetic mappings
-      energético: 'energetic',
-      activo: 'energetic',
-      motivado: 'energetic',
-      energetic: 'energetic',
-      motivated: 'energetic',
-      enérgico: 'energetic',
-      dinámico: 'energetic',
-      vigoroso: 'energetic',
-
-      // Calm mappings
-      calmado: 'calm',
-      tranquilo: 'calm',
-      relajado: 'calm',
-      calm: 'calm',
-      relaxed: 'calm',
-      peaceful: 'calm',
-      sereno: 'calm',
-      pacífico: 'calm',
+      calm: 'happy',
+      anxiety: 'calm',
+      stress: 'calm',
+      fatigue: 'calm',
+      sadness: 'happy',
+      anger: 'energetic',
     };
 
     // Check for exact match

@@ -18,4 +18,4 @@ export class SongEmotionVO {
   }
 }
 
-type SongEmotionType = (typeof SongEmotionVO.SONG_EMOTIONS)[number];
+export type SongEmotionType = (typeof SongEmotionVO.SONG_EMOTIONS)[number];

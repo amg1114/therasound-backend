@@ -107,7 +107,7 @@ export class SongProcessingService {
       artist: details.artists[0]?.name || track.artists[0]?.name || 'Unknown',
       emotion: SongEmotionVO.create(emotionAnalysis.emotion),
       durationMs: details.duration * 1000, // Convert seconds to milliseconds
-      spotifyUrl: `https://open.spotify.com/track/${track.id}`,
+      spotifyUrl: track.href,
       genres: genres.filter(Boolean),
       imageUrl: details.imageUrl || '',
       releaseDate: new Date(details.releaseDate),
@@ -135,7 +135,7 @@ export class SongProcessingService {
       isrc: '',
       ean: '',
       upc: '',
-      href: '',
+      href: `https://open.spotify.com/track/${spotifyId}`,
       availableCountries: '',
       popularity: 0,
     };

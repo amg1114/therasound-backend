@@ -9,6 +9,7 @@ import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repos
 import { ExternalMusicApiService } from './infrastructure/services/external-music-api.service';
 import { FetchAndRegisterSongsUseCase } from './application/use-cases/fetch-and-register-songs.usecase';
 import { RegisterSongBySpotifyIdUseCase } from './application/use-cases/register-song-by-spotify-id.usecase';
+import { GetSongByIdUseCase } from './application/use-cases/get-song-by-id.usecase';
 import { SongProcessingService } from './application/services/song-processing.service';
 import { SongsController } from './presentation/controllers/songs.controller';
 import { UsersModule } from '@modules/users/users.module';
@@ -32,6 +33,7 @@ import { UsersModule } from '@modules/users/users.module';
     ExternalMusicApiService,
     SongProcessingService,
     FetchAndRegisterSongsUseCase,
+    GetSongByIdUseCase,
     RegisterSongBySpotifyIdUseCase,
   ],
   exports: [SONG_REPOSITORY, FetchAndRegisterSongsUseCase],

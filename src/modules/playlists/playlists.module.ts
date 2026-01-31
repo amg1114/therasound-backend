@@ -7,6 +7,8 @@ import {
 import { PLAYLIST_REPOSITORY } from './domain/repositories/playlist-repository.interface';
 import { PlaylistRepositoryImpl } from './infrastructure/orm/repositories/playlist.repository';
 import { GeneratePlaylistUseCase } from './application/use-cases/generate-playlist.usecase';
+import { GetPlaylistByIdUseCase } from './application/use-cases/get-playlist-by-id.usecase';
+import { GetUserPlaylistsUseCase } from './application/use-cases/get-user-playlists.usecase';
 import { EmotionMappingService } from './application/services/emotion-mapping.service';
 import { ChatbotModule } from '@modules/chatbot/chatbot.module';
 import { SongsModule } from '@modules/songs/songs.module';
@@ -33,6 +35,8 @@ import { PlaylistsController } from './presentation/controllers/playlists.contro
     },
     EmotionMappingService,
     GeneratePlaylistUseCase,
+    GetPlaylistByIdUseCase,
+    GetUserPlaylistsUseCase,
   ],
   exports: [PLAYLIST_REPOSITORY, GeneratePlaylistUseCase],
 })

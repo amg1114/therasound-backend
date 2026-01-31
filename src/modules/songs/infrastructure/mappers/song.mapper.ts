@@ -30,6 +30,10 @@ export class SongMapper {
     song.genres = raw.genres;
     song.imageUrl = raw.imageUrl;
     song.releaseDate = raw.releaseDate;
+    song.audioFeatures = raw.audioFeatures;
+    song.emotionConfidence = raw.emotionConfidence;
+    song.emotionProbabilities = raw.emotionProbabilities;
+    song.reccobeatsId = raw.reccobeatsId;
 
     return song;
   }
@@ -53,6 +57,10 @@ export class SongMapper {
       genres: entity.genres,
       imageUrl: entity.imageUrl,
       releaseDate: entity.releaseDate,
+      audioFeatures: entity.audioFeatures,
+      emotionConfidence: entity.emotionConfidence,
+      emotionProbabilities: entity.emotionProbabilities,
+      reccobeatsId: entity.reccobeatsId,
     };
   }
 }

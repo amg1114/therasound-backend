@@ -8,6 +8,7 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   JWT_SECRET: Joi.string().default('default_jwt_secret'),
   SOUNDCHARTS_APP_ID: Joi.string().required(),
   SOUNDCHARTS_API_KEY: Joi.string().required(),
+  EMOTION_ANALYSIS_API_URL: Joi.string().default('http://localhost:8000'),
 });
 
 export const appConfig = () => ({
@@ -28,5 +29,8 @@ export const appConfig = () => ({
   soundcharts: {
     appId: process.env.SOUNDCHARTS_APP_ID,
     apiKey: process.env.SOUNDCHARTS_API_KEY,
+  },
+  emotionAnalysis: {
+    apiUrl: process.env.EMOTION_ANALYSIS_API_URL || 'http://localhost:8000',
   },
 });

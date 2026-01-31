@@ -1,10 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadGatewayException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ReccoBeatsResponseDto,
   ReccoBeatsTrackDto,
 } from '../dto/reccobeats-response.dto';
 import { SoundchartsResponseDto } from '../dto/soundcharts-response.dto';
+import { EmotionAnalysisResponseDto } from '../dto/emotion-analysis-response.dto';
 
 @Injectable()
 export class ExternalMusicApiService {
@@ -52,7 +58,7 @@ export class ExternalMusicApiService {
       });
 
       if (!response.ok) {
-        throw new Error(
+        throw new BadGatewayException(
           `ReccoBeats API error: ${response.status} ${response.statusText}`,
         );
       }
@@ -84,7 +90,9 @@ export class ExternalMusicApiService {
       const apiKey = this.configService.get<string>('soundcharts.apiKey');
 
       if (!appId || !apiKey) {
-        throw new Error('Soundcharts credentials not configured');
+        throw new InternalServerErrorException(
+          'Soundcharts credentials not configured',
+        );
       }
 
       const url = `${this.soundchartsBaseUrl}/song/by-platform/spotify/${spotifyId}`;
@@ -106,7 +114,7 @@ export class ExternalMusicApiService {
           return null;
         }
 
-        throw new Error(
+        throw new BadGatewayException(
           `Soundcharts API error: ${response.status} ${response.statusText}`,
         );
       }
@@ -131,6 +139,65 @@ export class ExternalMusicApiService {
         error.stack,
       );
       return null;
+    }
+  }
+
+  /**
+   * Fetches emotion analysis for a song from the emotion analysis API
+   * @param reccobeatsId - The ReccoBeats ID of the song
+   */
+  async getEmotionAnalysis(
+    reccobeatsId: string,
+  ): Promise<EmotionAnalysisResponseDto | null> {
+    try {
+      const baseUrl = this.configService.getOrThrow<string>(
+        'emotionAnalysis.apiUrl',
+      );
+
+      const url = `${baseUrl}/api/v1/analyze/${reccobeatsId}`;
+
+      this.logger.log(
+        `Fetching emotion analysis for ReccoBeats ID: ${reccobeatsId}`,
+      );
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          this.logger.warn(
+            `Emotion analysis not found for ReccoBeats ID: ${reccobeatsId}`,
+          );
+          return null;
+        }
+
+        throw new BadGatewayException(
+          `Emotion analysis API error: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const data = (await response.json()) as EmotionAnalysisResponseDto;
+
+      this.logger.log(
+        `Successfully fetched emotion analysis for ${reccobeatsId}: ${data.emotion} (confidence: ${data.confidence})`,
+      );
+
+      return data;
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch emotion analysis: ${error.message}`,
+        error.stack,
+      );
+      if (error instanceof BadGatewayException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Failed to fetch emotion analysis due to an unexpected error',
+      );
     }
   }
 }

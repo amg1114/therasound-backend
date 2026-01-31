@@ -107,6 +107,25 @@ export class FetchAndRegisterSongsUseCase {
 
     for (const track of newRecommendations) {
       try {
+        // Fetch emotion analysis first
+        const emotionAnalysis =
+          await this.externalMusicApiService.getEmotionAnalysis(track.id);
+
+        // Skip songs with sad emotion or no analysis
+        if (!emotionAnalysis) {
+          this.logger.log(
+            `Skipping song ${track.id} - no emotion analysis available`,
+          );
+          continue;
+        }
+
+        if (emotionAnalysis.emotion === 'sad') {
+          this.logger.log(
+            `Skipping song ${track.id} - emotion: ${emotionAnalysis.emotion}`,
+          );
+          continue;
+        }
+
         const songDetails = await this.externalMusicApiService.getSongDetails(
           track.id,
         );
@@ -126,7 +145,7 @@ export class FetchAndRegisterSongsUseCase {
           ...(g.sub || []),
         ]);
 
-        // Create song entity
+        // Create song entity with emotion analysis data
         const song: Partial<SongEntity> = {
           spotifyId: track.id,
           title: details.name,
@@ -138,6 +157,10 @@ export class FetchAndRegisterSongsUseCase {
           genres: genres.filter(Boolean),
           imageUrl: details.imageUrl || '',
           releaseDate: new Date(details.releaseDate),
+          audioFeatures: emotionAnalysis.audio_features,
+          emotionConfidence: emotionAnalysis.confidence,
+          emotionProbabilities: emotionAnalysis.probabilities,
+          reccobeatsId: emotionAnalysis.reccobeats_id,
         };
 
         newSongs.push(song);

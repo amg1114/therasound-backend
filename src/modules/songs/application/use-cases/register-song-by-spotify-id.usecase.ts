@@ -1,10 +1,12 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import {
-  SONG_REPOSITORY,
-  type ISongRepository,
-} from '@modules/songs/domain/repositories/song-repository.interface';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { SongProcessingService } from '../services/song-processing.service';
+import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
+import {
+  type ISongRepository,
+  SONG_REPOSITORY,
+} from '@modules/songs/domain/repositories/song-repository.interface';
 
 @Injectable()
 export class RegisterSongBySpotifyIdUseCase {
@@ -14,41 +16,50 @@ export class RegisterSongBySpotifyIdUseCase {
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
     private readonly songProcessingService: SongProcessingService,
+    private readonly externalMusicApiService: ExternalMusicApiService,
   ) {}
 
   /**
-   * Registers a single song by Spotify ID
-   * @param spotifyId - Spotify ID of the song to register
-   * @param emotion - The emotion to assign to the song
-   * @returns Registered song entity
+   * Fetches recommendations from ReccoBeats based on a Spotify ID and registers them
+   * @param spotifyId - Spotify ID to use as seed for recommendations
+   * @param emotion - The emotion to assign to the songs
+   * @param targetCount - Number of recommendations to fetch (default: 50)
+   * @returns Array of registered song entities
    */
-  async execute(spotifyId: string, emotion: string): Promise<SongEntity> {
-    this.logger.log(`Registering song with Spotify ID: ${spotifyId}`);
-
-    // Check if song already exists
-    const existingSong = await this.songRepository.findBySpotifyId(spotifyId);
-    if (existingSong) {
-      this.logger.log(`Song ${spotifyId} already exists, returning existing`);
-      return existingSong;
-    }
-
-    // Process the song with emotion analysis and metadata
-    const processedSong = await this.songProcessingService.processBySpotifyId(
-      spotifyId,
-      emotion,
+  async execute(
+    spotifyId: string,
+    targetCount: number = 50,
+  ): Promise<SongEntity[]> {
+    this.logger.log(
+      `Fetching ${targetCount} recommendations based on Spotify ID: ${spotifyId}`,
     );
 
-    if (!processedSong) {
-      throw new NotFoundException(
-        `Could not process song with Spotify ID: ${spotifyId}. Song may be sad or metadata unavailable.`,
+    // Fetch recommendations from ReccoBeats using the Spotify ID as seed
+    const recommendations =
+      await this.externalMusicApiService.getRecommendations(
+        [spotifyId],
+        [],
+        targetCount,
       );
+
+    if (recommendations.length === 0) {
+      this.logger.warn(`No recommendations found for Spotify ID: ${spotifyId}`);
+      return [];
     }
 
-    // Register the song
-    const registeredSong = await this.songRepository.create(processedSong);
+    this.logger.log(`Found ${recommendations.length} recommendations`);
 
-    this.logger.log(`Successfully registered song: ${registeredSong.title}`);
+    // Process and register the recommended tracks
+    const processedSongs =
+      await this.songProcessingService.processTracks(recommendations);
 
-    return registeredSong;
+    this.logger.log(
+      `Successfully processed ${processedSongs.length} songs (filtered sad songs)`,
+    );
+
+    const registeredSongs: SongEntity[] =
+      await this.songRepository.createMany(processedSongs);
+
+    return registeredSongs;
   }
 }

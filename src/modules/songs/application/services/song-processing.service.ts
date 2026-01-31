@@ -3,6 +3,7 @@ import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { ReccoBeatsTrackDto } from '@modules/songs/infrastructure/dto/reccobeats-response.dto';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 
 /**
  * Service responsible for processing and enriching songs with emotion analysis
@@ -20,18 +21,16 @@ export class SongProcessingService {
    * Processes a list of ReccoBeats tracks and enriches them with emotion analysis
    * and Soundcharts metadata. Filters out sad songs.
    * @param tracks - List of ReccoBeats tracks to process
-   * @param targetEmotion - The emotion to assign to the songs
    * @returns Array of enriched partial song entities
    */
   async processTracks(
     tracks: ReccoBeatsTrackDto[],
-    targetEmotion: string,
   ): Promise<Partial<SongEntity>[]> {
     const processedSongs: Partial<SongEntity>[] = [];
 
     for (const track of tracks) {
       try {
-        const song = await this.processTrack(track, targetEmotion);
+        const song = await this.processTrack(track);
         if (song) {
           processedSongs.push(song);
         }
@@ -55,7 +54,6 @@ export class SongProcessingService {
    */
   async processTrack(
     track: ReccoBeatsTrackDto,
-    targetEmotion: string,
   ): Promise<Partial<SongEntity> | null> {
     // Fetch emotion analysis first
     const emotionAnalysis =
@@ -76,10 +74,17 @@ export class SongProcessingService {
       return null;
     }
 
+    const spotifyId = SongMapper.extractSpotifyId(track.href);
+    if (!spotifyId) {
+      this.logger.warn(
+        `Could not extract Spotify ID from track href: ${track.href}, skipping`,
+      );
+      return null;
+    }
+
     // Fetch song details from Soundcharts
-    const songDetails = await this.externalMusicApiService.getSongDetails(
-      track.id,
-    );
+    const songDetails =
+      await this.externalMusicApiService.getSongDetails(spotifyId);
 
     if (!songDetails || !songDetails.object) {
       this.logger.warn(
@@ -91,14 +96,16 @@ export class SongProcessingService {
     const details = songDetails.object;
 
     // Extract genres (flatten the genre structure)
-    const genres = details.genres.flatMap((g) => [g.root, ...(g.sub || [])]);
+    const genres = [
+      ...new Set(details.genres.flatMap((g) => [g.root, ...(g.sub ?? [])])),
+    ].filter(Boolean); // Unique non-empty genres
 
     // Create song entity with emotion analysis data
     return {
-      spotifyId: track.id,
+      spotifyId: spotifyId,
       title: details.name,
       artist: details.artists[0]?.name || track.artists[0]?.name || 'Unknown',
-      emotion: SongEmotionVO.create(targetEmotion),
+      emotion: SongEmotionVO.create(emotionAnalysis.emotion),
       durationMs: details.duration * 1000, // Convert seconds to milliseconds
       spotifyUrl: `https://open.spotify.com/track/${track.id}`,
       genres: genres.filter(Boolean),
@@ -114,12 +121,10 @@ export class SongProcessingService {
   /**
    * Processes a single song by Spotify ID
    * @param spotifyId - Spotify ID of the song
-   * @param targetEmotion - The emotion to assign to the song
    * @returns Enriched partial song entity or null if filtered
    */
   async processBySpotifyId(
     spotifyId: string,
-    targetEmotion: string,
   ): Promise<Partial<SongEntity> | null> {
     // Create a minimal track object for processing
     const track: ReccoBeatsTrackDto = {
@@ -135,6 +140,6 @@ export class SongProcessingService {
       popularity: 0,
     };
 
-    return this.processTrack(track, targetEmotion);
+    return this.processTrack(track);
   }
 }

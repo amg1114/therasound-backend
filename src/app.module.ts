@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PlaylistsModule } from './modules/playlists/playlists.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlaylistsModule } from './modules/playlists/playlists.module';
         abortEarly: true,
       },
     }),
+    EventEmitterModule.forRoot(),
     MongooseModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
         uri: config.get<string>('database.uri'),

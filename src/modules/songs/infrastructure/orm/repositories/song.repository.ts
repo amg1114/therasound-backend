@@ -8,12 +8,15 @@ import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { SongMapper } from '../../mappers/song.mapper';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
 
 @Injectable()
 export class SongRepositoryImpl implements ISongRepository {
   constructor(
     @InjectModel(SongEntityORM.name)
     private readonly model: Model<SongEntityORM>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findByEmotion(emotion: string): Promise<SongEntity[]> {
@@ -82,7 +85,15 @@ export class SongRepositoryImpl implements ISongRepository {
   async create(song: Partial<SongEntity>): Promise<SongEntity> {
     const ormData = SongMapper.toORM(song);
     const createdSong = await this.model.create(ormData);
-    return SongMapper.toEntity(createdSong);
+    const songEntity = SongMapper.toEntity(createdSong);
+
+    // Emit song created event
+    this.eventEmitter.emit(
+      'song.created',
+      new SongCreatedEvent(songEntity.id, songEntity.genres),
+    );
+
+    return songEntity;
   }
 
   async createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]> {

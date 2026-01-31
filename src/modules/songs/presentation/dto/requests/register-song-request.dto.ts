@@ -1,9 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class RegisterSongRequestDto {
   @ApiProperty({
-    description: 'Spotify ID of the song to register',
+    description: 'Spotify ID to use as seed for recommendations',
     example: '3n3Ppam7vgaVa1iaRUc9Lp',
   })
   @IsString()
@@ -11,11 +17,13 @@ export class RegisterSongRequestDto {
   spotifyId: string;
 
   @ApiProperty({
-    description: 'Emotion to assign to the song',
-    example: 'happy',
-    enum: ['happy', 'calm', 'energetic', 'sad'],
+    description: 'Number of recommendations to fetch',
+    example: 50,
+    required: false,
+    default: 50,
   })
-  @IsString()
-  @IsNotEmpty()
-  emotion: string;
+  @IsNumber()
+  @IsOptional()
+  @Min(1)
+  targetCount?: number;
 }

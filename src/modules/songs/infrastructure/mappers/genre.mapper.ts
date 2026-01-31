@@ -7,7 +7,15 @@ export class GenreMapper {
 
     genre.id = raw._id.toString();
     genre.name = raw.name;
+    genre.songsCount = raw.songsCount || 0;
 
     return genre;
+  }
+
+  static toORM(entity: Partial<GenreEntity>): Partial<GenreEntityORM> {
+    return {
+      name: entity.name,
+      songsCount: entity.songsCount || 0,
+    };
   }
 }

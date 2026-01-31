@@ -104,10 +104,8 @@ export class FetchAndRegisterSongsUseCase {
     }
 
     // 5. Process tracks with emotion analysis and metadata
-    const processedSongs = await this.songProcessingService.processTracks(
-      newRecommendations,
-      emotion,
-    );
+    const processedSongs =
+      await this.songProcessingService.processTracks(newRecommendations);
 
     if (processedSongs.length === 0) {
       this.logger.warn('No songs could be processed successfully');

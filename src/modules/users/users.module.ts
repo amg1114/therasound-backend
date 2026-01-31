@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   UserEntityORM,
@@ -19,6 +19,7 @@ import { UpdateDislikedSongsUseCase } from './application/use-cases/update-disli
 import { UpdateDislikedGenresUseCase } from './application/use-cases/update-disliked-genres.usecase';
 import { UpdateDislikedArtistsUseCase } from './application/use-cases/update-disliked-artists.usecase';
 import { UserPreferencesController } from './presentation/controllers/user-preferences.controller';
+import { SongsModule } from '@modules/songs/songs.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
         schema: UserPreferencesSchema,
       },
     ]),
+    forwardRef(() => SongsModule),
   ],
   controllers: [UserPreferencesController],
   providers: [

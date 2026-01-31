@@ -25,19 +25,14 @@ export class SongsController {
 
   @Post('register')
   @ApiOperation({
-    summary: 'Register a song by Spotify ID',
+    summary: 'Fetch and register songs by Spotify ID',
     description:
-      'Fetches song metadata and emotion analysis, then registers the song in the database. Returns existing song if already registered.',
+      'Fetches recommendations from ReccoBeats using a Spotify ID as seed, enriches them with emotion analysis and metadata, then registers them in the database. Filters out sad songs.',
   })
   @ApiResponse({
     status: 201,
-    description: 'Song successfully registered',
-    type: SongResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description:
-      'Song could not be processed (sad emotion or metadata unavailable)',
+    description: 'Songs successfully fetched and registered',
+    type: [SongResponseDto],
   })
   @ApiResponse({
     status: 401,
@@ -45,13 +40,13 @@ export class SongsController {
   })
   async registerSong(
     @Body() dto: RegisterSongRequestDto,
-  ): Promise<SongResponseDto> {
-    const song = await this.registerSongBySpotifyIdUseCase.execute(
+  ): Promise<SongResponseDto[]> {
+    const songs = await this.registerSongBySpotifyIdUseCase.execute(
       dto.spotifyId,
-      dto.emotion,
+      dto.targetCount,
     );
 
-    return SongMapper.toResponseDto(song);
+    return songs.map((song) => SongMapper.toResponseDto(song));
   }
 
   @Get(':id')

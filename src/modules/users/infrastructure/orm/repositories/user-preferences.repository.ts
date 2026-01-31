@@ -27,10 +27,7 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
   ): Promise<UserPreferencesEntity> {
     const ormData = UserPreferencesMapper.toORM(userPreferences);
 
-    let createdPreferences = new this.model({
-      ...ormData,
-      user: userPreferences.id,
-    });
+    let createdPreferences = new this.model(ormData);
 
     createdPreferences = await createdPreferences.save();
 

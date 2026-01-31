@@ -36,4 +36,10 @@ export class SongEntity {
   emotionConfidence?: number;
   emotionProbabilities?: EmotionProbabilities;
   reccobeatsId?: string;
+
+  static create(data: Partial<SongEntity>): SongEntity {
+    const song = new SongEntity();
+    Object.assign(song, data);
+    return song;
+  }
 }

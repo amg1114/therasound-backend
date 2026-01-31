@@ -3,6 +3,10 @@ import {
   type IUserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
+import {
+  type ISongRepository,
+  SONG_REPOSITORY,
+} from '@modules/songs/domain/repositories/song-repository.interface';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { UpdateLikedSongsRequestDto } from '@modules/users/presentation/dto/requests/update-liked-songs-request.dto';
 
@@ -11,6 +15,8 @@ export class UpdateLikedSongsUseCase {
   constructor(
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: IUserPreferencesRepository,
+    @Inject(SONG_REPOSITORY)
+    private readonly songRepository: ISongRepository,
   ) {}
 
   async execute(
@@ -31,11 +37,18 @@ export class UpdateLikedSongsUseCase {
     const updatedLikedSongs = [...userPreferences.likedSongs];
 
     if (action === 'add') {
-      if (!updatedLikedSongs.includes(songId)) {
-        updatedLikedSongs.push(songId);
+      // Fetch the song entity
+      const song = await this.songRepository.findById(songId);
+      if (!song) {
+        throw new NotFoundException(`Song not found: ${songId}`);
+      }
+
+      // Check if song is not already in the list
+      if (!updatedLikedSongs.find((s) => s.id === songId)) {
+        updatedLikedSongs.push(song);
       }
     } else if (action === 'remove') {
-      const index = updatedLikedSongs.indexOf(songId);
+      const index = updatedLikedSongs.findIndex((s) => s.id === songId);
       if (index > -1) {
         updatedLikedSongs.splice(index, 1);
       }

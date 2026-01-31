@@ -42,28 +42,27 @@ export class FetchAndRegisterSongsUseCase {
     const userPreferences =
       await this.userPreferencesRepository.findByUserId(userId);
 
-    // 2. Get last 5 liked and disliked songs
-    const likedSongIds = userPreferences
-      ? userPreferences.likedSongs.slice(-5)
+    // 2. Get last 5 liked and disliked songs filtered by emotion
+    const likedSongs = userPreferences
+      ? userPreferences.likedSongs.filter(
+          (song) => song.emotion.getValue() === emotion,
+        )
       : [];
-    const dislikedSongIds = userPreferences
-      ? userPreferences.dislikedSongs.slice(-5)
+    const dislikedSongs = userPreferences
+      ? userPreferences.dislikedSongs.filter(
+          (song) => song.emotion.getValue() === emotion,
+        )
       : [];
 
-    // Get spotify IDs for seeds
-    const likedSongs =
-      likedSongIds.length > 0
-        ? await this.songRepository.findMany(likedSongIds)
-        : [];
-    const dislikedSongs =
-      dislikedSongIds.length > 0
-        ? await this.songRepository.findMany(dislikedSongIds)
-        : [];
+    const seeds = likedSongs
+      .map((song) => song.spotifyId)
+      .filter(Boolean)
+      .slice(0, 5);
 
-    const seeds = likedSongs.map((song) => song.spotifyId).filter(Boolean);
     const negativeSeeds = dislikedSongs
       .map((song) => song.spotifyId)
-      .filter(Boolean);
+      .filter(Boolean)
+      .slice(0, 5);
 
     this.logger.log(
       `Using ${seeds.length} seeds and ${negativeSeeds.length} negative seeds`,

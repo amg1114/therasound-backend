@@ -1,8 +1,10 @@
+import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+
 export class UserPreferencesEntity {
   id?: string;
   user: string;
-  likedSongs: string[];
-  dislikedSongs: string[];
+  likedSongs: SongEntity[];
+  dislikedSongs: SongEntity[];
   dislikedGenres: string[];
   dislikedArtists: string[];
 
@@ -16,8 +18,8 @@ export class UserPreferencesEntity {
   }: {
     id?: string;
     user: string;
-    likedSongs: string[];
-    dislikedSongs: string[];
+    likedSongs: SongEntity[];
+    dislikedSongs: SongEntity[];
     dislikedGenres: string[];
     dislikedArtists: string[];
   }) {
@@ -31,8 +33,8 @@ export class UserPreferencesEntity {
 
   static create(props: {
     user: string;
-    likedSongs: string[];
-    dislikedSongs: string[];
+    likedSongs: SongEntity[];
+    dislikedSongs: SongEntity[];
     dislikedGenres: string[];
     dislikedArtists: string[];
   }): UserPreferencesEntity {
@@ -48,8 +50,8 @@ export class UserPreferencesEntity {
   static reconstruct(props: {
     id: string;
     user: string;
-    likedSongs: string[];
-    dislikedSongs: string[];
+    likedSongs: SongEntity[];
+    dislikedSongs: SongEntity[];
     dislikedGenres: string[];
     dislikedArtists: string[];
   }): UserPreferencesEntity {

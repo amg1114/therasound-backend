@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
 
 /**
  * Response DTO for user preferences
@@ -12,18 +13,16 @@ export class UserPreferencesResponseDto {
   id: string;
 
   @ApiProperty({
-    description: 'List of song IDs that the user has liked',
-    type: [String],
-    example: ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012'],
+    description: 'List of songs that the user has liked',
+    type: [SongResponseDto],
   })
-  likedSongs: string[];
+  likedSongs: SongResponseDto[];
 
   @ApiProperty({
-    description: 'List of song IDs that the user has disliked',
-    type: [String],
-    example: ['507f1f77bcf86cd799439013', '507f1f77bcf86cd799439014'],
+    description: 'List of songs that the user has disliked',
+    type: [SongResponseDto],
   })
-  dislikedSongs: string[];
+  dislikedSongs: SongResponseDto[];
 
   @ApiProperty({
     description: 'List of genre IDs or names that the user has disliked',

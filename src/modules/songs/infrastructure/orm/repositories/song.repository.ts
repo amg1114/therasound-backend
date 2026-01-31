@@ -68,6 +68,17 @@ export class SongRepositoryImpl implements ISongRepository {
     return songs.map((song) => SongMapper.toEntity(song));
   }
 
+  async findManyByEmotion(
+    ids: string[],
+    emotion: string,
+  ): Promise<SongEntity[]> {
+    const songs = await this.model.find({
+      _id: { $in: ids },
+      emotion: emotion,
+    });
+    return songs.map((song) => SongMapper.toEntity(song));
+  }
+
   async create(song: Partial<SongEntity>): Promise<SongEntity> {
     const ormData = SongMapper.toORM(song);
     const createdSong = await this.model.create(ormData);

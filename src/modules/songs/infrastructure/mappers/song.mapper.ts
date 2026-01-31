@@ -2,6 +2,7 @@ import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { SongEntityORM } from '../orm/entities/song-entity.orm';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { BadRequestException } from '@nestjs/common';
+import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
 
 export class SongMapper {
   /**
@@ -62,5 +63,26 @@ export class SongMapper {
       emotionProbabilities: entity.emotionProbabilities,
       reccobeatsId: entity.reccobeatsId,
     };
+  }
+
+  static toResponseDto(entity: SongEntity): SongResponseDto {
+    const response = new SongResponseDto();
+
+    response.id = entity.id;
+    response.spotifyId = entity.spotifyId;
+    response.title = entity.title;
+    response.artist = entity.artist;
+    response.emotion = entity.emotion.getValue();
+    response.durationMs = entity.durationMs;
+    response.spotifyUrl = entity.spotifyUrl;
+    response.genres = entity.genres;
+    response.imageUrl = entity.imageUrl;
+    response.releaseDate = entity.releaseDate;
+    response.audioFeatures = entity.audioFeatures;
+    response.emotionConfidence = entity.emotionConfidence;
+    response.emotionProbabilities = entity.emotionProbabilities;
+    response.reccobeatsId = entity.reccobeatsId;
+
+    return response;
   }
 }

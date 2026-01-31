@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { SongEntityORM } from '@modules/songs/infrastructure/orm/entities/song-entity.orm';
 
 @Schema({
   collection: 'user_preferences',

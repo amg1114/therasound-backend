@@ -4,6 +4,7 @@ import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.
 import { Types } from 'mongoose';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { PlaylistResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-response.dto';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 
 export class PlaylistMapper {
   static toDomain(ormEntity: PlaylistEntityORM): PlaylistEntity {
@@ -60,17 +61,7 @@ export class PlaylistMapper {
     return {
       id: entity.id,
       userId: entity.userId,
-      songs: entity.songs.map((song) => ({
-        id: song.id,
-        title: song.title,
-        artist: song.artist,
-        emotion: song.emotion.getValue(),
-        durationMs: song.durationMs,
-        spotifyUrl: song.spotifyUrl,
-        genres: song.genres,
-        imageUrl: song.imageUrl,
-        releaseDate: song.releaseDate,
-      })),
+      songs: entity.songs.map((song) => SongMapper.toResponseDto(song)),
       emotion: entity.emotion.getValue(),
       durationMs: entity.durationMs,
       createdAt: entity.createdAt,

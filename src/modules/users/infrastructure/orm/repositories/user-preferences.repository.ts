@@ -38,7 +38,10 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
   }
 
   async findById(id: string): Promise<UserPreferencesEntity | null> {
-    const ormEntity = await this.model.findById(id);
+    const ormEntity = await this.model
+      .findById(id)
+      .populate('likedSongs')
+      .populate('dislikedSongs');
 
     if (!ormEntity) {
       return null;
@@ -48,7 +51,10 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
   }
 
   async findByUserId(userId: string): Promise<UserPreferencesEntity | null> {
-    const ormEntity = await this.model.findOne({ user: userId });
+    const ormEntity = await this.model
+      .findOne({ user: userId })
+      .populate('likedSongs')
+      .populate('dislikedSongs');
 
     if (!ormEntity) {
       return null;

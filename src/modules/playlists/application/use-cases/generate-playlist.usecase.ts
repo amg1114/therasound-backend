@@ -64,7 +64,7 @@ export class GeneratePlaylistUseCase {
     // 4. Get available songs with filters applied
     let availableSongs = userPreferences
       ? await this.songRepository.findByEmotionWithFilters(songEmotion, {
-          excludedSongIds: userPreferences.dislikedSongs,
+          excludedSongIds: userPreferences.dislikedSongs.map((song) => song.id),
           excludedArtistIds: userPreferences.dislikedArtists,
           excludedGenres: userPreferences.dislikedGenres,
         })
@@ -94,7 +94,9 @@ export class GeneratePlaylistUseCase {
         // Re-fetch available songs after registration
         availableSongs = userPreferences
           ? await this.songRepository.findByEmotionWithFilters(songEmotion, {
-              excludedSongIds: userPreferences.dislikedSongs,
+              excludedSongIds: userPreferences.dislikedSongs.map(
+                (song) => song.id,
+              ),
               excludedArtistIds: userPreferences.dislikedArtists,
               excludedGenres: userPreferences.dislikedGenres,
             })

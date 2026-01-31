@@ -1,13 +1,23 @@
-import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { RegisterSongBySpotifyIdUseCase } from '@modules/songs/application/use-cases/register-song-by-spotify-id.usecase';
 import { GetSongByIdUseCase } from '@modules/songs/application/use-cases/get-song-by-id.usecase';
+import { GetTopLikedSongsByGenreUseCase } from '@modules/songs/application/use-cases/get-top-liked-songs-by-genre.usecase';
 import { RegisterSongRequestDto } from '../dto/requests/register-song-request.dto';
 import { SongResponseDto } from '../dto/responses/song-response.dto';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
@@ -21,6 +31,7 @@ export class SongsController {
   constructor(
     private readonly registerSongBySpotifyIdUseCase: RegisterSongBySpotifyIdUseCase,
     private readonly getSongByIdUseCase: GetSongByIdUseCase,
+    private readonly getTopLikedSongsByGenreUseCase: GetTopLikedSongsByGenreUseCase,
   ) {}
 
   @Post('register')
@@ -75,5 +86,33 @@ export class SongsController {
   async getSongById(@Param('id') id: string): Promise<SongResponseDto> {
     const song = await this.getSongByIdUseCase.execute(id);
     return SongMapper.toResponseDto(song);
+  }
+
+  @Get('top/liked')
+  @ApiOperation({
+    summary: 'Get top liked songs',
+    description:
+      'Retrieves the top 5 most liked songs. Optionally filter by genre using query parameter.',
+  })
+  @ApiQuery({
+    name: 'genre',
+    description: 'Filter by genre (optional)',
+    required: false,
+    example: 'Pop',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Top liked songs successfully retrieved',
+    type: [SongResponseDto],
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  async getTopLikedSongs(
+    @Query('genre') genre?: string,
+  ): Promise<SongResponseDto[]> {
+    const songs = await this.getTopLikedSongsByGenreUseCase.execute(genre, 5);
+    return songs.map((song) => SongMapper.toResponseDto(song));
   }
 }

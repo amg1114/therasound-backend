@@ -103,4 +103,24 @@ export class SongRepositoryImpl implements ISongRepository {
     }
     return createdSongs;
   }
+
+  async incrementLikesCount(songId: string): Promise<void> {
+    await this.model.updateOne({ _id: songId }, { $inc: { likesCount: 1 } });
+  }
+
+  async decrementLikesCount(songId: string): Promise<void> {
+    await this.model.updateOne({ _id: songId }, { $inc: { likesCount: -1 } });
+  }
+
+  async findTopLikedByGenre(
+    genre: string,
+    limit: number,
+  ): Promise<SongEntity[]> {
+    const query = genre ? { genres: genre } : {};
+    const songs = await this.model
+      .find(query)
+      .sort({ likesCount: -1 })
+      .limit(limit);
+    return songs.map((song) => SongMapper.toEntity(song));
+  }
 }

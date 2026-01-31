@@ -20,6 +20,7 @@ import { UpdateDislikedGenresUseCase } from './application/use-cases/update-disl
 import { UpdateDislikedArtistsUseCase } from './application/use-cases/update-disliked-artists.usecase';
 import { UserPreferencesController } from './presentation/controllers/user-preferences.controller';
 import { SongsModule } from '@modules/songs/songs.module';
+import { SongLikedListener } from './application/listeners/song-liked.listener';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SongsModule } from '@modules/songs/songs.module';
     UpdateDislikedSongsUseCase,
     UpdateDislikedGenresUseCase,
     UpdateDislikedArtistsUseCase,
+    SongLikedListener,
   ],
   exports: [
     USER_REPOSITORY,

@@ -9,6 +9,8 @@ import {
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { UpdateLikedSongsRequestDto } from '@modules/users/presentation/dto/requests/update-liked-songs-request.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SongLikedEvent } from '../events/song-liked.event';
 
 @Injectable()
 export class UpdateLikedSongsUseCase {
@@ -17,6 +19,7 @@ export class UpdateLikedSongsUseCase {
     private readonly userPreferencesRepository: IUserPreferencesRepository,
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(
@@ -63,6 +66,12 @@ export class UpdateLikedSongsUseCase {
       dislikedArtists: userPreferences.dislikedArtists,
     });
 
-    return await this.userPreferencesRepository.update(updatedPreferences);
+    const result =
+      await this.userPreferencesRepository.update(updatedPreferences);
+
+    // Emit event to update song likes count
+    this.eventEmitter.emit('song.liked', new SongLikedEvent(songId, action));
+
+    return result;
   }
 }

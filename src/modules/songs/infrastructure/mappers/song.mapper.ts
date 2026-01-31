@@ -35,6 +35,7 @@ export class SongMapper {
     song.emotionConfidence = raw.emotionConfidence;
     song.emotionProbabilities = raw.emotionProbabilities;
     song.reccobeatsId = raw.reccobeatsId;
+    song.likesCount = raw.likesCount || 0;
 
     return song;
   }
@@ -62,6 +63,7 @@ export class SongMapper {
       emotionConfidence: entity.emotionConfidence,
       emotionProbabilities: entity.emotionProbabilities,
       reccobeatsId: entity.reccobeatsId,
+      likesCount: entity.likesCount || 0,
     };
   }
 
@@ -82,6 +84,7 @@ export class SongMapper {
     response.emotionConfidence = entity.emotionConfidence;
     response.emotionProbabilities = entity.emotionProbabilities;
     response.reccobeatsId = entity.reccobeatsId;
+    response.likesCount = entity.likesCount;
 
     return response;
   }

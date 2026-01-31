@@ -29,4 +29,10 @@ export interface ISongRepository {
   create(song: Partial<SongEntity>): Promise<SongEntity>;
 
   createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]>;
+
+  incrementLikesCount(songId: string): Promise<void>;
+
+  decrementLikesCount(songId: string): Promise<void>;
+
+  findTopLikedByGenre(genre: string, limit: number): Promise<SongEntity[]>;
 }

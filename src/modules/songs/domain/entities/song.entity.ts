@@ -37,6 +37,9 @@ export class SongEntity {
   emotionProbabilities?: EmotionProbabilities;
   reccobeatsId?: string;
 
+  // Statistics
+  likesCount: number;
+
   static create(data: Partial<SongEntity>): SongEntity {
     const song = new SongEntity();
     Object.assign(song, data);

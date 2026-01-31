@@ -18,6 +18,7 @@ import { RegisterSongBySpotifyIdUseCase } from './application/use-cases/register
 import { GetSongByIdUseCase } from './application/use-cases/get-song-by-id.usecase';
 import { GetAllGenresUseCase } from './application/use-cases/get-all-genres.usecase';
 import { GetGenreByIdUseCase } from './application/use-cases/get-genre-by-id.usecase';
+import { GetTopLikedSongsByGenreUseCase } from './application/use-cases/get-top-liked-songs-by-genre.usecase';
 import { SongProcessingService } from './application/services/song-processing.service';
 import { SongsController } from './presentation/controllers/songs.controller';
 import { GenresController } from './presentation/controllers/genres.controller';
@@ -54,6 +55,7 @@ import { SongCreatedListener } from './application/listeners/song-created.listen
     GetSongByIdUseCase,
     RegisterSongBySpotifyIdUseCase,
     GetAllGenresUseCase,
+    GetTopLikedSongsByGenreUseCase,
     GetGenreByIdUseCase,
     SongCreatedListener,
   ],

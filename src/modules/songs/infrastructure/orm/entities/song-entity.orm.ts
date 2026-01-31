@@ -91,6 +91,10 @@ export class SongEntityORM extends Document {
 
   @Prop({ required: false, index: true })
   reccobeatsId?: string;
+
+  // Statistics
+  @Prop({ required: true, default: 0 })
+  likesCount: number;
 }
 
 export const SongSchema = SchemaFactory.createForClass(SongEntityORM);

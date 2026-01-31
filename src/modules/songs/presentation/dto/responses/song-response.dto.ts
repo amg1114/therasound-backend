@@ -167,4 +167,10 @@ export class SongResponseDto {
     example: 'track_abc123',
   })
   reccobeatsId?: string;
+
+  @ApiProperty({
+    description: 'Number of users who liked this song',
+    example: 42,
+  })
+  likesCount: number;
 }

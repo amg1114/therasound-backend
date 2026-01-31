@@ -9,7 +9,7 @@ import {
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
+import { SongProcessingService } from '../services/song-processing.service';
 
 @Injectable()
 export class FetchAndRegisterSongsUseCase {
@@ -21,6 +21,7 @@ export class FetchAndRegisterSongsUseCase {
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: IUserPreferencesRepository,
     private readonly externalMusicApiService: ExternalMusicApiService,
+    private readonly songProcessingService: SongProcessingService,
   ) {}
 
   /**
@@ -48,6 +49,7 @@ export class FetchAndRegisterSongsUseCase {
           (song) => song.emotion.getValue() === emotion,
         )
       : [];
+
     const dislikedSongs = userPreferences
       ? userPreferences.dislikedSongs.filter(
           (song) => song.emotion.getValue() === emotion,
@@ -101,84 +103,21 @@ export class FetchAndRegisterSongsUseCase {
       return [];
     }
 
-    // 5. Fetch full details from Soundcharts and create songs
-    const newSongs: Partial<SongEntity>[] = [];
+    // 5. Process tracks with emotion analysis and metadata
+    const processedSongs = await this.songProcessingService.processTracks(
+      newRecommendations,
+      emotion,
+    );
 
-    for (const track of newRecommendations) {
-      try {
-        // Fetch emotion analysis first
-        const emotionAnalysis =
-          await this.externalMusicApiService.getEmotionAnalysis(track.id);
-
-        // Skip songs with sad emotion or no analysis
-        if (!emotionAnalysis) {
-          this.logger.log(
-            `Skipping song ${track.id} - no emotion analysis available`,
-          );
-          continue;
-        }
-
-        if (emotionAnalysis.emotion === 'sad') {
-          this.logger.log(
-            `Skipping song ${track.id} - emotion: ${emotionAnalysis.emotion}`,
-          );
-          continue;
-        }
-
-        const songDetails = await this.externalMusicApiService.getSongDetails(
-          track.id,
-        );
-
-        if (!songDetails || !songDetails.object) {
-          this.logger.warn(
-            `Could not fetch details for song: ${track.id}, skipping`,
-          );
-          continue;
-        }
-
-        const details = songDetails.object;
-
-        // Extract genres (flatten the genre structure)
-        const genres = details.genres.flatMap((g) => [
-          g.root,
-          ...(g.sub || []),
-        ]);
-
-        // Create song entity with emotion analysis data
-        const song: Partial<SongEntity> = {
-          spotifyId: track.id,
-          title: details.name,
-          artist:
-            details.artists[0]?.name || track.artists[0]?.name || 'Unknown',
-          emotion: SongEmotionVO.create(emotion),
-          durationMs: details.duration * 1000, // Convert seconds to milliseconds
-          spotifyUrl: `https://open.spotify.com/track/${track.id}`,
-          genres: genres.filter(Boolean),
-          imageUrl: details.imageUrl || '',
-          releaseDate: new Date(details.releaseDate),
-          audioFeatures: emotionAnalysis.audio_features,
-          emotionConfidence: emotionAnalysis.confidence,
-          emotionProbabilities: emotionAnalysis.probabilities,
-          reccobeatsId: emotionAnalysis.reccobeats_id,
-        };
-
-        newSongs.push(song);
-      } catch (error) {
-        this.logger.error(
-          `Error processing song ${track.id}: ${error.message}`,
-        );
-        // Continue with other songs
-      }
-    }
-
-    if (newSongs.length === 0) {
+    if (processedSongs.length === 0) {
       this.logger.warn('No songs could be processed successfully');
       return [];
     }
 
     // 6. Register all new songs in batch
-    this.logger.log(`Registering ${newSongs.length} new songs`);
-    const registeredSongs = await this.songRepository.createMany(newSongs);
+    this.logger.log(`Registering ${processedSongs.length} new songs`);
+    const registeredSongs =
+      await this.songRepository.createMany(processedSongs);
 
     this.logger.log(
       `Successfully registered ${registeredSongs.length} new songs`,

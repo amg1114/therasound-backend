@@ -4,7 +4,7 @@ import { SongLikedEvent } from '../events/song-liked.event';
 import { Inject } from '@nestjs/common';
 import {
   SONG_REPOSITORY,
-  ISongRepository,
+  type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 
 @Injectable()

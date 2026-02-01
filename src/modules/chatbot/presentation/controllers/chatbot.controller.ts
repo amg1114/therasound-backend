@@ -3,9 +3,10 @@ import { GetChatbotResponseDto } from '../dto/requests/conversation-request.dto'
 import { GetChatbotResponseUseCase } from '@modules/chatbot/application/use-cases/get-chatbot-response.usecase';
 import { GetChatbotAnalysisDto } from '../dto/requests/analysis-request.dto';
 import { GetChatbotAnalysisUseCase } from '@modules/chatbot/application/use-cases/get-chatbot-analysis.usecase';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('chatbot')
+@ApiBearerAuth()
 export class ChatbotController {
   constructor(
     private readonly getChatbotResponseUseCase: GetChatbotResponseUseCase,

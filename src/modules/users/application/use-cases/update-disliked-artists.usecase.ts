@@ -24,7 +24,7 @@ export class UpdateDislikedArtistsUseCase {
 
     if (!userPreferences) {
       throw new NotFoundException(
-        `User preferences not found for user ${userId}`,
+        `Preferencias de usuario no encontradas para el usuario ${userId}`,
       );
     }
 

@@ -7,7 +7,7 @@ export class SongEmotionVO {
 
   public static create(emotion: string): SongEmotionVO {
     if (!this.SONG_EMOTIONS.includes(emotion as SongEmotionType)) {
-      throw new BadRequestException(`Invalid song emotion: ${emotion}`);
+      throw new BadRequestException(`Emoción de canción inválida: ${emotion}`);
     }
 
     return new SongEmotionVO(emotion as SongEmotionType);

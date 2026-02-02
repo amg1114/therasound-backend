@@ -14,6 +14,7 @@ import {
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
+import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
 
 @Injectable()
 export class LoginUserUseCase {
@@ -31,13 +32,13 @@ export class LoginUserUseCase {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
 
     const userPreferences = await this.userPreferencesRepository.findByUserId(
@@ -60,6 +61,15 @@ export class LoginUserUseCase {
     return {
       accessToken: this.jwtService.sign(payload),
       user: UserMapper.toResponseDto(user),
+      userPreferences: userPreferences
+        ? UserPreferencesMapper.toResponseDto(userPreferences)
+        : {
+            id: user.id!,
+            likedSongs: [],
+            dislikedSongs: [],
+            dislikedGenres: [],
+            dislikedArtists: [],
+          },
     };
   }
 }

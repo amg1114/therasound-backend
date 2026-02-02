@@ -42,13 +42,13 @@ export class ChatbotService implements IChatbotService {
 
     if (typeof content !== 'string') {
       throw new InternalServerErrorException(
-        'Invalid response from chatbot: content is not a string',
+        'Respuesta inválida del chatbot: el contenido no es una cadena',
       );
     }
 
     if (content.trim().length === 0) {
       throw new InternalServerErrorException(
-        'Invalid response from chatbot: content is empty',
+        'Respuesta inválida del chatbot: el contenido está vacío',
       );
     }
 
@@ -72,13 +72,13 @@ export class ChatbotService implements IChatbotService {
 
     if (typeof content !== 'string') {
       throw new InternalServerErrorException(
-        'Invalid response from chatbot: content is not a string',
+        'Respuesta inválida del chatbot: el contenido no es una cadena',
       );
     }
 
     if (content.trim().length === 0) {
       throw new InternalServerErrorException(
-        'Invalid response from chatbot: content is empty',
+        'Respuesta inválida del chatbot: el contenido está vacío',
       );
     }
 

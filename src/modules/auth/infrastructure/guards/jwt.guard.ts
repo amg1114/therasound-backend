@@ -32,11 +32,11 @@ export class JwtGuard extends AuthGuard('jwt') {
 
   handleRequest<TUser = any>(err: any, user: TUser, info: any): TUser {
     if (info?.name === 'JsonWebTokenError') {
-      throw new UnauthorizedException('Invalid access token');
+      throw new UnauthorizedException('Token de acceso inválido');
     }
 
     if (info?.name === 'NotBeforeError') {
-      throw new UnauthorizedException('Token not active yet');
+      throw new UnauthorizedException('Token aún no activo');
     }
 
     // If there is an error or no user, throw exception

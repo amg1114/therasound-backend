@@ -10,8 +10,10 @@ export class UpdateLikedSongsRequestDto {
     description: 'ID of the song to add or remove from liked songs',
     example: '507f1f77bcf86cd799439011',
   })
-  @IsMongoId()
-  @IsNotEmpty()
+  @IsMongoId({
+    message: 'El ID de la canción debe ser un ID de MongoDB válido',
+  })
+  @IsNotEmpty({ message: 'El ID de la canción es requerido' })
   songId: string;
 
   @ApiProperty({
@@ -19,7 +21,7 @@ export class UpdateLikedSongsRequestDto {
     enum: ['add', 'remove'],
     example: 'add',
   })
-  @IsEnum(['add', 'remove'])
-  @IsNotEmpty()
+  @IsEnum(['add', 'remove'], { message: 'La acción debe ser "add" o "remove"' })
+  @IsNotEmpty({ message: 'La acción es requerida' })
   action: 'add' | 'remove';
 }

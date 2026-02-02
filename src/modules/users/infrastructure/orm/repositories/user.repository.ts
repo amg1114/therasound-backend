@@ -41,7 +41,7 @@ export class UserRepositoryImpl implements IUserRepository {
         err.code === 11000 &&
         (err.keyPattern?.email || err.keyValue?.email)
       ) {
-        throw new ConflictException('User with this email already exists');
+        throw new ConflictException('El usuario con este email ya existe');
       }
 
       throw error;
@@ -79,7 +79,7 @@ export class UserRepositoryImpl implements IUserRepository {
       });
 
       if (existingUser) {
-        throw new ConflictException('User with this email already exists');
+        throw new ConflictException('El usuario con este email ya existe');
       }
     }
 
@@ -90,7 +90,7 @@ export class UserRepositoryImpl implements IUserRepository {
     );
 
     if (!updatedOrmEntity) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return UserMapper.toDomain(updatedOrmEntity);
@@ -100,7 +100,7 @@ export class UserRepositoryImpl implements IUserRepository {
     const result = await this.model.findByIdAndDelete(id);
 
     if (!result) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuario no encontrado');
     }
   }
 }

@@ -21,7 +21,9 @@ export class GetPlaylistByIdUseCase {
     const playlist = await this.playlistRepository.findById(id);
 
     if (!playlist) {
-      throw new NotFoundException(`Playlist with ID ${id} not found`);
+      throw new NotFoundException(
+        `Lista de reproducción con ID ${id} no encontrada`,
+      );
     }
 
     return playlist;

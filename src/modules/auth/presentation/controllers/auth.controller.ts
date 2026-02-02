@@ -1,28 +1,85 @@
 import { LoginUserUseCase } from '@modules/auth/application/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from '@modules/auth/application/use-cases/register-user.usecase';
+import { GetCurrentUserUseCase } from '@modules/auth/application/use-cases/get-current-user.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
-import { Body, Controller, Post } from '@nestjs/common';
+import { CurrentUser } from '@modules/auth/infrastructure/decorators/current-user.decorator';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { LoginRequestDto } from '../dto/requests/login-request.dto';
 import { RegisterRequestDto } from '../dto/requests/register-request.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { AuthResponseDto } from '../dto/responses/auth-response.dto';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
+import { type IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
+    private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
   ) {}
 
   @ApiOperation({ summary: 'User login' })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuario autenticado exitosamente',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Credenciales inválidas',
+  })
   @PublicRoute()
   @Post('login')
-  login(@Body() body: LoginRequestDto) {
+  login(@Body() body: LoginRequestDto): Promise<AuthResponseDto> {
     return this.loginUserUseCase.execute(body);
   }
+
   @ApiOperation({ summary: 'User registration' })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuario registrado exitosamente',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El usuario con este email ya existe',
+  })
   @PublicRoute()
   @Post('register')
-  register(@Body() body: RegisterRequestDto) {
+  register(@Body() body: RegisterRequestDto): Promise<AuthResponseDto> {
     return this.registerUserUseCase.execute(body);
+  }
+
+  @ApiOperation({
+    summary: 'Get current user',
+    description: 'Returns the current authenticated user data and preferences',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Datos del usuario obtenidos exitosamente',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autenticado',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get('me')
+  async getCurrentUser(
+    @CurrentUser() currentUser: IJwtPayload,
+  ): Promise<Omit<AuthResponseDto, 'accessToken'>> {
+    return this.getCurrentUserUseCase.execute(currentUser.sub);
   }
 }

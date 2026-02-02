@@ -7,6 +7,7 @@ import {
   USER_REPOSITORY,
 } from '@modules/users/domain/repositories/user-repository.interface';
 import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
+import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -25,7 +26,7 @@ export class RegisterUserUseCase {
     const userExists = await this.userRepository.findByEmail(dto.email);
 
     if (userExists) {
-      throw new ConflictException('User with this email already exists');
+      throw new ConflictException('El usuario con este email ya existe');
     }
 
     dto.password = await bcrypt.hash(dto.password, 10);
@@ -59,6 +60,7 @@ export class RegisterUserUseCase {
     return {
       accessToken: this.jwtService.sign(payload),
       user: UserMapper.toResponseDto(user),
+      userPreferences: UserPreferencesMapper.toResponseDto(userPreferences),
     };
   }
 }

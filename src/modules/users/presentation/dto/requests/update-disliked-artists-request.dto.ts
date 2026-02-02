@@ -11,8 +11,8 @@ export class UpdateDislikedArtistsRequestDto {
       'ID or name of the artist to add or remove from disliked artists',
     example: 'Artist Name',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El ID del artista debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'El ID del artista es requerido' })
   artistId: string;
 
   @ApiProperty({
@@ -21,7 +21,7 @@ export class UpdateDislikedArtistsRequestDto {
     enum: ['add', 'remove'],
     example: 'add',
   })
-  @IsEnum(['add', 'remove'])
-  @IsNotEmpty()
+  @IsEnum(['add', 'remove'], { message: 'La acción debe ser "add" o "remove"' })
+  @IsNotEmpty({ message: 'La acción es requerida' })
   action: 'add' | 'remove';
 }

@@ -45,7 +45,8 @@ export class SongMapper {
     let spotifyId = entity.spotifyId;
     if (!spotifyId && entity.spotifyUrl) {
       const id = this.extractSpotifyId(entity.spotifyUrl);
-      if (!id) throw new BadRequestException('Invalid Spotify URL provided');
+      if (!id)
+        throw new BadRequestException('URL de Spotify inválida proporcionada');
       spotifyId = id;
     }
 

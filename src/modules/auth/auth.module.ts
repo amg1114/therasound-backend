@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './infrastructure/guards/jwt.guard';
 import { LoginUserUseCase } from './application/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from './application/use-cases/register-user.usecase';
+import { GetCurrentUserUseCase } from './application/use-cases/get-current-user.usecase';
 import { AuthController } from './presentation/controllers/auth.controller';
 
 @Module({
@@ -25,6 +26,7 @@ import { AuthController } from './presentation/controllers/auth.controller';
     JwtStrategy,
     LoginUserUseCase,
     RegisterUserUseCase,
+    GetCurrentUserUseCase,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

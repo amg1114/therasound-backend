@@ -11,8 +11,8 @@ export class UpdateDislikedGenresRequestDto {
       'ID or name of the genre to add or remove from disliked genres',
     example: 'rock',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El ID del género debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'El ID del género es requerido' })
   genreId: string;
 
   @ApiProperty({
@@ -21,7 +21,7 @@ export class UpdateDislikedGenresRequestDto {
     enum: ['add', 'remove'],
     example: 'add',
   })
-  @IsEnum(['add', 'remove'])
-  @IsNotEmpty()
+  @IsEnum(['add', 'remove'], { message: 'La acción debe ser "add" o "remove"' })
+  @IsNotEmpty({ message: 'La acción es requerida' })
   action: 'add' | 'remove';
 }

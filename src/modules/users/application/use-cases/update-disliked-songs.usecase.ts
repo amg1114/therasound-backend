@@ -30,7 +30,7 @@ export class UpdateDislikedSongsUseCase {
 
     if (!userPreferences) {
       throw new NotFoundException(
-        `User preferences not found for user ${userId}`,
+        `Preferencias de usuario no encontradas para el usuario ${userId}`,
       );
     }
 
@@ -40,7 +40,7 @@ export class UpdateDislikedSongsUseCase {
       // Fetch the song entity
       const song = await this.songRepository.findById(songId);
       if (!song) {
-        throw new NotFoundException(`Song not found: ${songId}`);
+        throw new NotFoundException(`Canción no encontrada: ${songId}`);
       }
 
       // Check if song is not already in the list

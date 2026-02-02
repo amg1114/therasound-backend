@@ -72,7 +72,7 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
     );
 
     if (!updatedOrmEntity) {
-      throw new NotFoundException('User preferences not found');
+      throw new NotFoundException('Preferencias de usuario no encontradas');
     }
 
     return UserPreferencesMapper.toDomain(updatedOrmEntity);

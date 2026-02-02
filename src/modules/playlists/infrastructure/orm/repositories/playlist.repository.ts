@@ -74,7 +74,7 @@ export class PlaylistRepositoryImpl implements IPlaylistRepository {
     );
 
     if (!updatedOrmEntity) {
-      throw new NotFoundException('Playlist not found');
+      throw new NotFoundException('Lista de reproducción no encontrada');
     }
 
     return PlaylistMapper.toDomain(updatedOrmEntity);
@@ -84,7 +84,7 @@ export class PlaylistRepositoryImpl implements IPlaylistRepository {
     const result = await this.model.findByIdAndDelete(id);
 
     if (!result) {
-      throw new NotFoundException('Playlist not found');
+      throw new NotFoundException('Lista de reproducción no encontrada');
     }
   }
 }

@@ -59,7 +59,7 @@ export class ExternalMusicApiService {
 
       if (!response.ok) {
         throw new BadGatewayException(
-          `ReccoBeats API error: ${response.status} ${response.statusText}`,
+          `Error en API de ReccoBeats: ${response.status} ${response.statusText}`,
         );
       }
 
@@ -91,7 +91,7 @@ export class ExternalMusicApiService {
 
       if (!appId || !apiKey) {
         throw new InternalServerErrorException(
-          'Soundcharts credentials not configured',
+          'Credenciales de Soundcharts no configuradas',
         );
       }
 
@@ -115,7 +115,7 @@ export class ExternalMusicApiService {
         }
 
         throw new BadGatewayException(
-          `Soundcharts API error: ${response.status} ${response.statusText}`,
+          `Error en API de Soundcharts: ${response.status} ${response.statusText}`,
         );
       }
 
@@ -176,7 +176,7 @@ export class ExternalMusicApiService {
         }
 
         throw new BadGatewayException(
-          `Emotion analysis API error: ${response.status} ${response.statusText}`,
+          `Error en API de análisis de emociones: ${response.status} ${response.statusText}`,
         );
       }
 
@@ -196,7 +196,7 @@ export class ExternalMusicApiService {
         throw error;
       }
       throw new InternalServerErrorException(
-        'Failed to fetch emotion analysis due to an unexpected error',
+        'Error al obtener análisis de emociones debido a un error inesperado',
       );
     }
   }

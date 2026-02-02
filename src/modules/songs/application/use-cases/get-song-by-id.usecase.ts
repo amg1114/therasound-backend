@@ -21,7 +21,7 @@ export class GetSongByIdUseCase {
     const song = await this.songRepository.findById(id);
 
     if (!song) {
-      throw new NotFoundException(`Song with ID ${id} not found`);
+      throw new NotFoundException(`Canción con ID ${id} no encontrada`);
     }
 
     return song;

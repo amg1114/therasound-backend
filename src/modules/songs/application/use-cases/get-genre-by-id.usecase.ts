@@ -24,7 +24,7 @@ export class GetGenreByIdUseCase {
     const genre = await this.genreRepository.findById(id);
 
     if (!genre) {
-      throw new NotFoundException(`Genre with ID ${id} not found`);
+      throw new NotFoundException(`Género con ID ${id} no encontrado`);
     }
 
     return genre;

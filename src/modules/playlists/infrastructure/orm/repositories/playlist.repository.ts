@@ -49,6 +49,18 @@ export class PlaylistRepositoryImpl implements IPlaylistRepository {
     return ormEntities.map((entity) => PlaylistMapper.toDomain(entity));
   }
 
+  async findRecentByUserId(
+    userId: string,
+    limit: number,
+  ): Promise<PlaylistEntity[]> {
+    const ormEntities = await this.model
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(limit);
+
+    return ormEntities.map((entity) => PlaylistMapper.toDomain(entity));
+  }
+
   async findLastByUserIdAndEmotion(
     userId: string,
     emotion: string,

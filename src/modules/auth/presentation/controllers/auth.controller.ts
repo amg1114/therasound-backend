@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 import { type IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
+import { UserEntity } from '@modules/users/domain/entities/user.entity';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -77,9 +78,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @Get('me')
-  async getCurrentUser(
-    @CurrentUser() currentUser: IJwtPayload,
-  ): Promise<Omit<AuthResponseDto, 'accessToken'>> {
-    return this.getCurrentUserUseCase.execute(currentUser.sub);
+  async getCurrentUser(@CurrentUser() currentUser: UserEntity) {
+    //return currentUser;
+    return this.getCurrentUserUseCase.execute(currentUser.id!);
   }
 }

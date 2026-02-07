@@ -20,7 +20,10 @@ export class GetChatbotResponseUseCase {
       ...dto.history,
       {
         role: 'system',
-        content: `Te quedan ${dto.remainingTurns} turnos antes de cerrar la conversación.`,
+        content:
+          dto.remainingTurns === 1
+            ? 'Recuerda que este es el último turno de la conversación.'
+            : `Quedan ${dto.remainingTurns} turnos en esta conversación.`,
       },
       { role: 'user', content: dto.message },
     ];

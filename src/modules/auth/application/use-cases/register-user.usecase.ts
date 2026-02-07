@@ -6,6 +6,10 @@ import {
   type IUserRepository,
   USER_REPOSITORY,
 } from '@modules/users/domain/repositories/user-repository.interface';
+import {
+  PLAYLIST_REPOSITORY,
+  type IPlaylistRepository,
+} from '@modules/playlists/domain/repositories/playlist-repository.interface';
 import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
@@ -18,6 +22,8 @@ export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(PLAYLIST_REPOSITORY)
+    private readonly playlistRepository: IPlaylistRepository,
     private readonly jwtService: JwtService,
     private readonly createUserPreferencesUseCase: CreateUserPreferencesUseCase,
   ) {}
@@ -61,6 +67,7 @@ export class RegisterUserUseCase {
       accessToken: this.jwtService.sign(payload),
       user: UserMapper.toResponseDto(user),
       userPreferences: UserPreferencesMapper.toResponseDto(userPreferences),
+      recentPlaylists: [],
     };
   }
 }

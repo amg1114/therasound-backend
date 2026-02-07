@@ -4,6 +4,7 @@ import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.
 import { Types } from 'mongoose';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { PlaylistResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-response.dto';
+import { PlaylistSummaryResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-summary-response.dto';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 
 export class PlaylistMapper {
@@ -64,6 +65,15 @@ export class PlaylistMapper {
       songs: entity.songs.map((song) => SongMapper.toResponseDto(song)),
       emotion: entity.emotion.getValue(),
       durationMs: entity.durationMs,
+      createdAt: entity.createdAt,
+    };
+  }
+
+  static toSummaryDto(entity: PlaylistEntity): PlaylistSummaryResponseDto {
+    return {
+      id: entity.id,
+      emotion: entity.emotion.getValue(),
+      songCount: entity.songs.length,
       createdAt: entity.createdAt,
     };
   }

@@ -13,8 +13,13 @@ import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
+import {
+  PLAYLIST_REPOSITORY,
+  type IPlaylistRepository,
+} from '@modules/playlists/domain/repositories/playlist-repository.interface';
 import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
+import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
 
 @Injectable()
 export class LoginUserUseCase {
@@ -23,6 +28,8 @@ export class LoginUserUseCase {
     private readonly userRepository: IUserRepository,
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: IUserPreferencesRepository,
+    @Inject(PLAYLIST_REPOSITORY)
+    private readonly playlistRepository: IPlaylistRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -43,6 +50,11 @@ export class LoginUserUseCase {
 
     const userPreferences = await this.userPreferencesRepository.findByUserId(
       user.id!,
+    );
+
+    const recentPlaylists = await this.playlistRepository.findRecentByUserId(
+      user.id!,
+      5,
     );
 
     const payload: IJwtPayload = {
@@ -70,6 +82,9 @@ export class LoginUserUseCase {
             dislikedGenres: [],
             dislikedArtists: [],
           },
+      recentPlaylists: recentPlaylists.map((playlist) =>
+        PlaylistMapper.toSummaryDto(playlist),
+      ),
     };
   }
 }

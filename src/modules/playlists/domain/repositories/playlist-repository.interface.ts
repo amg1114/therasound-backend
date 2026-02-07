@@ -9,6 +9,8 @@ export interface IPlaylistRepository {
 
   findByUserId(userId: string): Promise<PlaylistEntity[]>;
 
+  findRecentByUserId(userId: string, limit: number): Promise<PlaylistEntity[]>;
+
   findLastByUserIdAndEmotion(
     userId: string,
     emotion: string,

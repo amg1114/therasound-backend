@@ -1,4 +1,5 @@
 import { UsersModule } from '@modules/users/users.module';
+import { PlaylistsModule } from '@modules/playlists/playlists.module';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,6 +15,7 @@ import { AuthController } from './presentation/controllers/auth.controller';
 @Module({
   imports: [
     UsersModule,
+    PlaylistsModule,
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

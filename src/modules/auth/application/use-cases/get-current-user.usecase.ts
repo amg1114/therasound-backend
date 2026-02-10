@@ -11,10 +11,11 @@ import {
   PLAYLIST_REPOSITORY,
   type IPlaylistRepository,
 } from '@modules/playlists/domain/repositories/playlist-repository.interface';
-import { AuthResponseDto } from '@modules/auth/presentation/dto/responses/auth-response.dto';
 import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
 import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
+import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { ProfileResponseDto } from '@modules/auth/presentation/dto/responses/profile-response.dto';
 
 @Injectable()
 export class GetCurrentUserUseCase {
@@ -27,35 +28,35 @@ export class GetCurrentUserUseCase {
     private readonly playlistRepository: IPlaylistRepository,
   ) {}
 
-  async execute(userId: string): Promise<Omit<AuthResponseDto, 'accessToken'>> {
+  async execute(userId: string): Promise<ProfileResponseDto> {
     const user = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const userPreferences =
+    let userPreferences =
       await this.userPreferencesRepository.findByUserId(userId);
 
+    if (!userPreferences) {
+      userPreferences = UserPreferencesEntity.create(userId);
+      userPreferences =
+        await this.userPreferencesRepository.create(userPreferences);
+    }
     const recentPlaylists = await this.playlistRepository.findRecentByUserId(
       userId,
       5,
     );
 
-    return {
-      user: UserMapper.toResponseDto(user),
-      userPreferences: userPreferences
-        ? UserPreferencesMapper.toResponseDto(userPreferences)
-        : {
-            id: userId,
-            likedSongs: [],
-            dislikedSongs: [],
-            dislikedGenres: [],
-            dislikedArtists: [],
-          },
-      recentPlaylists: recentPlaylists.map((playlist) =>
-        PlaylistMapper.toSummaryDto(playlist),
-      ),
-    };
+    const response = new ProfileResponseDto();
+
+    response.user = UserMapper.toResponseDto(user);
+    response.userPreferences =
+      UserPreferencesMapper.toResponseDto(userPreferences);
+    response.recentPlaylists = recentPlaylists.map((playlist) =>
+      PlaylistMapper.toSummaryDto(playlist),
+    );
+
+    return response;
   }
 }

@@ -1,7 +1,7 @@
 import { HistorySongVO } from '../value-objects/history-song.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 
-interface UserPreferencesProps {
+export interface UserPreferencesProps {
   id?: string;
   userId: string;
   likedSongs: SongSummaryVO[];
@@ -64,5 +64,19 @@ export class UserPreferencesEntity implements UserPreferencesProps {
 
   static reconstruct(props: UserPreferencesProps): UserPreferencesEntity {
     return new UserPreferencesEntity(props);
+  }
+
+  getValues(): UserPreferencesProps {
+    return {
+      id: this.id,
+      userId: this.userId,
+      likedSongs: this.likedSongs,
+      dislikedSongs: this.dislikedSongs,
+      dislikedGenres: this.dislikedGenres,
+      dislikedArtists: this.dislikedArtists,
+      likedGenres: this.likedGenres,
+      likedArtists: this.likedArtists,
+      listenedHistory: this.listenedHistory,
+    };
   }
 }

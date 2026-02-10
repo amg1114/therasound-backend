@@ -55,12 +55,7 @@ export class RegisterUserUseCase {
       sub: user.id!,
       email: user.email,
       name: user.name,
-      userPreferences: {
-        likedSongs: userPreferences.likedSongs.map((song) => song.id),
-        dislikedSongs: userPreferences.dislikedSongs.map((song) => song.id),
-        dislikedGenres: userPreferences.dislikedGenres,
-        dislikedArtists: userPreferences.dislikedArtists,
-      },
+      userPreferences: userPreferences.getValues(),
     };
 
     return {

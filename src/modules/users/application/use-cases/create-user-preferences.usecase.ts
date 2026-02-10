@@ -22,13 +22,7 @@ export class CreateUserPreferencesUseCase {
       );
     }
 
-    const userPreferences = UserPreferencesEntity.create({
-      user: userId,
-      likedSongs: [],
-      dislikedSongs: [],
-      dislikedGenres: [],
-      dislikedArtists: [],
-    });
+    const userPreferences = UserPreferencesEntity.create(userId);
 
     return await this.userPreferencesRepository.create(userPreferences);
   }

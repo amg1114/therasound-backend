@@ -13,6 +13,10 @@ export class SongEmotionVO {
     return new SongEmotionVO(emotion as SongEmotionType);
   }
 
+  equals(other: SongEmotionVO): boolean {
+    return this.value === other.value;
+  }
+
   getValue(): SongEmotionType {
     return this.value;
   }

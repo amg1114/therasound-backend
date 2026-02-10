@@ -42,12 +42,8 @@ export class UpdateDislikedGenresUseCase {
     }
 
     const updatedPreferences = UserPreferencesEntity.reconstruct({
-      id: userPreferences.id!,
-      userId: userPreferences.userId,
-      likedSongs: userPreferences.likedSongs,
-      dislikedSongs: userPreferences.dislikedSongs,
+      ...userPreferences,
       dislikedGenres: updatedDislikedGenres,
-      dislikedArtists: userPreferences.dislikedArtists,
     });
 
     return await this.userPreferencesRepository.update(updatedPreferences);

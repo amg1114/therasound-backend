@@ -1,11 +1,11 @@
-import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { HistorySongVO } from '../value-objects/history-song.vo';
+import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 
 interface UserPreferencesProps {
   id?: string;
-  user: string;
-  likedSongs: SongEntity[];
-  dislikedSongs: SongEntity[];
+  userId: string;
+  likedSongs: SongSummaryVO[];
+  dislikedSongs: SongSummaryVO[];
   likedGenres: string[];
   dislikedGenres: string[];
   dislikedArtists: string[];
@@ -15,18 +15,21 @@ interface UserPreferencesProps {
 
 export class UserPreferencesEntity implements UserPreferencesProps {
   id?: string;
-  user: string;
-  likedSongs: SongEntity[];
-  dislikedSongs: SongEntity[];
-  dislikedGenres: string[];
-  dislikedArtists: string[];
-  likedGenres: string[];
-  likedArtists: string[];
+  userId: string;
   listenedHistory: HistorySongVO[];
+
+  likedSongs: SongSummaryVO[];
+  dislikedSongs: SongSummaryVO[];
+
+  likedGenres: string[];
+  dislikedGenres: string[];
+
+  likedArtists: string[];
+  dislikedArtists: string[];
 
   private constructor({
     id,
-    user,
+    userId,
     likedSongs,
     dislikedSongs,
     dislikedGenres,
@@ -36,7 +39,7 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     listenedHistory,
   }: UserPreferencesProps) {
     this.id = id;
-    this.user = user;
+    this.userId = userId;
     this.likedSongs = likedSongs;
     this.dislikedSongs = dislikedSongs;
     this.dislikedGenres = dislikedGenres;
@@ -46,9 +49,9 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     this.listenedHistory = listenedHistory;
   }
 
-  static create(userId: UserPreferencesProps['user']): UserPreferencesEntity {
+  static create(userId: UserPreferencesProps['userId']): UserPreferencesEntity {
     return new UserPreferencesEntity({
-      user: userId,
+      userId,
       likedSongs: [],
       dislikedSongs: [],
       dislikedGenres: [],

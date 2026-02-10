@@ -9,6 +9,7 @@ import {
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { UpdateDislikedSongsRequestDto } from '@modules/users/presentation/dto/requests/update-disliked-songs-request.dto';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 
 @Injectable()
 export class UpdateDislikedSongsUseCase {
@@ -45,7 +46,7 @@ export class UpdateDislikedSongsUseCase {
 
       // Check if song is not already in the list
       if (!updatedDislikedSongs.find((s) => s.id === songId)) {
-        updatedDislikedSongs.push(song);
+        updatedDislikedSongs.push(SongMapper.toSummaryVO(song));
       }
     } else if (action === 'remove') {
       const index = updatedDislikedSongs.findIndex((s) => s.id === songId);
@@ -55,12 +56,8 @@ export class UpdateDislikedSongsUseCase {
     }
 
     const updatedPreferences = UserPreferencesEntity.reconstruct({
-      id: userPreferences.id!,
-      userId: userPreferences.userId,
-      likedSongs: userPreferences.likedSongs,
+      ...userPreferences,
       dislikedSongs: updatedDislikedSongs,
-      dislikedGenres: userPreferences.dislikedGenres,
-      dislikedArtists: userPreferences.dislikedArtists,
     });
 
     return await this.userPreferencesRepository.update(updatedPreferences);

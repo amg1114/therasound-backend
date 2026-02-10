@@ -11,6 +11,7 @@ import { UserPreferencesEntity } from '@modules/users/domain/entities/user-prefe
 import { UpdateLikedSongsRequestDto } from '@modules/users/presentation/dto/requests/update-liked-songs-request.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SongLikedEvent } from '../events/song-liked.event';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 
 @Injectable()
 export class UpdateLikedSongsUseCase {
@@ -48,7 +49,7 @@ export class UpdateLikedSongsUseCase {
 
       // Check if song is not already in the list
       if (!updatedLikedSongs.find((s) => s.id === songId)) {
-        updatedLikedSongs.push(song);
+        updatedLikedSongs.push(SongMapper.toSummaryVO(song));
       }
     } else if (action === 'remove') {
       const index = updatedLikedSongs.findIndex((s) => s.id === songId);
@@ -58,12 +59,8 @@ export class UpdateLikedSongsUseCase {
     }
 
     const updatedPreferences = UserPreferencesEntity.reconstruct({
-      id: userPreferences.id!,
-      userId: userPreferences.userId,
+      ...userPreferences,
       likedSongs: updatedLikedSongs,
-      dislikedSongs: userPreferences.dislikedSongs,
-      dislikedGenres: userPreferences.dislikedGenres,
-      dislikedArtists: userPreferences.dislikedArtists,
     });
 
     const result =

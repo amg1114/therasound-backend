@@ -20,6 +20,7 @@ import {
 import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
 import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
+import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 
 @Injectable()
 export class LoginUserUseCase {
@@ -48,9 +49,15 @@ export class LoginUserUseCase {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const userPreferences = await this.userPreferencesRepository.findByUserId(
+    let userPreferences = await this.userPreferencesRepository.findByUserId(
       user.id!,
     );
+
+    if (!userPreferences) {
+      userPreferences = UserPreferencesEntity.create(user.id!);
+      userPreferences =
+        await this.userPreferencesRepository.create(userPreferences);
+    }
 
     const recentPlaylists = await this.playlistRepository.findRecentByUserId(
       user.id!,
@@ -61,27 +68,13 @@ export class LoginUserUseCase {
       sub: user.id!,
       email: user.email,
       name: user.name,
-      userPreferences: {
-        likedSongs: userPreferences?.likedSongs.map((song) => song.id) || [],
-        dislikedSongs:
-          userPreferences?.dislikedSongs.map((song) => song.id) || [],
-        dislikedGenres: userPreferences?.dislikedGenres || [],
-        dislikedArtists: userPreferences?.dislikedArtists || [],
-      },
+      userPreferences: userPreferences.getValues(),
     };
 
     return {
       accessToken: this.jwtService.sign(payload),
       user: UserMapper.toResponseDto(user),
-      userPreferences: userPreferences
-        ? UserPreferencesMapper.toResponseDto(userPreferences)
-        : {
-            id: user.id!,
-            likedSongs: [],
-            dislikedSongs: [],
-            dislikedGenres: [],
-            dislikedArtists: [],
-          },
+      userPreferences: UserPreferencesMapper.toResponseDto(userPreferences),
       recentPlaylists: recentPlaylists.map((playlist) =>
         PlaylistMapper.toSummaryDto(playlist),
       ),

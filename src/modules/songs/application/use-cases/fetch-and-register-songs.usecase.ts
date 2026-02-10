@@ -45,15 +45,11 @@ export class FetchAndRegisterSongsUseCase {
 
     // 2. Get last 5 liked and disliked songs filtered by emotion
     const likedSongs = userPreferences
-      ? userPreferences.likedSongs.filter(
-          (song) => song.emotion.getValue() === emotion,
-        )
+      ? userPreferences.likedSongs.filter((song) => song.emotion === emotion)
       : [];
 
     const dislikedSongs = userPreferences
-      ? userPreferences.dislikedSongs.filter(
-          (song) => song.emotion.getValue() === emotion,
-        )
+      ? userPreferences.dislikedSongs.filter((song) => song.emotion === emotion)
       : [];
 
     const seeds = likedSongs

@@ -3,6 +3,7 @@ import { SongEntityORM } from '../orm/entities/song-entity.orm';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { BadRequestException } from '@nestjs/common';
 import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
+import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 
 export class SongMapper {
   /**
@@ -88,5 +89,17 @@ export class SongMapper {
     response.likesCount = entity.likesCount;
 
     return response;
+  }
+
+  static toSummaryVO(entity: SongEntity): SongSummaryVO {
+    return {
+      id: entity.id,
+      spotifyId: entity.spotifyId,
+      title: entity.title,
+      artist: entity.artist,
+      emotion: entity.emotion.getValue(),
+      genres: entity.genres,
+      imageUrl: entity.imageUrl,
+    };
   }
 }

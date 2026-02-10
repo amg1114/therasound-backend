@@ -1,15 +1,17 @@
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { HistorySongVO } from '../value-objects/history-song.vo';
 
 interface UserPreferencesProps {
   id?: string;
   user: string;
   likedSongs: SongEntity[];
   dislikedSongs: SongEntity[];
+  likedGenres: string[];
   dislikedGenres: string[];
   dislikedArtists: string[];
+  likedArtists: string[];
+  listenedHistory: HistorySongVO[];
 }
-
-export type CreateUserPreferencesProps = Omit<UserPreferencesProps, 'id'>;
 
 export class UserPreferencesEntity implements UserPreferencesProps {
   id?: string;
@@ -18,6 +20,9 @@ export class UserPreferencesEntity implements UserPreferencesProps {
   dislikedSongs: SongEntity[];
   dislikedGenres: string[];
   dislikedArtists: string[];
+  likedGenres: string[];
+  likedArtists: string[];
+  listenedHistory: HistorySongVO[];
 
   private constructor({
     id,
@@ -26,6 +31,9 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     dislikedSongs,
     dislikedGenres,
     dislikedArtists,
+    likedGenres,
+    likedArtists,
+    listenedHistory,
   }: UserPreferencesProps) {
     this.id = id;
     this.user = user;
@@ -33,15 +41,21 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     this.dislikedSongs = dislikedSongs;
     this.dislikedGenres = dislikedGenres;
     this.dislikedArtists = dislikedArtists;
+    this.likedGenres = likedGenres;
+    this.likedArtists = likedArtists;
+    this.listenedHistory = listenedHistory;
   }
 
-  static create(props: CreateUserPreferencesProps): UserPreferencesEntity {
+  static create(userId: UserPreferencesProps['user']): UserPreferencesEntity {
     return new UserPreferencesEntity({
-      user: props.user,
-      likedSongs: props.likedSongs,
-      dislikedSongs: props.dislikedSongs,
-      dislikedGenres: props.dislikedGenres,
-      dislikedArtists: props.dislikedArtists,
+      user: userId,
+      likedSongs: [],
+      dislikedSongs: [],
+      dislikedGenres: [],
+      dislikedArtists: [],
+      likedGenres: [],
+      likedArtists: [],
+      listenedHistory: [],
     });
   }
 

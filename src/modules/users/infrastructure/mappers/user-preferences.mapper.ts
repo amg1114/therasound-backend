@@ -2,30 +2,19 @@ import { UserPreferencesEntity } from '@modules/users/domain/entities/user-prefe
 import { UserPreferencesEntityORM } from '../orm/entities/user-preferences-entity.orm';
 import { Types } from 'mongoose';
 import { UserPreferencesResponseDto } from '@modules/users/presentation/dto/responses/user-preferences-response.dto';
-import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
-import { SongEntityORM } from '@modules/songs/infrastructure/orm/entities/song-entity.orm';
 
 export class UserPreferencesMapper {
   static toDomain(ormEntity: UserPreferencesEntityORM): UserPreferencesEntity {
     const domainEntity = UserPreferencesEntity.reconstruct({
       id: ormEntity._id.toString(),
-      user: ormEntity.user.toString(),
-      likedSongs: Array.isArray(ormEntity.likedSongs)
-        ? ormEntity.likedSongs.map((song) =>
-            song instanceof Types.ObjectId
-              ? ({ id: song.toString() } as any)
-              : SongMapper.toEntity(song as SongEntityORM),
-          )
-        : [],
-      dislikedSongs: Array.isArray(ormEntity.dislikedSongs)
-        ? ormEntity.dislikedSongs.map((song) =>
-            song instanceof Types.ObjectId
-              ? ({ id: song.toString() } as any)
-              : SongMapper.toEntity(song as SongEntityORM),
-          )
-        : [],
+      userId: ormEntity.userId.toString(),
+      likedSongs: ormEntity.likedSongs,
+      dislikedSongs: ormEntity.dislikedSongs,
+      likedGenres: ormEntity.likedGenres,
       dislikedGenres: ormEntity.dislikedGenres,
+      likedArtists: ormEntity.likedArtists,
       dislikedArtists: ormEntity.dislikedArtists,
+      listenedHistory: ormEntity.listenedHistory,
     });
 
     return domainEntity;
@@ -35,15 +24,14 @@ export class UserPreferencesMapper {
     domainEntity: UserPreferencesEntity,
   ): Partial<UserPreferencesEntityORM> {
     return {
-      likedSongs: domainEntity.likedSongs.map(
-        (song) => new Types.ObjectId(song.id),
-      ),
-      dislikedSongs: domainEntity.dislikedSongs.map(
-        (song) => new Types.ObjectId(song.id),
-      ),
+      userId: new Types.ObjectId(domainEntity.userId),
+      likedSongs: domainEntity.likedSongs,
+      dislikedSongs: domainEntity.dislikedSongs,
+      likedGenres: domainEntity.likedGenres,
       dislikedGenres: domainEntity.dislikedGenres,
+      likedArtists: domainEntity.likedArtists,
       dislikedArtists: domainEntity.dislikedArtists,
-      user: new Types.ObjectId(domainEntity.user),
+      listenedHistory: domainEntity.listenedHistory,
     };
   }
 
@@ -53,14 +41,13 @@ export class UserPreferencesMapper {
     const response = new UserPreferencesResponseDto();
 
     response.id = domainEntity.id!;
-    response.likedSongs = domainEntity.likedSongs.map((song) =>
-      SongMapper.toResponseDto(song),
-    );
-    response.dislikedSongs = domainEntity.dislikedSongs.map((song) =>
-      SongMapper.toResponseDto(song),
-    );
+    response.likedSongs = domainEntity.likedSongs;
+    response.dislikedSongs = domainEntity.dislikedSongs;
+    response.likedGenres = domainEntity.likedGenres;
     response.dislikedGenres = domainEntity.dislikedGenres;
+    response.likedArtists = domainEntity.likedArtists;
     response.dislikedArtists = domainEntity.dislikedArtists;
+    response.listenedHistory = domainEntity.listenedHistory;
 
     return response;
   }

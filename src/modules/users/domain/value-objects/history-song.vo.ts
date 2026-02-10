@@ -1,18 +1,6 @@
-interface HistorySongProps {
-  songId: string;
+import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
+
+export type HistorySongVO = {
+  song: SongSummaryVO;
   listenedAt: Date;
-}
-
-export class HistorySongVO implements HistorySongProps {
-  songId: string;
-  listenedAt: Date;
-
-  private constructor(props: HistorySongProps) {
-    this.songId = props.songId;
-    this.listenedAt = props.listenedAt;
-  }
-
-  static create(props: HistorySongProps): HistorySongVO {
-    return new HistorySongVO(props);
-  }
-}
+};

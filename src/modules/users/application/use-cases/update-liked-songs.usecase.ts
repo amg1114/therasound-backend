@@ -59,7 +59,7 @@ export class UpdateLikedSongsUseCase {
 
     const updatedPreferences = UserPreferencesEntity.reconstruct({
       id: userPreferences.id!,
-      user: userPreferences.user,
+      userId: userPreferences.userId,
       likedSongs: updatedLikedSongs,
       dislikedSongs: userPreferences.dislikedSongs,
       dislikedGenres: userPreferences.dislikedGenres,

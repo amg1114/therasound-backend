@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
+import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
+import { HistorySongVO } from '@modules/users/domain/value-objects/history-song.vo';
 
 /**
  * Response DTO for user preferences
@@ -14,15 +15,20 @@ export class UserPreferencesResponseDto {
 
   @ApiProperty({
     description: 'List of songs that the user has liked',
-    type: [SongResponseDto],
   })
-  likedSongs: SongResponseDto[];
+  likedSongs: SongSummaryVO[];
 
   @ApiProperty({
     description: 'List of songs that the user has disliked',
-    type: [SongResponseDto],
   })
-  dislikedSongs: SongResponseDto[];
+  dislikedSongs: SongSummaryVO[];
+
+  @ApiProperty({
+    description: 'List of genre IDs or names that the user has liked',
+    type: [String],
+    example: ['rock', 'metal'],
+  })
+  likedGenres: string[];
 
   @ApiProperty({
     description: 'List of genre IDs or names that the user has disliked',
@@ -32,9 +38,22 @@ export class UserPreferencesResponseDto {
   dislikedGenres: string[];
 
   @ApiProperty({
+    description: 'List of artist IDs or names that the user has liked',
+    type: [String],
+    example: ['Artist 1', 'Artist 2'],
+  })
+  likedArtists: string[];
+
+  @ApiProperty({
     description: 'List of artist IDs or names that the user has disliked',
     type: [String],
     example: ['Artist 1', 'Artist 2'],
   })
   dislikedArtists: string[];
+
+  @ApiProperty({
+    description:
+      'List of songs that the user has listened to, in order of most recent',
+  })
+  listenedHistory: HistorySongVO[];
 }

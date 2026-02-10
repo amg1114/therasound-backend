@@ -1,6 +1,17 @@
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 
-export class UserPreferencesEntity {
+interface UserPreferencesProps {
+  id?: string;
+  user: string;
+  likedSongs: SongEntity[];
+  dislikedSongs: SongEntity[];
+  dislikedGenres: string[];
+  dislikedArtists: string[];
+}
+
+export type CreateUserPreferencesProps = Omit<UserPreferencesProps, 'id'>;
+
+export class UserPreferencesEntity implements UserPreferencesProps {
   id?: string;
   user: string;
   likedSongs: SongEntity[];
@@ -15,14 +26,7 @@ export class UserPreferencesEntity {
     dislikedSongs,
     dislikedGenres,
     dislikedArtists,
-  }: {
-    id?: string;
-    user: string;
-    likedSongs: SongEntity[];
-    dislikedSongs: SongEntity[];
-    dislikedGenres: string[];
-    dislikedArtists: string[];
-  }) {
+  }: UserPreferencesProps) {
     this.id = id;
     this.user = user;
     this.likedSongs = likedSongs;
@@ -31,13 +35,7 @@ export class UserPreferencesEntity {
     this.dislikedArtists = dislikedArtists;
   }
 
-  static create(props: {
-    user: string;
-    likedSongs: SongEntity[];
-    dislikedSongs: SongEntity[];
-    dislikedGenres: string[];
-    dislikedArtists: string[];
-  }): UserPreferencesEntity {
+  static create(props: CreateUserPreferencesProps): UserPreferencesEntity {
     return new UserPreferencesEntity({
       user: props.user,
       likedSongs: props.likedSongs,
@@ -47,21 +45,7 @@ export class UserPreferencesEntity {
     });
   }
 
-  static reconstruct(props: {
-    id: string;
-    user: string;
-    likedSongs: SongEntity[];
-    dislikedSongs: SongEntity[];
-    dislikedGenres: string[];
-    dislikedArtists: string[];
-  }): UserPreferencesEntity {
-    return new UserPreferencesEntity({
-      id: props.id,
-      user: props.user,
-      likedSongs: props.likedSongs,
-      dislikedSongs: props.dislikedSongs,
-      dislikedGenres: props.dislikedGenres,
-      dislikedArtists: props.dislikedArtists,
-    });
+  static reconstruct(props: UserPreferencesProps): UserPreferencesEntity {
+    return new UserPreferencesEntity(props);
   }
 }

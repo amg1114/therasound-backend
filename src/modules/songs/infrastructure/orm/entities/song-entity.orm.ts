@@ -1,49 +1,8 @@
+import { type AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
+import { type EmotionProbabilitiesVO } from '@modules/songs/domain/value-objects/emotion-probabilities.vo';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-
-export class AudioFeaturesORM {
-  @Prop({ required: false })
-  acousticness?: number;
-
-  @Prop({ required: false })
-  danceability?: number;
-
-  @Prop({ required: false })
-  energy?: number;
-
-  @Prop({ required: false })
-  instrumentalness?: number;
-
-  @Prop({ required: false })
-  liveness?: number;
-
-  @Prop({ required: false })
-  loudness?: number;
-
-  @Prop({ required: false })
-  speechiness?: number;
-
-  @Prop({ required: false })
-  tempo?: number;
-
-  @Prop({ required: false })
-  valence?: number;
-}
-
-export class EmotionProbabilitiesORM {
-  @Prop({ required: false })
-  calm?: number;
-
-  @Prop({ required: false })
-  energetic?: number;
-
-  @Prop({ required: false })
-  happy?: number;
-
-  @Prop({ required: false })
-  sad?: number;
-}
 
 @Schema({
   collection: 'songs',
@@ -80,21 +39,30 @@ export class SongEntityORM extends Document {
   releaseDate: Date;
 
   // Emotion analysis data
-  @Prop({ required: false, type: AudioFeaturesORM })
-  audioFeatures?: AudioFeaturesORM;
+  @Prop({ required: true, type: Object })
+  audioFeatures: AudioFeaturesVO;
 
-  @Prop({ required: false })
-  emotionConfidence?: number;
+  @Prop({ required: true })
+  emotionConfidence: number;
 
-  @Prop({ required: false, type: EmotionProbabilitiesORM })
-  emotionProbabilities?: EmotionProbabilitiesORM;
+  @Prop({ required: true, type: Object })
+  emotionProbabilities: EmotionProbabilitiesVO;
 
-  @Prop({ required: false, index: true })
-  reccobeatsId?: string;
+  @Prop({ required: true, index: true })
+  reccobeatsId: string;
 
   // Statistics
   @Prop({ required: true, default: 0 })
   likesCount: number;
+
+  @Prop({ required: true, default: 0 })
+  skipCount: number;
+
+  @Prop({ required: true, default: 0 })
+  playCount: number;
+
+  @Prop({ required: true, default: 0 })
+  averageCompletionRate: number;
 }
 
 export const SongSchema = SchemaFactory.createForClass(SongEntityORM);

@@ -4,10 +4,10 @@ import {
   USER_PREFERENCES_REPOSITORY,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
-import { UpdateDislikedArtistsRequestDto } from '@modules/users/presentation/dto/requests/update-disliked-artists-request.dto';
+import { UpdateGenrePreferencesRequestDto } from '@modules/users/presentation/dto/requests/update-genre-preferences-request.dto';
 
 @Injectable()
-export class UpdateDislikedArtistsUseCase {
+export class UpdateGenresPreferencesUseCase {
   constructor(
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: IUserPreferencesRepository,
@@ -15,9 +15,10 @@ export class UpdateDislikedArtistsUseCase {
 
   async execute(
     userId: string,
-    dto: UpdateDislikedArtistsRequestDto,
+    preference: 'likedGenres' | 'dislikedGenres',
+    dto: UpdateGenrePreferencesRequestDto,
   ): Promise<UserPreferencesEntity> {
-    const { artistId, action } = dto;
+    const genres = new Set(dto.genres);
 
     const userPreferences =
       await this.userPreferencesRepository.findByUserId(userId);
@@ -28,22 +29,11 @@ export class UpdateDislikedArtistsUseCase {
       );
     }
 
-    const updatedDislikedArtists = [...userPreferences.dislikedArtists];
-
-    if (action === 'add') {
-      if (!updatedDislikedArtists.includes(artistId)) {
-        updatedDislikedArtists.push(artistId);
-      }
-    } else if (action === 'remove') {
-      const index = updatedDislikedArtists.indexOf(artistId);
-      if (index > -1) {
-        updatedDislikedArtists.splice(index, 1);
-      }
-    }
+    const updatedGenres = [...genres];
 
     const updatedPreferences = UserPreferencesEntity.reconstruct({
       ...userPreferences,
-      dislikedArtists: updatedDislikedArtists,
+      [preference]: updatedGenres,
     });
 
     return await this.userPreferencesRepository.update(updatedPreferences);

@@ -1,5 +1,13 @@
+import { SongsModule } from '@modules/songs/songs.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CreateUserPreferencesUseCase } from './application/use-cases/create-user-preferences.usecase';
+import { GetUserPreferencesUseCase } from './application/use-cases/get-user-preferences.usecase';
+import { ToggleSongPreferencesUseCase } from './application/use-cases/toggle-song-preferences.usecase';
+import { UpdateArtistsPreferencesUseCase } from './application/use-cases/update-artists-prefereces.usecase';
+import { UpdateGenresPreferencesUseCase } from './application/use-cases/update-genres-preferences.usecase';
+import { USER_PREFERENCES_REPOSITORY } from './domain/repositories/user-preferences-repository.interface';
+import { USER_REPOSITORY } from './domain/repositories/user-repository.interface';
 import {
   UserEntityORM,
   UserSchema,
@@ -8,18 +16,9 @@ import {
   UserPreferencesEntityORM,
   UserPreferencesSchema,
 } from './infrastructure/orm/entities/user-preferences-entity.orm';
-import { USER_REPOSITORY } from './domain/repositories/user-repository.interface';
-import { USER_PREFERENCES_REPOSITORY } from './domain/repositories/user-preferences-repository.interface';
-import { UserRepositoryImpl } from './infrastructure/orm/repositories/user.repository';
 import { UserPreferencesRepositoryImpl } from './infrastructure/orm/repositories/user-preferences.repository';
-import { CreateUserPreferencesUseCase } from './application/use-cases/create-user-preferences.usecase';
-import { GetUserPreferencesUseCase } from './application/use-cases/get-user-preferences.usecase';
+import { UserRepositoryImpl } from './infrastructure/orm/repositories/user.repository';
 import { UserPreferencesController } from './presentation/controllers/user-preferences.controller';
-import { SongsModule } from '@modules/songs/songs.module';
-import { SongLikedListener } from './application/listeners/song-liked.listener';
-import { ToggleSongPreferencesUseCase } from './application/use-cases/toggle-song-preferences.usecase';
-import { UpdateArtistsPreferencesUseCase } from './application/use-cases/update-artists-prefereces.usecase';
-import { UpdateGenresPreferencesUseCase } from './application/use-cases/update-genres-preferences.usecase';
 
 @Module({
   imports: [
@@ -51,8 +50,6 @@ import { UpdateGenresPreferencesUseCase } from './application/use-cases/update-g
     ToggleSongPreferencesUseCase,
     UpdateArtistsPreferencesUseCase,
     UpdateGenresPreferencesUseCase,
-
-    SongLikedListener,
   ],
   exports: [
     USER_REPOSITORY,

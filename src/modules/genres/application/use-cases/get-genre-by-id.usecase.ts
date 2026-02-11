@@ -2,8 +2,8 @@ import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
   GENRE_REPOSITORY,
   type IGenreRepository,
-} from '@modules/songs/domain/repositories/genre-repository.interface';
-import { GenreEntity } from '@modules/songs/domain/entities/genre.entity';
+} from '@modules/genres/domain/repositories/genre-repository.interface';
+import { GenreEntity } from '@modules/genres/domain/entities/genre.entity';
 
 @Injectable()
 export class GetGenreByIdUseCase {

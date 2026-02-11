@@ -6,9 +6,9 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import { GetAllGenresUseCase } from '@modules/songs/application/use-cases/get-all-genres.usecase';
-import { GetGenreByIdUseCase } from '@modules/songs/application/use-cases/get-genre-by-id.usecase';
-import { GenreResponseDto } from '../dto/responses/genre-response.dto';
+import { GetAllGenresUseCase } from '@modules/genres/application/use-cases/get-all-genres.usecase';
+import { GetGenreByIdUseCase } from '@modules/genres/application/use-cases/get-genre-by-id.usecase';
+import { GenreResponseDto } from '../../../songs/presentation/dto/responses/genre-response.dto';
 import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 
 @ApiTags('Genres')

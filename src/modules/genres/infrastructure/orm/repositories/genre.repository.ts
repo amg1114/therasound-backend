@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IGenreRepository } from '@modules/songs/domain/repositories/genre-repository.interface';
-import { GenreEntity } from '@modules/songs/domain/entities/genre.entity';
+import { IGenreRepository } from '@modules/genres/domain/repositories/genre-repository.interface';
+import { GenreEntity } from '@modules/genres/domain/entities/genre.entity';
 import { GenreEntityORM } from '../entities/genre-entity.orm';
 import { GenreMapper } from '../../mappers/genre.mapper';
 

@@ -5,7 +5,7 @@ import { Inject } from '@nestjs/common';
 import {
   GENRE_REPOSITORY,
   type IGenreRepository,
-} from '@modules/songs/domain/repositories/genre-repository.interface';
+} from '@modules/genres/domain/repositories/genre-repository.interface';
 
 @Injectable()
 export class SongCreatedListener {

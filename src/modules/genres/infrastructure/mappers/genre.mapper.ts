@@ -1,4 +1,4 @@
-import { GenreEntity } from '@modules/songs/domain/entities/genre.entity';
+import { GenreEntity } from '@modules/genres/domain/entities/genre.entity';
 import { GenreEntityORM } from '../orm/entities/genre-entity.orm';
 
 export class GenreMapper {

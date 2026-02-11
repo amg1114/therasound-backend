@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PlaylistsModule } from './modules/playlists/playlists.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { GenresModule } from './modules/genres/genres.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UsersModule,
     AuthModule,
     PlaylistsModule,
+    GenresModule,
   ],
   controllers: [],
   providers: [],

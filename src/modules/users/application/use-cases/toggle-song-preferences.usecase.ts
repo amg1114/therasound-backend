@@ -1,6 +1,6 @@
 import {
-  type ISongRepository,
   SONG_REPOSITORY,
+  type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
@@ -9,6 +9,7 @@ import {
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ToggleSongPreferencesUseCase {
@@ -17,6 +18,7 @@ export class ToggleSongPreferencesUseCase {
     private readonly userPreferencesRepository: IUserPreferencesRepository,
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(
@@ -42,6 +44,12 @@ export class ToggleSongPreferencesUseCase {
 
     if (preference === 'likedSongs') {
       userPreferences.toggleLikedSong(songSummary);
+
+      if (userPreferences.hasLikedSong(songSummary.id)) {
+        this.eventEmitter.emit('song.liked', songId);
+      } else {
+        this.eventEmitter.emit('song.disliked', songId);
+      }
     } else {
       userPreferences.toggleDislikedSong(songSummary);
     }

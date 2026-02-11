@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { HistorySongVO } from '../value-objects/history-song.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 
@@ -64,6 +65,52 @@ export class UserPreferencesEntity implements UserPreferencesProps {
 
   static reconstruct(props: UserPreferencesProps): UserPreferencesEntity {
     return new UserPreferencesEntity(props);
+  }
+
+  hasDislikedSong(songId: string): boolean {
+    return this.dislikedSongs.some((song) => song.id === songId);
+  }
+
+  hasLikedSong(songId: string): boolean {
+    return this.likedSongs.some((song) => song.id === songId);
+  }
+
+  removeLikedSong(songId: string): void {
+    if (!this.hasLikedSong(songId)) {
+      throw new NotFoundException(
+        `La canción con ID ${songId} no está en las canciones que le gustan`,
+      );
+    }
+
+    this.likedSongs = this.likedSongs.filter((song) => song.id !== songId);
+  }
+
+  removeDislikedSong(songId: string): void {
+    if (!this.hasDislikedSong(songId)) {
+      throw new NotFoundException(
+        `La canción con ID ${songId} no está en las canciones que no le gustan`,
+      );
+    }
+
+    this.dislikedSongs = this.dislikedSongs.filter(
+      (song) => song.id !== songId,
+    );
+  }
+
+  toggleLikedSong(song: SongSummaryVO): void {
+    if (this.hasLikedSong(song.id)) {
+      this.removeLikedSong(song.id);
+    } else {
+      this.likedSongs.push(song);
+    }
+  }
+
+  toggleDislikedSong(song: SongSummaryVO): void {
+    if (this.hasDislikedSong(song.id)) {
+      this.removeDislikedSong(song.id);
+    } else {
+      this.dislikedSongs.push(song);
+    }
   }
 
   getValues(): UserPreferencesProps {

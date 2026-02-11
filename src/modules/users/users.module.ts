@@ -14,13 +14,12 @@ import { UserRepositoryImpl } from './infrastructure/orm/repositories/user.repos
 import { UserPreferencesRepositoryImpl } from './infrastructure/orm/repositories/user-preferences.repository';
 import { CreateUserPreferencesUseCase } from './application/use-cases/create-user-preferences.usecase';
 import { GetUserPreferencesUseCase } from './application/use-cases/get-user-preferences.usecase';
-import { UpdateLikedSongsUseCase } from './application/use-cases/update-liked-songs.usecase';
-import { UpdateDislikedSongsUseCase } from './application/use-cases/update-disliked-songs.usecase';
-import { UpdateDislikedGenresUseCase } from './application/use-cases/update-disliked-genres.usecase';
-import { UpdateDislikedArtistsUseCase } from './application/use-cases/update-disliked-artists.usecase';
 import { UserPreferencesController } from './presentation/controllers/user-preferences.controller';
 import { SongsModule } from '@modules/songs/songs.module';
 import { SongLikedListener } from './application/listeners/song-liked.listener';
+import { ToggleSongPreferencesUseCase } from './application/use-cases/toggle-song-preferences.usecase';
+import { UpdateArtistsPreferencesUseCase } from './application/use-cases/update-artists-prefereces.usecase';
+import { UpdateGenresPreferencesUseCase } from './application/use-cases/update-genres-preferences.usecase';
 
 @Module({
   imports: [
@@ -46,12 +45,13 @@ import { SongLikedListener } from './application/listeners/song-liked.listener';
       provide: USER_PREFERENCES_REPOSITORY,
       useClass: UserPreferencesRepositoryImpl,
     },
+
     CreateUserPreferencesUseCase,
     GetUserPreferencesUseCase,
-    UpdateLikedSongsUseCase,
-    UpdateDislikedSongsUseCase,
-    UpdateDislikedGenresUseCase,
-    UpdateDislikedArtistsUseCase,
+    ToggleSongPreferencesUseCase,
+    UpdateArtistsPreferencesUseCase,
+    UpdateGenresPreferencesUseCase,
+
     SongLikedListener,
   ],
   exports: [
@@ -59,10 +59,6 @@ import { SongLikedListener } from './application/listeners/song-liked.listener';
     USER_PREFERENCES_REPOSITORY,
     CreateUserPreferencesUseCase,
     GetUserPreferencesUseCase,
-    UpdateLikedSongsUseCase,
-    UpdateDislikedSongsUseCase,
-    UpdateDislikedGenresUseCase,
-    UpdateDislikedArtistsUseCase,
   ],
 })
 export class UsersModule {}

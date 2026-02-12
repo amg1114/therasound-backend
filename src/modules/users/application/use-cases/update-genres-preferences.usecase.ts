@@ -1,10 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import {
   type IUserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { UpdateGenrePreferencesRequestDto } from '@modules/users/presentation/dto/requests/update-genre-preferences-request.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UpdateGenresPreferencesUseCase {

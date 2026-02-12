@@ -1,10 +1,10 @@
-import { IUserPreferencesRepository } from '@modules/users/domain/repositories/user-preferences-repository.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserPreferencesEntityORM } from '../entities/user-preferences-entity.orm';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
-import { Model } from 'mongoose';
+import { IUserPreferencesRepository } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 import { UserPreferencesMapper } from '../../mappers/user-preferences.mapper';
+import { UserPreferencesEntityORM } from '../entities/user-preferences-entity.orm';
 
 /**
  * Implementation of the User Preferences Repository using Mongoose ORM.
@@ -48,10 +48,16 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
   }
 
   async findByUserId(userId: string): Promise<UserPreferencesEntity | null> {
+    // Validate that userId is a valid ObjectId before querying
+    if (!Types.ObjectId.isValid(userId)) {
+      return null;
+    }
+
     const ormEntity = await this.model
-      .findOne({ user: userId })
-      .populate('likedSongs')
-      .populate('dislikedSongs');
+      .findOne({
+        userId: new Types.ObjectId(userId),
+      })
+      .exec();
 
     if (!ormEntity) {
       return null;

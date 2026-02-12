@@ -10,7 +10,7 @@ import { Document, Types } from 'mongoose';
 export class UserPreferencesEntityORM extends Document {
   declare _id: Types.ObjectId;
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'users' })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'users', unique: true })
   userId: Types.ObjectId;
 
   @Prop({ required: true })

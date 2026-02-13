@@ -1,10 +1,12 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import {
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
   ApiBody,
   ApiExtraModels,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiResponseOptions,
   getSchemaPath,
 } from '@nestjs/swagger';
 
@@ -16,6 +18,12 @@ interface ApiResponseConfig {
 }
 
 interface ApiParamConfig {
+  name: string;
+  description: string;
+  required?: boolean;
+  type?: Type<any> | 'string' | 'number' | 'boolean';
+}
+interface ApiQueryParamConfig {
   name: string;
   description: string;
   required?: boolean;
@@ -33,6 +41,7 @@ interface ApiEndpointOptions {
   description?: string;
   responses: ApiResponseConfig[];
   params?: ApiParamConfig[];
+  queries?: ApiQueryParamConfig[];
   body?: ApiBodyConfig;
 }
 
@@ -66,14 +75,14 @@ export function ApiEndpoint(options: ApiEndpointOptions) {
   // Add ApiResponse decorators
   if (options.responses && options.responses.length > 0) {
     options.responses.forEach((response) => {
-      const responseConfig: any = {
+      const responseConfig: ApiResponseOptions = {
         status: response.status,
         description: response.description,
       };
 
       if (response.type) {
         if (response.isArray) {
-          responseConfig.schema = {
+          (responseConfig as any).schema = {
             type: 'array',
             items: { $ref: getSchemaPath(response.type) },
           };
@@ -118,6 +127,20 @@ export function ApiEndpoint(options: ApiEndpointOptions) {
       }),
     );
     decorators.push(ApiExtraModels(options.body.type));
+  }
+
+  // Add ApiQuery decorators
+  if (options.queries && options.queries.length > 0) {
+    options.queries.forEach((query) => {
+      decorators.push(
+        ApiQuery({
+          name: query.name,
+          description: query.description,
+          required: query.required ?? true,
+          type: query.type,
+        }),
+      );
+    });
   }
 
   return applyDecorators(...decorators);

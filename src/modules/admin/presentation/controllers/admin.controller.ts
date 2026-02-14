@@ -1,7 +1,7 @@
 import { ApiEndpoint } from '@common/decorators';
 import { SeedFromSpotifyIdUseCase } from '@modules/admin/application/use-cases/seed-from-spotify-id.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
-import { type IReccoBeatsAudioFeatures } from '@modules/songs/infrastructure/services/external-music-api.service';
+import { type IReccoBeatsAudioFeaturesQueries } from '@modules/songs/infrastructure/services/external-music-api.service';
 import {
   Body,
   Controller,
@@ -31,6 +31,7 @@ export class AdminController {
       {
         name: 'negativeSeeds',
         description: 'Array of Spotify track IDs to avoid in recommendations',
+        required: false,
       },
 
       {
@@ -55,6 +56,7 @@ export class AdminController {
   @Post('/seed')
   @ApiBody({
     description: 'Optional audio features to filter recommendations',
+    required: false,
     schema: {
       type: 'object',
       properties: {
@@ -77,12 +79,12 @@ export class AdminController {
   async seedFromSpotifyId(
     @Query(
       'positiveSeeds',
-      new ParseArrayPipe({ items: String, separator: ',' }),
+      new ParseArrayPipe({ items: String, separator: ',', optional: true }),
     )
     positiveSeeds: string[],
     @Query(
       'negativeSeeds',
-      new ParseArrayPipe({ items: String, separator: ',' }),
+      new ParseArrayPipe({ items: String, separator: ',', optional: true }),
     )
     negativeSeeds?: string[],
     @Query(
@@ -92,7 +94,7 @@ export class AdminController {
       }),
     )
     size?: number,
-    @Body() audioFeatures?: IReccoBeatsAudioFeatures,
+    @Body() audioFeatures?: IReccoBeatsAudioFeaturesQueries,
   ) {
     return this.seedFromSpotifyIdUseCase.execute(
       positiveSeeds,

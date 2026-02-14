@@ -1,7 +1,8 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppConfig } from 'src/config/app.config';
 
@@ -22,6 +23,8 @@ export interface ScoringContext {
 
 @Injectable()
 export class SongScoringService {
+  private readonly logger = new Logger(SongScoringService.name);
+
   constructor(private readonly configService: ConfigService) {}
 
   /**
@@ -31,11 +34,7 @@ export class SongScoringService {
     // El peso cambia según el progreso de la playlist
     const weights = this.getAdaptiveWeights(context.playlistProgress);
 
-    const transitionScore = this.calculateTransitionScore(
-      song,
-      context.currentEmotion,
-      context.targetEmotion,
-    );
+    const transitionScore = this.calculateTransitionScore(song, context);
 
     const preferenceScore = this.calculatePreferenceScore(
       song,
@@ -59,6 +58,40 @@ export class SongScoringService {
   }
 
   /**
+   * Calcula la puntuación de transición entre emociones
+   */
+  calculateTransitionScore(
+    song: SongEntity,
+    { currentEmotion, targetEmotion }: ScoringContext,
+  ): number {
+    const emotionWeights =
+      this.configService.get<AppConfig['emotionWeights']>('emotionWeights')!;
+    const features = SongMapper.featuresToKeyFeatures(song);
+    let score = 0;
+
+    for (const [feature, value] of Object.entries(features)) {
+      const targetWeight = emotionWeights[targetEmotion.getValue()][
+        feature
+      ] as number;
+      const currentWeight = emotionWeights[currentEmotion.getValue()][
+        feature
+      ] as number;
+      const direction = targetWeight - currentWeight;
+      this.logger.debug(
+        `Feature: ${feature}, value: ${value}, targetWeight: ${targetWeight}, currentWeight: ${currentWeight}, direction: ${direction}`,
+      );
+      score += direction * value;
+    }
+
+    this.logger.debug(
+      `Transition score for song ${song.title}: ${score.toFixed(4)} (current: ${currentEmotion.getValue()}, target: ${targetEmotion.getValue()})`,
+    );
+
+    // Normaliza a 0-1 (ajusta según tu rango real)
+    return this.normalize(score, -10, 10);
+  }
+
+  /**
    * Pesos adaptativos: al inicio prioriza transición, al final preferencias
    */
   private getAdaptiveWeights(progress: number): SongScoringWeights {
@@ -71,33 +104,6 @@ export class SongScoringService {
       quality: 0.15, // Constante
       diversity: 0.05, // Constante
     };
-  }
-
-  private calculateTransitionScore(
-    song: SongEntity,
-    currentEmotion: EmotionVO,
-    targetEmotion: EmotionVO,
-  ): number {
-    const emotionWeights =
-      this.configService.get<AppConfig['emotionWeights']>('emotionWeights')!;
-
-    let score = 0;
-
-    for (const [feature, value] of Object.entries(song.audioFeatures)) {
-      const targetWeight = emotionWeights[targetEmotion.getValue()][
-        feature
-      ] as number;
-
-      const currentWeight = emotionWeights[currentEmotion.getValue()][
-        feature
-      ] as number;
-      const direction = targetWeight - currentWeight;
-
-      score += direction * value;
-    }
-
-    // Normaliza a 0-1 (ajusta según tu rango real)
-    return this.normalize(score, -10, 10);
   }
 
   private calculatePreferenceScore(

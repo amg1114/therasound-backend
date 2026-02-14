@@ -7,7 +7,7 @@ import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import {
   ExternalMusicApiService,
-  IReccoBeatsAudioFeatures,
+  IReccoBeatsAudioFeaturesQueries,
 } from '@modules/songs/infrastructure/services/external-music-api.service';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
@@ -25,7 +25,7 @@ export class SeedFromSpotifyIdUseCase {
     spotifyIds: string[],
     negativeSeeds?: string[],
     size = 50,
-    audioFeatures?: IReccoBeatsAudioFeatures,
+    audioFeatures?: IReccoBeatsAudioFeaturesQueries,
   ): Promise<SeedReportResponseDto> {
     this.logger.log(
       `Seeding songs from Spotify IDs: ${spotifyIds.join(', ')} with size: ${size}`,

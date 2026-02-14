@@ -1,5 +1,6 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { IKeyAudioFeatures } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
 import { BadRequestException } from '@nestjs/common';
@@ -106,6 +107,20 @@ export class SongMapper {
       emotion: entity.emotion.getValue(),
       genres: entity.genres,
       imageUrl: entity.imageUrl,
+    };
+  }
+
+  static featuresToKeyFeatures(entity: SongEntity): IKeyAudioFeatures {
+    return {
+      acousticness: entity.audioFeatures.acousticness,
+      danceability: entity.audioFeatures.danceability,
+      energy: entity.audioFeatures.energy,
+      instrumentalness: entity.audioFeatures.instrumentalness,
+      liveness: entity.audioFeatures.liveness,
+      loudness: entity.audioFeatures.loudness,
+      speechiness: entity.audioFeatures.speechiness,
+      tempo: entity.audioFeatures.tempo,
+      valence: entity.audioFeatures.valence,
     };
   }
 }

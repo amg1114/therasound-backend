@@ -20,7 +20,7 @@ import {
 import { SoundchartsResponseDto } from '../dto/soundcharts-response.dto';
 import { SongMapper } from '../mappers/song.mapper';
 
-export interface IReccoBeatsAudioFeatures {
+export interface IReccoBeatsAudioFeaturesQueries {
   danceability?: number;
   energy?: number;
   instrumentalness?: number;
@@ -52,7 +52,7 @@ export class ExternalMusicApiService {
     seeds: string[],
     negativeSeeds: string[],
     size = 50,
-    audioFeatures?: IReccoBeatsAudioFeatures,
+    audioFeatures?: IReccoBeatsAudioFeaturesQueries,
   ) {
     this.logger.log(
       `Fetching recommendations with seeds: ${seeds.join(', ')} and negative seeds: ${negativeSeeds.join(', ')}`,
@@ -88,7 +88,7 @@ export class ExternalMusicApiService {
     seeds: string[],
     negativeSeeds: string[],
     size: number = 50,
-    audioFeatures?: IReccoBeatsAudioFeatures,
+    audioFeatures?: IReccoBeatsAudioFeaturesQueries,
   ): Promise<ReccoBeatsTrackDto[]> {
     try {
       const params = new URLSearchParams();
@@ -234,7 +234,7 @@ export class ExternalMusicApiService {
       genres: genres.filter(Boolean),
       imageUrl: details.imageUrl || '',
       releaseDate: new Date(details.releaseDate),
-      audioFeatures: emotionAnalysis.audio_features,
+      audioFeatures: details.audio,
       emotionConfidence: emotionAnalysis.confidence,
       emotionProbabilities: emotionAnalysis.probabilities,
       reccobeatsId: emotionAnalysis.reccobeats_id,

@@ -1,5 +1,4 @@
 import { SeedReportResponseDto } from '@modules/admin/presentation/dto/responses/seed-report-response.dto';
-import { SongProcessingService } from '@modules/songs/application/services/song-processing.service';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   SONG_REPOSITORY,
@@ -20,7 +19,6 @@ export class SeedFromSpotifyIdUseCase {
   constructor(
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
-    private readonly songProcessingService: SongProcessingService,
     private readonly externalMusicApiService: ExternalMusicApiService,
   ) {}
 
@@ -34,52 +32,26 @@ export class SeedFromSpotifyIdUseCase {
       `Seeding songs from Spotify IDs: ${spotifyIds.join(', ')} with size: ${size}`,
     );
 
-    let tracks = await this.externalMusicApiService.getRecommendations(
-      spotifyIds,
-      negativeSeeds || [],
-      size,
-      audioFeatures,
-    );
-
-    const existingSongs = await this.songRepository.findManyByReccoBeatsIds(
-      tracks.map((t) => t.id),
-    );
-
-    tracks = tracks.filter(
-      (track) =>
-        !existingSongs.some((song) => {
-          if (song.reccobeatsId === track.id) {
-            this.logger.log(
-              `Skipping existing song with ReccoBeats ID: ${track.id} (Spotify ID: ${song.spotifyId})`,
-            );
-            return true;
-          }
-          return false;
-        }),
-    );
-
-    if (tracks.length === 0) {
-      this.logger.warn(
-        `No recommendations found for Spotify IDs: ${spotifyIds.join(', ')}`,
+    const recommendations =
+      await this.externalMusicApiService.fetchRecommendationsAndProcess(
+        spotifyIds,
+        negativeSeeds || [],
+        size,
+        audioFeatures,
       );
+
+    if (recommendations.length === 0) {
       throw new NotFoundException(
         `No recommendations found for Spotify IDs: ${spotifyIds.join(', ')}`,
       );
     }
 
     this.logger.log(
-      `Found ${tracks.length} recommendations, saving to database...`,
-    );
-
-    const processedSongs =
-      await this.songProcessingService.processTracks(tracks);
-
-    this.logger.log(
-      `Successfully processed ${processedSongs.length} songs (filtered sad songs)`,
+      `Found ${recommendations.length} recommendations, saving to database...`,
     );
 
     const registeredSongs: SongEntity[] =
-      await this.songRepository.createMany(processedSongs);
+      await this.songRepository.createMany(recommendations);
 
     const groupedByEmotion: Record<
       'happy' | 'sad' | 'calm' | 'energetic',

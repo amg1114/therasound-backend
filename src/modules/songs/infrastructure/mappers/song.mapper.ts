@@ -1,9 +1,9 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { SongEntityORM } from '../orm/entities/song-entity.orm';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
-import { BadRequestException } from '@nestjs/common';
-import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
+import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
+import { BadRequestException } from '@nestjs/common';
+import { SongEntityORM } from '../orm/entities/song-entity.orm';
 
 export class SongMapper {
   /**
@@ -26,7 +26,7 @@ export class SongMapper {
     song.spotifyId = raw.spotifyId;
     song.title = raw.title;
     song.artist = raw.artist;
-    song.emotion = SongEmotionVO.create(raw.emotion);
+    song.emotion = EmotionVO.create(raw.emotion);
     song.durationMs = raw.durationMs;
     song.spotifyUrl = raw.spotifyUrl;
     song.genres = raw.genres;

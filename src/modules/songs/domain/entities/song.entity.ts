@@ -1,13 +1,13 @@
+import { EmotionVO } from '../../../../common/domain/value-objects/emotion.vo';
 import { AudioFeaturesVO } from '../value-objects/audio-features.vo';
 import { EmotionProbabilitiesVO } from '../value-objects/emotion-probabilities.vo';
-import { SongEmotionVO } from '../value-objects/song-emotion.vo';
 
 export class SongEntity {
   id: string;
   spotifyId: string;
   title: string;
   artist: string;
-  emotion: SongEmotionVO;
+  emotion: EmotionVO;
   durationMs: number;
   spotifyUrl: string;
   genres: string[];

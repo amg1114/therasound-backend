@@ -1,9 +1,9 @@
-import { SongEmotionType } from '@modules/songs/domain/value-objects/song-emotion.vo';
+import { EmotionType } from '@common/domain/value-objects/emotion.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 
 export type SeededEmotionReport = {
-  emotion: SongEmotionType;
+  emotion: EmotionType;
   count: number;
   songs: SongSummaryVO[];
 };

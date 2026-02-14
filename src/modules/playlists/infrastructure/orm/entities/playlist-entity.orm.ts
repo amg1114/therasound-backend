@@ -1,4 +1,4 @@
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -10,7 +10,7 @@ class EmbeddedSong {
   @Prop({ required: true })
   artist: string;
 
-  @Prop({ required: true, enum: SongEmotionVO.SONG_EMOTIONS })
+  @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
   emotion: string;
 
   @Prop({ required: true })
@@ -45,7 +45,7 @@ export class PlaylistEntityORM extends Document {
   @Prop({ required: true, type: [EmbeddedSong] })
   songs: EmbeddedSong[];
 
-  @Prop({ required: true, enum: SongEmotionVO.SONG_EMOTIONS })
+  @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
   emotion: string;
 
   @Prop({ required: true })

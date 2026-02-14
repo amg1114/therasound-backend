@@ -1,6 +1,6 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.entity';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
@@ -32,8 +32,8 @@ export class PlaylistBuilderService {
 
   buildPlaylist(
     availableSongs: SongEntity[],
-    currentEmotion: SongEmotionVO,
-    targetEmotion: SongEmotionVO,
+    currentEmotion: EmotionVO,
+    targetEmotion: EmotionVO,
     userPreferences: UserPreferencesEntity,
   ): Partial<PlaylistEntity> {
     const builder = new PlaylistBuilderState(
@@ -60,8 +60,8 @@ class PlaylistBuilderState {
 
   constructor(
     availableSongs: SongEntity[],
-    private readonly currentEmotion: SongEmotionVO,
-    private readonly targetEmotion: SongEmotionVO,
+    private readonly currentEmotion: EmotionVO,
+    private readonly targetEmotion: EmotionVO,
     private readonly userPreferences: UserPreferencesEntity,
     private readonly scoringService: SongScoringService,
     private readonly config: BuilderConfig,

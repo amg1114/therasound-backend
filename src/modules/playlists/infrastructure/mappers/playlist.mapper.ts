@@ -1,11 +1,11 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.entity';
-import { PlaylistEntityORM } from '../orm/entities/playlist-entity.orm';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
-import { Types } from 'mongoose';
-import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { PlaylistResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-response.dto';
 import { PlaylistSummaryResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-summary-response.dto';
+import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
+import { Types } from 'mongoose';
+import { PlaylistEntityORM } from '../orm/entities/playlist-entity.orm';
 
 export class PlaylistMapper {
   static toDomain(ormEntity: PlaylistEntityORM): PlaylistEntity {
@@ -14,7 +14,7 @@ export class PlaylistMapper {
       song.id = embeddedSong.songId.toString();
       song.title = embeddedSong.title;
       song.artist = embeddedSong.artist;
-      song.emotion = SongEmotionVO.create(embeddedSong.emotion);
+      song.emotion = EmotionVO.create(embeddedSong.emotion);
       song.durationMs = embeddedSong.durationMs;
       song.spotifyUrl = embeddedSong.spotifyUrl;
       song.genres = embeddedSong.genres;
@@ -27,7 +27,7 @@ export class PlaylistMapper {
       id: ormEntity._id.toString(),
       userId: ormEntity.userId.toString(),
       songs,
-      emotion: SongEmotionVO.create(ormEntity.emotion),
+      emotion: EmotionVO.create(ormEntity.emotion),
       durationMs: ormEntity.durationMs,
       createdAt: ormEntity.createdAt,
     });

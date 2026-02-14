@@ -1,6 +1,6 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { type AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { type EmotionProbabilitiesVO } from '@modules/songs/domain/value-objects/emotion-probabilities.vo';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -20,7 +20,7 @@ export class SongEntityORM extends Document {
   @Prop({ required: true })
   artist: string;
 
-  @Prop({ required: true, enum: SongEmotionVO.SONG_EMOTIONS })
+  @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
   emotion: string;
 
   @Prop({ required: true })

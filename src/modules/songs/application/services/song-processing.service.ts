@@ -1,9 +1,9 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   type ISongRepository,
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { ReccoBeatsTrackDto } from '@modules/songs/infrastructure/dto/reccobeats-response.dto';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
@@ -103,7 +103,7 @@ export class SongProcessingService {
       spotifyId: spotifyId,
       title: details.name,
       artist: details.artists[0]?.name || track.artists[0]?.name || 'Unknown',
-      emotion: SongEmotionVO.create(emotionAnalysis.emotion),
+      emotion: EmotionVO.create(emotionAnalysis.emotion),
       durationMs: details.duration * 1000, // Convert seconds to milliseconds
       spotifyUrl: track.href,
       genres: genres.filter(Boolean),

@@ -1,9 +1,6 @@
 import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import {
-  ISongRepository,
-  SongFilters,
-} from '@modules/songs/domain/repositories/song-repository.interface';
+import { ISongRepository } from '@modules/songs/domain/repositories/song-repository.interface';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
@@ -19,55 +16,21 @@ export class SongRepositoryImpl implements ISongRepository {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async findByEmotion(emotion: string): Promise<SongEntity[]> {
-    const songs = await this.model.find({ emotion });
-    return songs.map((song) => SongMapper.toEntity(song));
-  }
-
-  async findByEmotionWithFilters(
-    emotion: string,
-    filters: SongFilters,
-  ): Promise<SongEntity[]> {
-    const query: any = { emotion };
-
-    // Exclude disliked songs
-    if (filters.excludedSongIds && filters.excludedSongIds.length > 0) {
-      query._id = { $nin: filters.excludedSongIds };
-    }
-
-    // Exclude disliked artists
-    if (filters.excludedArtistIds && filters.excludedArtistIds.length > 0) {
-      query.artist = { $nin: filters.excludedArtistIds };
-    }
-
-    // Exclude disliked genres
-    if (filters.excludedGenres && filters.excludedGenres.length > 0) {
-      query.genres = { $nin: filters.excludedGenres };
-    }
-
-    const songs = await this.model.find(query);
-    return songs.map((song) => SongMapper.toEntity(song));
-  }
-
   async findById(id: string): Promise<SongEntity | null> {
     const song = await this.model.findById(id);
     if (!song) return null;
     return SongMapper.toEntity(song);
   }
 
-  async findBySpotifyId(spotifyId: string): Promise<SongEntity | null> {
-    const song = await this.model.findOne({ spotifyId });
-    if (!song) return null;
-    return SongMapper.toEntity(song);
-  }
-
-  async findBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]> {
-    const songs = await this.model.find({ spotifyId: { $in: spotifyIds } });
+  async findAll(): Promise<SongEntity[]> {
+    const songs = await this.model.find();
     return songs.map((song) => SongMapper.toEntity(song));
   }
 
-  async findMany(ids: string[]): Promise<SongEntity[]> {
-    const songs = await this.model.find({ _id: { $in: ids } });
+  async findManyBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]> {
+    const songs = await this.model.find({
+      spotifyId: { $in: spotifyIds },
+    });
     return songs.map((song) => SongMapper.toEntity(song));
   }
 
@@ -75,18 +38,7 @@ export class SongRepositoryImpl implements ISongRepository {
     reccoBeatsIds: string[],
   ): Promise<SongEntity[]> {
     const songs = await this.model.find({
-      reccobeatsId: { $in: reccoBeatsIds },
-    });
-    return songs.map((song) => SongMapper.toEntity(song));
-  }
-
-  async findManyByEmotion(
-    ids: string[],
-    emotion: string,
-  ): Promise<SongEntity[]> {
-    const songs = await this.model.find({
-      _id: { $in: ids },
-      emotion: emotion,
+      reccoBeatsId: { $in: reccoBeatsIds },
     });
     return songs.map((song) => SongMapper.toEntity(song));
   }
@@ -119,17 +71,5 @@ export class SongRepositoryImpl implements ISongRepository {
 
   async decrementLikesCount(songId: string): Promise<void> {
     await this.model.updateOne({ _id: songId }, { $inc: { likesCount: -1 } });
-  }
-
-  async findTopLikedByGenre(
-    genre: string,
-    limit: number,
-  ): Promise<SongEntity[]> {
-    const query = genre ? { genres: genre } : {};
-    const songs = await this.model
-      .find(query)
-      .sort({ likesCount: -1 })
-      .limit(limit);
-    return songs.map((song) => SongMapper.toEntity(song));
   }
 }

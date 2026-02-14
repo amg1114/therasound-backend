@@ -15,10 +15,10 @@ export class SongEntity {
   releaseDate: Date;
 
   // Emotion analysis data
-  audioFeatures?: AudioFeaturesVO;
-  emotionConfidence?: number;
-  emotionProbabilities?: EmotionProbabilitiesVO;
-  reccobeatsId?: string;
+  audioFeatures: AudioFeaturesVO;
+  emotionConfidence: number;
+  emotionProbabilities: EmotionProbabilitiesVO;
+  reccobeatsId: string;
 
   // Statistics
   likesCount: number;

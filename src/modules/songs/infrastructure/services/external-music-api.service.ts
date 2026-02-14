@@ -152,10 +152,8 @@ export class ExternalMusicApiService {
    * @param tracks - List of ReccoBeats tracks to process
    * @returns Array of enriched partial song entities
    */
-  async processTracks(
-    tracks: ReccoBeatsTrackDto[],
-  ): Promise<Partial<SongEntity>[]> {
-    const processedSongs: Partial<SongEntity>[] = [];
+  async processTracks(tracks: ReccoBeatsTrackDto[]): Promise<SongEntity[]> {
+    const processedSongs: SongEntity[] = [];
 
     for (const track of tracks) {
       try {
@@ -181,9 +179,7 @@ export class ExternalMusicApiService {
    * @param targetEmotion - The emotion to assign to the song
    * @returns Enriched partial song entity or null if filtered
    */
-  async processTrack(
-    track: ReccoBeatsTrackDto,
-  ): Promise<Partial<SongEntity> | null> {
+  async processTrack(track: ReccoBeatsTrackDto): Promise<SongEntity | null> {
     const songExists = await this.songRepository.existsByReccoBeatsId(track.id);
     if (songExists) {
       this.logger.log(
@@ -226,10 +222,9 @@ export class ExternalMusicApiService {
     // Extract genres (flatten the genre structure)
     const genres = [
       ...new Set(details.genres.flatMap((g) => [g.root, ...(g.sub ?? [])])),
-    ].filter(Boolean); // Unique non-empty genres
+    ].filter(Boolean);
 
-    // Create song entity with emotion analysis data
-    return {
+    const newSong = SongEntity.create({
       spotifyId: spotifyId,
       title: details.name,
       artist: details.artists[0]?.name || track.artists[0]?.name || 'Unknown',
@@ -243,7 +238,9 @@ export class ExternalMusicApiService {
       emotionConfidence: emotionAnalysis.confidence,
       emotionProbabilities: emotionAnalysis.probabilities,
       reccobeatsId: emotionAnalysis.reccobeats_id,
-    };
+    });
+
+    return this.songRepository.create(newSong);
   }
 
   /**

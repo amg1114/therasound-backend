@@ -1,5 +1,4 @@
 import { SeedReportResponseDto } from '@modules/admin/presentation/dto/responses/seed-report-response.dto';
-import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   SONG_REPOSITORY,
   type ISongRepository,
@@ -46,17 +45,12 @@ export class SeedFromSpotifyIdUseCase {
       );
     }
 
-    this.logger.log(
-      `Found ${recommendations.length} recommendations, saving to database...`,
-    );
-
-    const registeredSongs: SongEntity[] =
-      await this.songRepository.createMany(recommendations);
+    this.logger.log(`Found ${recommendations.length} recommendations.`);
 
     const groupedByEmotion: Record<
       'happy' | 'sad' | 'calm' | 'energetic',
       SongSummaryVO[]
-    > = registeredSongs.reduce(
+    > = recommendations.reduce(
       (acc, song) => {
         if (!acc[song.emotion.getValue()]) {
           acc[song.emotion.getValue()] = [];
@@ -68,7 +62,7 @@ export class SeedFromSpotifyIdUseCase {
     );
 
     const response = new SeedReportResponseDto();
-    response.totalSeededSongs = registeredSongs.length;
+    response.totalSeededSongs = recommendations.length;
     response.happySongs = {
       emotion: 'happy',
       count: groupedByEmotion['happy']?.length || 0,

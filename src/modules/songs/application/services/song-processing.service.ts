@@ -1,9 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import {
+  type ISongRepository,
+  SONG_REPOSITORY,
+} from '@modules/songs/domain/repositories/song-repository.interface';
 import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { ReccoBeatsTrackDto } from '@modules/songs/infrastructure/dto/reccobeats-response.dto';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
+import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 /**
  * Service responsible for processing and enriching songs with emotion analysis
@@ -15,6 +19,7 @@ export class SongProcessingService {
 
   constructor(
     private readonly externalMusicApiService: ExternalMusicApiService,
+    @Inject(SONG_REPOSITORY) private readonly songRepository: ISongRepository,
   ) {}
 
   /**
@@ -63,13 +68,6 @@ export class SongProcessingService {
     if (!emotionAnalysis) {
       this.logger.log(
         `Skipping song ${track.id} - no emotion analysis available`,
-      );
-      return null;
-    }
-
-    if (emotionAnalysis.emotion === 'sad') {
-      this.logger.log(
-        `Skipping song ${track.id} - emotion: ${emotionAnalysis.emotion}`,
       );
       return null;
     }

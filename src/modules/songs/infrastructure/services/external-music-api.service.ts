@@ -1,16 +1,31 @@
 import {
-  Injectable,
-  Logger,
   BadGatewayException,
+  Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EmotionAnalysisResponseDto } from '../dto/emotion-analysis-response.dto';
 import {
   ReccoBeatsResponseDto,
   ReccoBeatsTrackDto,
 } from '../dto/reccobeats-response.dto';
 import { SoundchartsResponseDto } from '../dto/soundcharts-response.dto';
-import { EmotionAnalysisResponseDto } from '../dto/emotion-analysis-response.dto';
+
+export interface IReccoBeatsAudioFeatures {
+  danceability?: number;
+  energy?: number;
+  instrumentalness?: number;
+  key?: number;
+  liveness?: number;
+  loudness?: number;
+  mode?: number;
+  speechiness?: number;
+  tempo?: number;
+  valence?: number;
+  popularity?: number;
+  featureWeight?: number;
+}
 
 @Injectable()
 export class ExternalMusicApiService {
@@ -31,6 +46,7 @@ export class ExternalMusicApiService {
     seeds: string[],
     negativeSeeds: string[],
     size: number = 50,
+    audioFeatures?: IReccoBeatsAudioFeatures,
   ): Promise<ReccoBeatsTrackDto[]> {
     try {
       const params = new URLSearchParams();
@@ -46,6 +62,14 @@ export class ExternalMusicApiService {
         params.append('negativeSeeds', negativeSeeds.slice(0, 5).join(','));
       }
 
+      if (audioFeatures) {
+        Object.entries(audioFeatures).forEach(([key, value]) => {
+          if (value !== undefined) {
+            params.append(key, value);
+          }
+        });
+      }
+
       const url = `${this.reccobeatsBaseUrl}/track/recommendation?${params.toString()}`;
 
       this.logger.log(`Fetching recommendations from ReccoBeats: ${url}`);
@@ -59,7 +83,7 @@ export class ExternalMusicApiService {
 
       if (!response.ok) {
         throw new BadGatewayException(
-          `Error en API de ReccoBeats: ${response.status} ${response.statusText}`,
+          `Error en API de ReccoBeats: ${response.status} ${response.statusText} \n Response: ${await response.text()}`,
         );
       }
 

@@ -1,27 +1,17 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  Get,
-  Param,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
-import { RegisterSongBySpotifyIdUseCase } from '@modules/songs/application/use-cases/register-song-by-spotify-id.usecase';
+import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 import { GetSongByIdUseCase } from '@modules/songs/application/use-cases/get-song-by-id.usecase';
 import { GetTopLikedSongsByGenreUseCase } from '@modules/songs/application/use-cases/get-top-liked-songs-by-genre.usecase';
-import { RegisterSongRequestDto } from '../dto/requests/register-song-request.dto';
-import { SongResponseDto } from '../dto/responses/song-response.dto';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
-import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { SongResponseDto } from '../dto/responses/song-response.dto';
 
 @ApiTags('Songs')
 @Controller('songs')
@@ -29,36 +19,9 @@ import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 @ApiBearerAuth()
 export class SongsController {
   constructor(
-    private readonly registerSongBySpotifyIdUseCase: RegisterSongBySpotifyIdUseCase,
     private readonly getSongByIdUseCase: GetSongByIdUseCase,
     private readonly getTopLikedSongsByGenreUseCase: GetTopLikedSongsByGenreUseCase,
   ) {}
-
-  @Post('register')
-  @ApiOperation({
-    summary: 'Fetch and register songs by Spotify ID',
-    description:
-      'Fetches recommendations from ReccoBeats using a Spotify ID as seed, enriches them with emotion analysis and metadata, then registers them in the database. Filters out sad songs.',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Songs successfully fetched and registered',
-    type: [SongResponseDto],
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  async registerSong(
-    @Body() dto: RegisterSongRequestDto,
-  ): Promise<SongResponseDto[]> {
-    const songs = await this.registerSongBySpotifyIdUseCase.execute(
-      dto.spotifyId,
-      dto.targetCount,
-    );
-
-    return songs.map((song) => SongMapper.toResponseDto(song));
-  }
 
   @Get(':id')
   @ApiOperation({

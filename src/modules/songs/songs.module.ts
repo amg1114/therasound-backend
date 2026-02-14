@@ -7,7 +7,6 @@ import { SongProcessingService } from './application/services/song-processing.se
 import { FetchAndRegisterSongsUseCase } from './application/use-cases/fetch-and-register-songs.usecase';
 import { GetSongByIdUseCase } from './application/use-cases/get-song-by-id.usecase';
 import { GetTopLikedSongsByGenreUseCase } from './application/use-cases/get-top-liked-songs-by-genre.usecase';
-import { RegisterSongBySpotifyIdUseCase } from './application/use-cases/register-song-by-spotify-id.usecase';
 import { SONG_REPOSITORY } from './domain/repositories/song-repository.interface';
 import {
   SongEntityORM,
@@ -38,10 +37,14 @@ import { SongsController } from './presentation/controllers/songs.controller';
     SongProcessingService,
     FetchAndRegisterSongsUseCase,
     GetSongByIdUseCase,
-    RegisterSongBySpotifyIdUseCase,
     GetTopLikedSongsByGenreUseCase,
     SongCreatedListener,
   ],
-  exports: [SONG_REPOSITORY, FetchAndRegisterSongsUseCase],
+  exports: [
+    SONG_REPOSITORY,
+    FetchAndRegisterSongsUseCase,
+    SongProcessingService,
+    ExternalMusicApiService,
+  ],
 })
 export class SongsModule {}

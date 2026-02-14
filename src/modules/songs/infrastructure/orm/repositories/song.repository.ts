@@ -1,15 +1,15 @@
+import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
+import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   ISongRepository,
   SongFilters,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { SongEntityORM } from '../entities/song-entity.orm';
-import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { SongMapper } from '../../mappers/song.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { SongMapper } from '../../mappers/song.mapper';
+import { SongEntityORM } from '../entities/song-entity.orm';
 
 @Injectable()
 export class SongRepositoryImpl implements ISongRepository {
@@ -68,6 +68,15 @@ export class SongRepositoryImpl implements ISongRepository {
 
   async findMany(ids: string[]): Promise<SongEntity[]> {
     const songs = await this.model.find({ _id: { $in: ids } });
+    return songs.map((song) => SongMapper.toEntity(song));
+  }
+
+  async findManyByReccoBeatsIds(
+    reccoBeatsIds: string[],
+  ): Promise<SongEntity[]> {
+    const songs = await this.model.find({
+      reccobeatsId: { $in: reccoBeatsIds },
+    });
     return songs.map((song) => SongMapper.toEntity(song));
   }
 

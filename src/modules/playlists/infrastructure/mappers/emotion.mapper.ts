@@ -1,20 +1,20 @@
-import { SongEmotionType } from '@modules/songs/domain/value-objects/song-emotion.vo';
-import { Injectable } from '@nestjs/common';
+import {
+  SongEmotionType,
+  SongEmotionVO,
+} from '@modules/songs/domain/value-objects/song-emotion.vo';
 
 /**
  * Service to map emotion analysis results to song emotions
  * Maps the output from chatbot emotion analysis to valid song emotion values
  */
-@Injectable()
-export class EmotionMappingService {
+export class EmotionMapper {
   /**
    * Maps an analyzed emotion string to a song emotion
    * @param analyzedEmotion - The emotion returned from chatbot analysis
    * @returns A valid song emotion: 'happy', 'sad', 'energetic', or 'calm'
    */
-  mapToSongEmotion(analyzedEmotion: string): string {
+  static mapToSongEmotion(analyzedEmotion: string): SongEmotionVO {
     const normalized = analyzedEmotion.toLowerCase().trim();
-
     // Mapping patterns for different emotions
     const emotionMap: Record<string, SongEmotionType> = {
       joy: 'happy',
@@ -28,17 +28,17 @@ export class EmotionMappingService {
 
     // Check for exact match
     if (emotionMap[normalized]) {
-      return emotionMap[normalized];
+      return SongEmotionVO.create(emotionMap[normalized]);
     }
 
     // Check for partial matches
     for (const [key, value] of Object.entries(emotionMap)) {
       if (normalized.includes(key)) {
-        return value;
+        return SongEmotionVO.create(value);
       }
     }
 
     // Default to calm if no match found
-    return 'calm';
+    return SongEmotionVO.create('calm');
   }
 }

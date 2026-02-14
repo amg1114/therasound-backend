@@ -1,5 +1,5 @@
+import { EmotionType } from '@common/domain/value-objects/emotion.vo';
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
-import { SongEmotionType } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { readFileSync } from 'fs';
 import * as Joi from 'joi';
 import { join } from 'path';
@@ -26,7 +26,7 @@ export type AppConfig = {
   emotionAnalysis: {
     apiUrl: string;
   };
-  emotionWeights: Record<SongEmotionType, AudioFeaturesVO>;
+  emotionWeights: Record<EmotionType, AudioFeaturesVO>;
 };
 
 const emotionWeightsPath = join(
@@ -36,7 +36,7 @@ const emotionWeightsPath = join(
 );
 const emotionWeights = JSON.parse(
   readFileSync(emotionWeightsPath, 'utf-8'),
-) as Record<SongEmotionType, AudioFeaturesVO>;
+) as Record<EmotionType, AudioFeaturesVO>;
 
 export const APP_CONFIG_SCHEMA = Joi.object({
   PORT: Joi.number().default(3000),

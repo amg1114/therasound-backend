@@ -1,5 +1,5 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { SongEmotionVO } from '@modules/songs/domain/value-objects/song-emotion.vo';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,8 +13,8 @@ export interface SongScoringWeights {
 }
 
 export interface ScoringContext {
-  currentEmotion: SongEmotionVO;
-  targetEmotion: SongEmotionVO;
+  currentEmotion: EmotionVO;
+  targetEmotion: EmotionVO;
   userPreferences: UserPreferencesEntity;
   selectedSongs: SongEntity[];
   playlistProgress: number; // 0-1
@@ -75,8 +75,8 @@ export class SongScoringService {
 
   private calculateTransitionScore(
     song: SongEntity,
-    currentEmotion: SongEmotionVO,
-    targetEmotion: SongEmotionVO,
+    currentEmotion: EmotionVO,
+    targetEmotion: EmotionVO,
   ): number {
     const emotionWeights =
       this.configService.get<AppConfig['emotionWeights']>('emotionWeights')!;

@@ -1,6 +1,6 @@
+import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 import { NotFoundException } from '@nestjs/common';
 import { HistorySongVO } from '../value-objects/history-song.vo';
-import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 
 export interface UserPreferencesProps {
   id?: string;
@@ -75,6 +75,18 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     return this.likedSongs.some((song) => song.id === songId);
   }
 
+  hasLikedArtist(artist: string): boolean {
+    return this.likedArtists.includes(artist);
+  }
+
+  hasDislikedArtist(artist: string): boolean {
+    return this.dislikedArtists.includes(artist);
+  }
+
+  hasListenedSong(songId: string): boolean {
+    return this.listenedHistory.some((entry) => entry.song.id === songId);
+  }
+
   removeLikedSong(songId: string): void {
     if (!this.hasLikedSong(songId)) {
       throw new NotFoundException(
@@ -113,6 +125,20 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     }
   }
 
+  getRecentHistory(limit: number): HistorySongVO[] {
+    return this.listenedHistory
+      .slice()
+      .sort((a, b) => b.listenedAt.getTime() - a.listenedAt.getTime())
+      .slice(0, limit);
+  }
+
+  getCompletionRateForSong(songId: string): number {
+    const historyEntry = this.listenedHistory.find(
+      (entry) => entry.song.id === songId,
+    );
+    return historyEntry ? historyEntry.completionRate : 0;
+  }
+
   getValues(): UserPreferencesProps {
     return {
       id: this.id,
@@ -125,5 +151,52 @@ export class UserPreferencesEntity implements UserPreferencesProps {
       likedArtists: this.likedArtists,
       listenedHistory: this.listenedHistory,
     };
+  }
+
+  /**
+   * Calcula peso de preferencia por género basado en canciones liked
+   * Retorna Map<género, peso entre 0-1>
+   */
+  calculateGenreWeights(): Map<string, number> {
+    const genreCounts = new Map<string, number>();
+    const totalSongs = this.likedSongs.length;
+
+    if (totalSongs === 0) {
+      // Si no hay canciones liked, usa los géneros seleccionados
+      return this.calculateGenreWeightsFromSelection();
+    }
+
+    // Cuenta cuántas canciones liked tiene cada género
+    for (const song of this.likedSongs) {
+      for (const genre of song.genres) {
+        genreCounts.set(genre, (genreCounts.get(genre) || 0) + 1);
+      }
+    }
+
+    // Convierte conteos a pesos (0-1)
+    const weights = new Map<string, number>();
+    const maxCount = Math.max(...genreCounts.values());
+
+    for (const [genre, count] of genreCounts) {
+      weights.set(genre, count / maxCount); // Normaliza al género más popular
+    }
+
+    return weights;
+  }
+
+  private calculateGenreWeightsFromSelection(): Map<string, number> {
+    const weights = new Map<string, number>();
+
+    // Géneros explícitamente liked tienen peso máximo
+    for (const genre of this.likedGenres) {
+      weights.set(genre, 1.0);
+    }
+
+    // Géneros disliked tienen peso mínimo
+    for (const genre of this.dislikedGenres) {
+      weights.set(genre, 0.0);
+    }
+
+    return weights;
   }
 }

@@ -1,18 +1,18 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiTags,
-  ApiBearerAuth,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
+import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-user.decorator';
 import { GeneratePlaylistUseCase } from '@modules/playlists/application/use-cases/generate-playlist.usecase';
 import { GetPlaylistByIdUseCase } from '@modules/playlists/application/use-cases/get-playlist-by-id.usecase';
 import { GetUserPlaylistsUseCase } from '@modules/playlists/application/use-cases/get-user-playlists.usecase';
+import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GeneratePlaylistRequestDto } from '../dto/requests/generate-playlist-request.dto';
 import { PlaylistResponseDto } from '../dto/responses/playlist-response.dto';
-import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
-import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-user.decorator';
 
 @ApiTags('playlists')
 @ApiBearerAuth()
@@ -43,7 +43,8 @@ export class PlaylistsController {
     @CurrentUserId() userId: string,
     @Body() body: GeneratePlaylistRequestDto,
   ): Promise<PlaylistResponseDto> {
-    return this.generatePlaylistUseCase.execute(userId, body);
+    const playlist = await this.generatePlaylistUseCase.execute(userId, body);
+    return PlaylistMapper.toResponseDto(playlist);
   }
 
   @Get()

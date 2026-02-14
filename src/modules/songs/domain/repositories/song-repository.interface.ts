@@ -9,24 +9,13 @@ export interface SongFilters {
 }
 
 export interface ISongRepository {
-  findByEmotion(emotion: string): Promise<SongEntity[]>;
-
-  findByEmotionWithFilters(
-    emotion: string,
-    filters: SongFilters,
-  ): Promise<SongEntity[]>;
-
   findById(id: string): Promise<SongEntity | null>;
 
-  findBySpotifyId(spotifyId: string): Promise<SongEntity | null>;
-
-  findBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]>;
-
-  findMany(ids: string[]): Promise<SongEntity[]>;
+  findManyBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]>;
 
   findManyByReccoBeatsIds(reccoBeatsIds: string[]): Promise<SongEntity[]>;
 
-  findManyByEmotion(ids: string[], emotion: string): Promise<SongEntity[]>;
+  findAll(): Promise<SongEntity[]>;
 
   create(song: Partial<SongEntity>): Promise<SongEntity>;
 
@@ -35,6 +24,4 @@ export interface ISongRepository {
   incrementLikesCount(songId: string): Promise<void>;
 
   decrementLikesCount(songId: string): Promise<void>;
-
-  findTopLikedByGenre(genre: string, limit: number): Promise<SongEntity[]>;
 }

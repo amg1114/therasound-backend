@@ -1,14 +1,14 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   SONG_REPOSITORY,
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
+import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
 import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
-import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
-import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SongProcessingService } from '../services/song-processing.service';
 
 @Injectable()
@@ -82,7 +82,7 @@ export class FetchAndRegisterSongsUseCase {
     // 4. Filter out songs that are already registered
     const spotifyIds = recommendations.map((track) => track.id);
     const existingSongs =
-      await this.songRepository.findBySpotifyIds(spotifyIds);
+      await this.songRepository.findManyBySpotifyIds(spotifyIds);
     const existingSpotifyIds = new Set(
       existingSongs.map((song) => song.spotifyId),
     );

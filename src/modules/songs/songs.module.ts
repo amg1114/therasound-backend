@@ -6,7 +6,6 @@ import { SongCreatedListener } from './application/listeners/song-created.listen
 import { SongProcessingService } from './application/services/song-processing.service';
 import { FetchAndRegisterSongsUseCase } from './application/use-cases/fetch-and-register-songs.usecase';
 import { GetSongByIdUseCase } from './application/use-cases/get-song-by-id.usecase';
-import { GetTopLikedSongsByGenreUseCase } from './application/use-cases/get-top-liked-songs-by-genre.usecase';
 import { SONG_REPOSITORY } from './domain/repositories/song-repository.interface';
 import {
   SongEntityORM,
@@ -37,7 +36,6 @@ import { SongsController } from './presentation/controllers/songs.controller';
     SongProcessingService,
     FetchAndRegisterSongsUseCase,
     GetSongByIdUseCase,
-    GetTopLikedSongsByGenreUseCase,
     SongCreatedListener,
   ],
   exports: [

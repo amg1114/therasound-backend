@@ -24,6 +24,8 @@ export interface ISongRepository {
 
   findMany(ids: string[]): Promise<SongEntity[]>;
 
+  findManyByReccoBeatsIds(reccoBeatsIds: string[]): Promise<SongEntity[]>;
+
   findManyByEmotion(ids: string[], emotion: string): Promise<SongEntity[]>;
 
   create(song: Partial<SongEntity>): Promise<SongEntity>;

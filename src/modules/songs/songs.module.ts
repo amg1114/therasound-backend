@@ -3,8 +3,6 @@ import { UsersModule } from '@modules/users/users.module';
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SongCreatedListener } from './application/listeners/song-created.listener';
-import { SongProcessingService } from './application/services/song-processing.service';
-import { FetchAndRegisterSongsUseCase } from './application/use-cases/fetch-and-register-songs.usecase';
 import { GetSongByIdUseCase } from './application/use-cases/get-song-by-id.usecase';
 import { SONG_REPOSITORY } from './domain/repositories/song-repository.interface';
 import {
@@ -33,16 +31,9 @@ import { SongsController } from './presentation/controllers/songs.controller';
       useClass: SongRepositoryImpl,
     },
     ExternalMusicApiService,
-    SongProcessingService,
-    FetchAndRegisterSongsUseCase,
     GetSongByIdUseCase,
     SongCreatedListener,
   ],
-  exports: [
-    SONG_REPOSITORY,
-    FetchAndRegisterSongsUseCase,
-    SongProcessingService,
-    ExternalMusicApiService,
-  ],
+  exports: [SONG_REPOSITORY, ExternalMusicApiService],
 })
 export class SongsModule {}

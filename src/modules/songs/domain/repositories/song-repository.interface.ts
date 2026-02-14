@@ -24,4 +24,6 @@ export interface ISongRepository {
   incrementLikesCount(songId: string): Promise<void>;
 
   decrementLikesCount(songId: string): Promise<void>;
+
+  existsByReccoBeatsId(reccoBeatsId: string): Promise<boolean>;
 }

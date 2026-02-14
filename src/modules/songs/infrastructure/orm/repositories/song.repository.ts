@@ -72,4 +72,9 @@ export class SongRepositoryImpl implements ISongRepository {
   async decrementLikesCount(songId: string): Promise<void> {
     await this.model.updateOne({ _id: songId }, { $inc: { likesCount: -1 } });
   }
+
+  async existsByReccoBeatsId(reccoBeatsId: string): Promise<boolean> {
+    const count = await this.model.countDocuments({ reccoBeatsId });
+    return count > 0;
+  }
 }

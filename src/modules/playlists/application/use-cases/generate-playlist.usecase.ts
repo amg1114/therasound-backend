@@ -12,6 +12,7 @@ import {
   SONG_REPOSITORY,
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
+import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
 import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
@@ -19,13 +20,15 @@ import {
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EmotionMapper } from '../../infrastructure/mappers/emotion.mapper';
 import { PlaylistBuilderService } from '../services/playlist-builder.service';
-
+const MIN_SONGS_THRESHOLD = 20;
 @Injectable()
 export class GeneratePlaylistUseCase {
   private readonly logger = new Logger(GeneratePlaylistUseCase.name);
 
   constructor(
     private readonly playlistBuilderService: PlaylistBuilderService,
+    private readonly externalMusicApi: ExternalMusicApiService,
+
     @Inject(CHATBOT_SERVICE_TOKEN)
     private readonly chatbotService: IChatbotService,
     @Inject(PLAYLIST_REPOSITORY)
@@ -59,6 +62,12 @@ export class GeneratePlaylistUseCase {
     }
 
     const availableSongs = await this.songRepository.findAll();
+
+    if (availableSongs.length < MIN_SONGS_THRESHOLD) {
+      this.logger.warn(
+        `Número insuficiente de canciones disponibles (${availableSongs.length}) para generar una playlist personalizada. Se generará una playlist genérica.`,
+      );
+    }
 
     const playlist = this.playlistBuilderService.buildPlaylist(
       availableSongs,

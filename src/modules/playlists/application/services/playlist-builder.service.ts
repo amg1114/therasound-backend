@@ -15,6 +15,8 @@ export class PlaylistBuilderService {
     minDurationMs: 15 * 60 * 1000, // 15 min
     maxStepIncrement: 0.05,
     initialMaxStep: 0.15,
+    maxTotalIterations: 1000, // Prevent runaway loops
+    maxConsecutiveFailures: 50, // Stop after 50 failed attempts in a row
   };
 
   constructor(private readonly scoringService: SongScoringService) {}

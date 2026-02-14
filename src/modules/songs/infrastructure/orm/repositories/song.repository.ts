@@ -1,10 +1,13 @@
 import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { ISongRepository } from '@modules/songs/domain/repositories/song-repository.interface';
+import {
+  ISongRepository,
+  SongFilters,
+} from '@modules/songs/domain/repositories/song-repository.interface';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, QueryFilter, Types } from 'mongoose';
 import { SongMapper } from '../../mappers/song.mapper';
 import { SongEntityORM } from '../entities/song-entity.orm';
 
@@ -31,6 +34,20 @@ export class SongRepositoryImpl implements ISongRepository {
     const songs = await this.model.find({
       spotifyId: { $in: spotifyIds },
     });
+    return songs.map((song) => SongMapper.toEntity(song));
+  }
+
+  async findPopular(
+    limit: number,
+    filters?: SongFilters,
+  ): Promise<SongEntity[]> {
+    const query = this.buildQueryFilters(filters);
+
+    const songs = await this.model
+      .find(query)
+      .sort({ likesCount: -1 })
+      .limit(limit);
+
     return songs.map((song) => SongMapper.toEntity(song));
   }
 
@@ -76,5 +93,33 @@ export class SongRepositoryImpl implements ISongRepository {
   async existsByReccoBeatsId(reccoBeatsId: string): Promise<boolean> {
     const count = await this.model.countDocuments({ reccoBeatsId });
     return count > 0;
+  }
+
+  private buildQueryFilters(filters?: SongFilters): QueryFilter<SongEntityORM> {
+    const query: QueryFilter<SongEntityORM> = {};
+
+    if (filters?.excludedSongIds) {
+      query._id = {
+        $nin: filters.excludedSongIds.map((id) => new Types.ObjectId(id)),
+      };
+    }
+
+    if (filters?.excludedArtists) {
+      query.artist = { $nin: filters.excludedArtists };
+    }
+
+    if (filters?.deseableArtists) {
+      query.artist = { $in: filters.deseableArtists };
+    }
+
+    if (filters?.excludedGenres) {
+      query.genres = { $nin: filters.excludedGenres };
+    }
+
+    if (filters?.deseableGenres) {
+      query.genres = { $in: filters.deseableGenres };
+    }
+
+    return query;
   }
 }

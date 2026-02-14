@@ -27,6 +27,7 @@ export type AppConfig = {
     apiUrl: string;
   };
   emotionWeights: Record<EmotionType, AudioFeaturesVO>;
+  defaultSeedRecommendations: string;
 };
 
 const emotionWeightsPath = join(
@@ -47,6 +48,7 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   SOUNDCHARTS_APP_ID: Joi.string().required(),
   SOUNDCHARTS_API_KEY: Joi.string().required(),
   EMOTION_ANALYSIS_API_URL: Joi.string().default('http://localhost:8000'),
+  DEFAULT_SEED_RECOMMENDATIONS: Joi.string().required(),
 });
 
 export const appConfig = (): AppConfig => ({
@@ -72,4 +74,5 @@ export const appConfig = (): AppConfig => ({
     apiUrl: process.env.EMOTION_ANALYSIS_API_URL || 'http://localhost:8000',
   },
   emotionWeights,
+  defaultSeedRecommendations: process.env.DEFAULT_SEED_RECOMMENDATIONS!,
 });

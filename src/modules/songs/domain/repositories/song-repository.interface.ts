@@ -4,8 +4,10 @@ export const SONG_REPOSITORY = 'SONG_REPOSITORY';
 
 export interface SongFilters {
   excludedSongIds?: string[];
-  excludedArtistIds?: string[];
+  excludedArtists?: string[];
   excludedGenres?: string[];
+  deseableGenres?: string[];
+  deseableArtists?: string[];
 }
 
 export interface ISongRepository {
@@ -14,6 +16,8 @@ export interface ISongRepository {
   findManyBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]>;
 
   findManyByReccoBeatsIds(reccoBeatsIds: string[]): Promise<SongEntity[]>;
+
+  findPopular(limit: number, filters?: SongFilters): Promise<SongEntity[]>;
 
   findAll(): Promise<SongEntity[]>;
 

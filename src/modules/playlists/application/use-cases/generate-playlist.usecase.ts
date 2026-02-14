@@ -45,7 +45,8 @@ export class GeneratePlaylistUseCase {
       await this.chatbotService.getEmotionAnalysis(conversationHistory);
 
     // 2. Map analyzed emotion to song emotion
-    const targetEmotion = EmotionMapper.mapToSongEmotion(emotionAnalysis);
+    const currentEmotion = EmotionMapper.analysisToCurrent(emotionAnalysis);
+    const targetEmotion = EmotionMapper.analysisToTarget(emotionAnalysis);
 
     // 3. Get user preferences to apply filtering
     const userPreferences =
@@ -61,8 +62,8 @@ export class GeneratePlaylistUseCase {
 
     const playlist = this.playlistBuilderService.buildPlaylist(
       availableSongs,
+      currentEmotion,
       targetEmotion,
-      targetEmotion, // For simplicity, using the same emotion as current and target
       userPreferences,
     );
 

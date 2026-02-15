@@ -1,4 +1,5 @@
 import { ApiEndpoint } from '@common/decorators';
+import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { SeedFromSpotifyIdUseCase } from '@modules/admin/application/use-cases/seed-from-spotify-id.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
 import { type IReccoBeatsAudioFeaturesQueries } from '@modules/songs/infrastructure/services/external-music-api.service';
@@ -16,6 +17,7 @@ import { ApiBody } from '@nestjs/swagger';
 export class AdminController {
   constructor(
     private readonly seedFromSpotifyIdUseCase: SeedFromSpotifyIdUseCase,
+    private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -102,5 +104,43 @@ export class AdminController {
       size,
       audioFeatures,
     );
+  }
+
+  @ApiEndpoint({
+    summary: 'Seed songs from local CSV file',
+    description:
+      'Reads and processes songs from the local CSV file (278k_labelled_uri.csv). Optionally limit the number of records to process.',
+
+    queries: [
+      {
+        name: 'limit',
+        description: 'Maximum number of records to process from the CSV',
+        required: false,
+      },
+    ],
+
+    responses: [
+      {
+        status: 201,
+        description: 'CSV processing completed',
+      },
+      {
+        status: 500,
+        description: 'Error reading or processing CSV file',
+      },
+    ],
+  })
+  @Post('/seed/local')
+  @PublicRoute()
+  async seedFromLocal(
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        optional: true,
+      }),
+    )
+    limit?: number,
+  ) {
+    return this.seedFromLocalUseCase.execute(limit);
   }
 }

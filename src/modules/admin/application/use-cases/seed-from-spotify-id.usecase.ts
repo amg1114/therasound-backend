@@ -1,24 +1,21 @@
 import { SeedReportResponseDto } from '@modules/admin/presentation/dto/responses/seed-report-response.dto';
-import {
-  SONG_REPOSITORY,
-  type ISongRepository,
-} from '@modules/songs/domain/repositories/song-repository.interface';
+import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import {
   ExternalMusicApiService,
   IReccoBeatsAudioFeaturesQueries,
 } from '@modules/songs/infrastructure/services/external-music-api.service';
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { SongProcessingService } from '@modules/songs/infrastructure/services/song-processing.service';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class SeedFromSpotifyIdUseCase {
   private readonly logger = new Logger(SeedFromSpotifyIdUseCase.name);
 
   constructor(
-    @Inject(SONG_REPOSITORY)
-    private readonly songRepository: ISongRepository,
     private readonly externalMusicApiService: ExternalMusicApiService,
+    private readonly songProcessingService: SongProcessingService,
   ) {}
 
   async execute(
@@ -32,7 +29,7 @@ export class SeedFromSpotifyIdUseCase {
     );
 
     const recommendations =
-      await this.externalMusicApiService.fetchRecommendationsAndProcess(
+      await this.externalMusicApiService.fetchRecommendations(
         spotifyIds,
         negativeSeeds || [],
         size,
@@ -47,15 +44,36 @@ export class SeedFromSpotifyIdUseCase {
 
     this.logger.log(`Found ${recommendations.length} recommendations.`);
 
+    const processedSongs: SongEntity[] = [];
+
+    for (const rec of recommendations) {
+      try {
+        const processedSong =
+          await this.songProcessingService.processTrackRecommendation(rec);
+        if (processedSong) {
+          processedSongs.push(processedSong);
+        }
+      } catch (error) {
+        this.logger.error(
+          `Error processing recommendation: ${rec.href}`,
+          error instanceof Error ? error.stack : undefined,
+        );
+      }
+    }
+
+    this.logger.log(
+      `Successfully stored ${processedSongs.length} songs in the database.`,
+    );
     const groupedByEmotion: Record<
       'happy' | 'sad' | 'calm' | 'energetic',
       SongSummaryVO[]
-    > = recommendations.reduce(
+    > = processedSongs.reduce(
       (acc, song) => {
-        if (!acc[song.emotion.getValue()]) {
-          acc[song.emotion.getValue()] = [];
+        const emotion = song.emotion.getValue();
+        if (!acc[emotion]) {
+          acc[emotion] = [];
         }
-        acc[song.emotion.getValue()].push(SongMapper.toSummaryVO(song));
+        acc[emotion].push(SongMapper.toSummaryVO(song));
         return acc;
       },
       {} as Record<'happy' | 'sad' | 'calm' | 'energetic', SongSummaryVO[]>,

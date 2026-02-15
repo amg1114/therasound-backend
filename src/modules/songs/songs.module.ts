@@ -1,5 +1,6 @@
 import { GenresModule } from '@modules/genres/genres.module';
 import { UsersModule } from '@modules/users/users.module';
+import { HttpModule } from '@nestjs/axios';
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SongCreatedListener } from './application/listeners/song-created.listener';
@@ -11,10 +12,12 @@ import {
 } from './infrastructure/orm/entities/song-entity.orm';
 import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repository';
 import { ExternalMusicApiService } from './infrastructure/services/external-music-api.service';
+import { SongProcessingService } from './infrastructure/services/song-processing.service';
 import { SongsController } from './presentation/controllers/songs.controller';
 
 @Module({
   imports: [
+    HttpModule,
     MongooseModule.forFeature([
       {
         name: SongEntityORM.name,
@@ -30,10 +33,13 @@ import { SongsController } from './presentation/controllers/songs.controller';
       provide: SONG_REPOSITORY,
       useClass: SongRepositoryImpl,
     },
+
     ExternalMusicApiService,
+    SongProcessingService,
+
     GetSongByIdUseCase,
     SongCreatedListener,
   ],
-  exports: [SONG_REPOSITORY, ExternalMusicApiService],
+  exports: [SONG_REPOSITORY, ExternalMusicApiService, SongProcessingService],
 })
 export class SongsModule {}

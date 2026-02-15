@@ -14,6 +14,7 @@ import {
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
+import { SongProcessingService } from '@modules/songs/infrastructure/services/song-processing.service';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import {
   USER_PREFERENCES_REPOSITORY,
@@ -31,6 +32,7 @@ export class GeneratePlaylistUseCase {
   constructor(
     private readonly playlistBuilderService: PlaylistBuilderService,
     private readonly externalMusicApi: ExternalMusicApiService,
+    private readonly songProcessingService: SongProcessingService,
     private readonly configService: ConfigService,
 
     @Inject(CHATBOT_SERVICE_TOKEN)
@@ -84,14 +86,21 @@ export class GeneratePlaylistUseCase {
         );
       }
 
-      const recommendations =
-        await this.externalMusicApi.fetchRecommendationsAndProcess(
-          positiveSeeds,
-          negativeSeeds,
-          MIN_SONGS_THRESHOLD,
-        );
+      const recommendations = await this.externalMusicApi.fetchRecommendations(
+        positiveSeeds,
+        negativeSeeds,
+        MIN_SONGS_THRESHOLD,
+      );
 
-      availableSongs.push(...recommendations);
+      const processedRecommendations = (
+        await Promise.all(
+          recommendations.map((rec) =>
+            this.songProcessingService.processTrackRecommendation(rec),
+          ),
+        )
+      ).filter((processed) => processed !== null && processed !== undefined);
+
+      availableSongs.push(...processedRecommendations);
     }
 
     const playlist = this.playlistBuilderService.buildPlaylist(

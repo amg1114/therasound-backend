@@ -28,6 +28,9 @@ export type AppConfig = {
   };
   emotionWeights: Record<EmotionType, AudioFeaturesVO>;
   defaultSeedRecommendations: string;
+  acrCloud: {
+    accessKey: string;
+  };
 };
 
 const emotionWeightsPath = join(
@@ -49,6 +52,7 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   SOUNDCHARTS_API_KEY: Joi.string().required(),
   EMOTION_ANALYSIS_API_URL: Joi.string().default('http://localhost:8000'),
   DEFAULT_SEED_RECOMMENDATIONS: Joi.string().required(),
+  ACR_CLOUD_ACCESS_KEY: Joi.string().required(),
 });
 
 export const appConfig = (): AppConfig => ({
@@ -75,4 +79,7 @@ export const appConfig = (): AppConfig => ({
   },
   emotionWeights,
   defaultSeedRecommendations: process.env.DEFAULT_SEED_RECOMMENDATIONS!,
+  acrCloud: {
+    accessKey: process.env.ACR_CLOUD_ACCESS_KEY!,
+  },
 });

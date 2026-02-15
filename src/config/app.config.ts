@@ -27,6 +27,7 @@ export type AppConfig = {
     apiUrl: string;
   };
   emotionWeights: Record<EmotionType, AudioFeaturesVO>;
+  emotionFeatureTargets: Record<EmotionType, AudioFeaturesVO>;
   defaultSeedRecommendations: string;
   acrCloud: {
     accessKey: string;
@@ -40,6 +41,15 @@ const emotionWeightsPath = join(
 );
 const emotionWeights = JSON.parse(
   readFileSync(emotionWeightsPath, 'utf-8'),
+) as Record<EmotionType, AudioFeaturesVO>;
+
+const emotionFeatureTargetsPath = join(
+  process.cwd(),
+  'src/config',
+  'feature_emotion_targets.json',
+);
+const emotionFeatureTargets = JSON.parse(
+  readFileSync(emotionFeatureTargetsPath, 'utf-8'),
 ) as Record<EmotionType, AudioFeaturesVO>;
 
 export const APP_CONFIG_SCHEMA = Joi.object({
@@ -78,6 +88,7 @@ export const appConfig = (): AppConfig => ({
     apiUrl: process.env.EMOTION_ANALYSIS_API_URL || 'http://localhost:8000',
   },
   emotionWeights,
+  emotionFeatureTargets,
   defaultSeedRecommendations: process.env.DEFAULT_SEED_RECOMMENDATIONS!,
   acrCloud: {
     accessKey: process.env.ACR_CLOUD_ACCESS_KEY!,

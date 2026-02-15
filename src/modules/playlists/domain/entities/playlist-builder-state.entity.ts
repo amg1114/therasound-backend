@@ -141,7 +141,8 @@ export class PlaylistBuilderState {
     );
 
     this.playlist.push(best.song);
-    this.lastTransitionScore = best.transitionScore;
+    this.lastTransitionScore =
+      this.lastTransitionScore * 0.7 + best.transitionScore * 0.3; // Smooth the transition score for next iteration
     this.removeFromRemaining(best.song.id);
     return true;
   }
@@ -153,30 +154,29 @@ export class PlaylistBuilderState {
     const candidates: ScoredCandidate[] = [];
 
     for (const song of this.remainingSongs) {
-      const transitionScore = this.scoringService.calculateTransitionScore(
-        song,
-        this.context,
-      );
+      const candidateTransitionScore =
+        this.scoringService.calculateTransitionScore(song, this.context);
 
-      this.logger.debug(
-        `Evaluating song: ${song.title}, transitionScore: ${transitionScore.toFixed(2)}, lastTransitionScore: ${this.lastTransitionScore.toFixed(2)}, maxStep: ${this.maxStep.toFixed(2)}`,
-      );
-      const isValidTransition =
-        transitionScore > this.lastTransitionScore &&
-        transitionScore - this.lastTransitionScore <= this.maxStep;
+      const transitionDelta =
+        candidateTransitionScore - this.lastTransitionScore;
 
-      if (isValidTransition) {
-        const combinedScore = this.scoringService.calculateScore(
-          song,
-          this.context,
-        );
+      const transitionPenalty =
+        transitionDelta < 0 ? Math.abs(transitionDelta) : 0;
 
-        candidates.push({
-          song,
-          transitionScore,
-          combinedScore,
-        });
+      // Penalización suave en lugar de descarte
+      if (transitionPenalty > this.maxStep) {
+        continue;
       }
+
+      const combinedScore =
+        this.scoringService.calculateScore(song, this.context) -
+        transitionPenalty; // Resta la penalización al score combinado
+
+      candidates.push({
+        song,
+        transitionScore: candidateTransitionScore,
+        combinedScore,
+      });
     }
 
     this.logger.debug(

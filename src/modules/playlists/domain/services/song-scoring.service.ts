@@ -24,7 +24,7 @@ export interface ScoringContext {
 @Injectable()
 export class SongScoringService {
   private readonly logger = new Logger(SongScoringService.name);
-
+  static MIN_FEATURE_IMPORTANCE = 0.15;
   constructor(private readonly configService: ConfigService) {}
 
   /**
@@ -60,35 +60,58 @@ export class SongScoringService {
   /**
    * Calcula la puntuación de transición entre emociones
    */
-  calculateTransitionScore(
-    song: SongEntity,
-    { currentEmotion, targetEmotion }: ScoringContext,
-  ): number {
-    const emotionWeights =
+  calculateTransitionScore(song: SongEntity, context: ScoringContext): number {
+    const emotionFeatureWeights =
       this.configService.get<AppConfig['emotionWeights']>('emotionWeights')!;
-    const features = SongMapper.songFeaturesToKeyFeatures(song);
-    let score = 0;
 
-    for (const [feature, value] of Object.entries(features)) {
-      const targetWeight = emotionWeights[targetEmotion.getValue()][
-        feature
+    const emotionFeatureTargets = this.configService.get<
+      AppConfig['emotionFeatureTargets']
+    >('emotionFeatureTargets')!;
+
+    const songFeatures = SongMapper.songFeaturesToKeyFeatures(song);
+
+    const targetEmotionKey = context.targetEmotion.getValue();
+
+    let totalWeightedDistance = 0;
+    let totalWeight = 0;
+
+    for (const [featureName, songFeatureValue] of Object.entries(
+      songFeatures,
+    )) {
+      const featureImportance = (emotionFeatureWeights[targetEmotionKey]?.[
+        featureName
+      ] ?? 0) as number;
+
+      if (featureImportance < SongScoringService.MIN_FEATURE_IMPORTANCE) {
+        continue; // feature irrelevante para esta emoción
+      }
+
+      const targetFeatureValue = emotionFeatureTargets[targetEmotionKey][
+        featureName
       ] as number;
-      const currentWeight = emotionWeights[currentEmotion.getValue()][
-        feature
-      ] as number;
-      const direction = targetWeight - currentWeight;
-      this.logger.debug(
-        `Feature: ${feature}, value: ${value}, targetWeight: ${targetWeight}, currentWeight: ${currentWeight}, direction: ${direction}`,
-      );
-      score += direction * value;
+
+      const featureDistance = Math.abs(songFeatureValue - targetFeatureValue);
+
+      totalWeightedDistance += featureDistance * featureImportance;
+      totalWeight += featureImportance;
     }
 
+    if (totalWeight === 0) {
+      return 0.5; // neutral seguro
+    }
+
+    const normalizedDistance = totalWeightedDistance / totalWeight;
+
+    // Convertimos distancia en afinidad (1 = perfecto, 0 = lejano)
+    const transitionScore = 1 - Math.min(normalizedDistance, 1);
+
     this.logger.debug(
-      `Transition score for song ${song.title}: ${score.toFixed(4)} (current: ${currentEmotion.getValue()}, target: ${targetEmotion.getValue()})`,
+      `Transition score for song ${song.title}: ${transitionScore.toFixed(
+        3,
+      )} (targetEmotion: ${targetEmotionKey})`,
     );
 
-    // Normaliza a 0-1 (ajusta según tu rango real)
-    return this.normalize(score, -10, 10);
+    return transitionScore;
   }
 
   /**

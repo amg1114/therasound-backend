@@ -66,7 +66,7 @@ export class SongScoringService {
   ): number {
     const emotionWeights =
       this.configService.get<AppConfig['emotionWeights']>('emotionWeights')!;
-    const features = SongMapper.featuresToKeyFeatures(song);
+    const features = SongMapper.songFeaturesToKeyFeatures(song);
     let score = 0;
 
     for (const [feature, value] of Object.entries(features)) {

@@ -45,7 +45,7 @@ export class PlaylistMapper {
             songId: new Types.ObjectId(song.id),
             title: song.title,
             artist: song.artist,
-            emotion: song.emotion.getValue(),
+            emotion: song.emotion?.getValue(),
             durationMs: song.durationMs,
             spotifyUrl: song.spotifyUrl,
             genres: song.genres,

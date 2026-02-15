@@ -48,8 +48,8 @@ export class SongEntityORM extends Document {
   @Prop({ required: true, type: Object })
   emotionProbabilities: EmotionProbabilitiesVO;
 
-  @Prop({ required: true, index: true })
-  reccobeatsId: string;
+  @Prop({ required: false, unique: true, index: true })
+  reccobeatsId?: string;
 
   // Statistics
   @Prop({ required: true, default: 0 })

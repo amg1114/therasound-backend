@@ -95,6 +95,11 @@ export class SongRepositoryImpl implements ISongRepository {
     return count > 0;
   }
 
+  async existsBySpotifyId(spotifyId: string): Promise<boolean> {
+    const count = await this.model.countDocuments({ spotifyId });
+    return count > 0;
+  }
+
   private buildQueryFilters(filters?: SongFilters): QueryFilter<SongEntityORM> {
     const query: QueryFilter<SongEntityORM> = {};
 

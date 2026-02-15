@@ -110,7 +110,7 @@ export class SongMapper {
     };
   }
 
-  static featuresToKeyFeatures(entity: SongEntity): IKeyAudioFeatures {
+  static songFeaturesToKeyFeatures(entity: SongEntity): IKeyAudioFeatures {
     return {
       acousticness: entity.audioFeatures.acousticness,
       danceability: entity.audioFeatures.danceability,
@@ -121,6 +121,22 @@ export class SongMapper {
       speechiness: entity.audioFeatures.speechiness,
       tempo: entity.audioFeatures.tempo,
       valence: entity.audioFeatures.valence,
+    };
+  }
+
+  static audioFeaturesToKeyFeatures(
+    entity: SongEntity['audioFeatures'],
+  ): IKeyAudioFeatures {
+    return {
+      acousticness: entity.acousticness,
+      danceability: entity.danceability,
+      energy: entity.energy,
+      instrumentalness: entity.instrumentalness,
+      liveness: entity.liveness,
+      loudness: entity.loudness,
+      speechiness: entity.speechiness,
+      tempo: entity.tempo,
+      valence: entity.valence,
     };
   }
 }

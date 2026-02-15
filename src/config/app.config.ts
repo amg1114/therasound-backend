@@ -3,54 +3,74 @@ import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-featu
 import { readFileSync } from 'fs';
 import * as Joi from 'joi';
 import { join } from 'path';
-
+export type EmotionFeatureValues = Record<EmotionType, AudioFeaturesVO>;
 export type AppConfig = {
   app: {
     env: string;
     port: number;
   };
-  openrouter: {
-    apiKey: string;
+
+  external_apis: {
+    urls: {
+      emotion_analysis: string;
+      recco_beats: string;
+      acr_cloud: string;
+    };
+    keys: {
+      open_router: string;
+      acr_cloud: string;
+    };
   };
+
   database: {
     uri: string;
     name: string;
   };
+
   jwt: {
     secret: string;
   };
-  soundcharts: {
-    appId: string;
-    apiKey: string;
+
+  emotion_analysis: {
+    targets: EmotionFeatureValues;
+    weights: EmotionFeatureValues;
   };
-  emotionAnalysis: {
-    apiUrl: string;
-  };
-  emotionWeights: Record<EmotionType, AudioFeaturesVO>;
-  emotionFeatureTargets: Record<EmotionType, AudioFeaturesVO>;
-  defaultSeedRecommendations: string;
-  acrCloud: {
-    accessKey: string;
-  };
+
+  default_seed_recommendations: string;
 };
 
-const emotionWeightsPath = join(
-  process.cwd(),
-  'src/config',
-  'feature_emotion_weights.json',
-);
-const emotionWeights = JSON.parse(
-  readFileSync(emotionWeightsPath, 'utf-8'),
-) as Record<EmotionType, AudioFeaturesVO>;
+let emotionWeightsCache: EmotionFeatureValues | null = null;
+let emotionTargetsCache: EmotionFeatureValues | null = null;
 
-const emotionFeatureTargetsPath = join(
-  process.cwd(),
-  'src/config',
-  'feature_emotion_targets.json',
-);
-const emotionFeatureTargets = JSON.parse(
-  readFileSync(emotionFeatureTargetsPath, 'utf-8'),
-) as Record<EmotionType, AudioFeaturesVO>;
+const loadEmotionWeights = (): EmotionFeatureValues => {
+  if (!emotionWeightsCache) {
+    const path = join(
+      process.cwd(),
+      'src/config',
+      'feature_emotion_weights.json',
+    );
+    emotionWeightsCache = JSON.parse(readFileSync(path, 'utf-8')) as Record<
+      EmotionType,
+      AudioFeaturesVO
+    >;
+  }
+  return emotionWeightsCache;
+};
+
+const loadEmotionTargets = (): EmotionFeatureValues => {
+  if (!emotionTargetsCache) {
+    const path = join(
+      process.cwd(),
+      'src/config',
+      'feature_emotion_targets.json',
+    );
+    emotionTargetsCache = JSON.parse(readFileSync(path, 'utf-8')) as Record<
+      EmotionType,
+      AudioFeaturesVO
+    >;
+  }
+  return emotionTargetsCache;
+};
 
 export const APP_CONFIG_SCHEMA = Joi.object({
   PORT: Joi.number().default(3000),
@@ -65,32 +85,37 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   ACR_CLOUD_ACCESS_KEY: Joi.string().required(),
 });
 
+const DEFAULT_PORT = 3000;
+const DEFAULT_JWT_SECRET = 'default_jwt_secret';
+const RECCO_BEATS_URL = 'https://api.reccobeats.com/v1';
+const ACR_CLOUD_URL = 'https://eu-api-v2.acrcloud.com/api';
+
 export const appConfig = (): AppConfig => ({
   app: {
-    env: process.env.NODE_ENV || 'dev',
-    port: parseInt(process.env.PORT || '3000', 10),
+    env: process.env.NODE_ENV || 'development',
+    port: parseInt(process.env.PORT!, 10) || DEFAULT_PORT,
   },
-  openrouter: {
-    apiKey: process.env.OPENROUTER_API_KEY!,
+  external_apis: {
+    urls: {
+      emotion_analysis: process.env.EMOTION_ANALYSIS_API_URL!,
+      recco_beats: RECCO_BEATS_URL,
+      acr_cloud: ACR_CLOUD_URL,
+    },
+    keys: {
+      open_router: process.env.OPENROUTER_API_KEY!,
+      acr_cloud: process.env.ACR_CLOUD_ACCESS_KEY!,
+    },
   },
   database: {
     uri: process.env.DATABASE_URI!,
     name: process.env.DATABASE_NAME!,
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'default_jwt_secret',
+    secret: process.env.JWT_SECRET || DEFAULT_JWT_SECRET,
   },
-  soundcharts: {
-    appId: process.env.SOUNDCHARTS_APP_ID!,
-    apiKey: process.env.SOUNDCHARTS_API_KEY!,
+  emotion_analysis: {
+    targets: loadEmotionTargets(),
+    weights: loadEmotionWeights(),
   },
-  emotionAnalysis: {
-    apiUrl: process.env.EMOTION_ANALYSIS_API_URL || 'http://localhost:8000',
-  },
-  emotionWeights,
-  emotionFeatureTargets,
-  defaultSeedRecommendations: process.env.DEFAULT_SEED_RECOMMENDATIONS!,
-  acrCloud: {
-    accessKey: process.env.ACR_CLOUD_ACCESS_KEY!,
-  },
+  default_seed_recommendations: process.env.DEFAULT_SEED_RECOMMENDATIONS!,
 });

@@ -4,7 +4,7 @@ import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from 'src/config/app.config';
+import { EmotionFeatureValues } from 'src/config/app.config';
 
 export interface SongScoringWeights {
   emotion: number;
@@ -61,12 +61,13 @@ export class SongScoringService {
    * Calcula la puntuación de transición entre emociones
    */
   calculateTransitionScore(song: SongEntity, context: ScoringContext): number {
-    const emotionFeatureWeights =
-      this.configService.get<AppConfig['emotionWeights']>('emotionWeights')!;
+    const emotionFeatureWeights = this.configService.get<EmotionFeatureValues>(
+      'emotion_analysis.weights',
+    )!;
 
-    const emotionFeatureTargets = this.configService.get<
-      AppConfig['emotionFeatureTargets']
-    >('emotionFeatureTargets')!;
+    const emotionFeatureTargets = this.configService.get<EmotionFeatureValues>(
+      'emotion_analysis.targets',
+    )!;
 
     const songFeatures = SongMapper.songFeaturesToKeyFeatures(song);
 

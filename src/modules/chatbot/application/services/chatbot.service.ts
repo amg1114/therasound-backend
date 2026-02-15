@@ -1,11 +1,11 @@
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OpenRouter } from '@openrouter/sdk';
 import {
   IChatbotService,
   IConversationMessage,
   IHistoryMessage,
 } from '../../infrastructure/services/chatbot-service.interface';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { OpenRouter } from '@openrouter/sdk';
 import { emotionAnalysisSystemPrompt } from '../prompts/emotion-analysis.system';
 
 /**
@@ -28,7 +28,9 @@ export class ChatbotService implements IChatbotService {
 
   constructor(configService: ConfigService) {
     this.client = new OpenRouter({
-      apiKey: configService.getOrThrow<string>('openrouter.apiKey'),
+      apiKey: configService.getOrThrow<string>(
+        'external_apis.keys.open_router',
+      ),
     });
   }
 

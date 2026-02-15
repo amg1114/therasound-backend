@@ -42,13 +42,24 @@ export interface IExternalDetails {
 export class ExternalMusicApiService {
   private readonly logger = new Logger(ExternalMusicApiService.name);
 
-  private readonly reccobeatsBaseUrl = 'https://api.reccobeats.com/v1';
-  private readonly acrCloudBaseUrl = 'https://eu-api-v2.acrcloud.com/api';
+  private readonly reccobeatsBaseUrl: string;
+  private readonly acrCloudBaseUrl: string;
+  private readonly emotionAnalysisBaseUrl: string;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
-  ) {}
+  ) {
+    this.reccobeatsBaseUrl = this.configService.getOrThrow<string>(
+      'external_apis.urls.recco_beats',
+    );
+    this.acrCloudBaseUrl = this.configService.getOrThrow<string>(
+      'external_apis.urls.acr_cloud',
+    );
+    this.emotionAnalysisBaseUrl = this.configService.getOrThrow<string>(
+      'external_apis.urls.emotion_analysis',
+    );
+  }
 
   async fetchRecommendations(
     seeds: string[],
@@ -112,7 +123,9 @@ export class ExternalMusicApiService {
 
   async getExternalSongDetails(spotifyId: string): Promise<IExternalDetails> {
     try {
-      const accessKey = this.configService.get<string>('acrCloud.accessKey');
+      const accessKey = this.configService.get<string>(
+        'external_apis.keys.acr_cloud',
+      );
       if (!accessKey) {
         throw new InternalServerErrorException(
           'ACRCloud access key not configured',
@@ -168,11 +181,7 @@ export class ExternalMusicApiService {
     reccobeatsId: string,
   ): Promise<EmotionAnalysisResponseDto> {
     try {
-      const baseUrl = this.configService.getOrThrow<string>(
-        'emotionAnalysis.apiUrl',
-      );
-
-      const url = `${baseUrl}/api/v1/analyze/${reccobeatsId}`;
+      const url = `${this.emotionAnalysisBaseUrl}/api/v1/analyze/${reccobeatsId}`;
 
       this.logger.log(
         `Fetching emotion analysis for ReccoBeats ID: ${reccobeatsId}`,
@@ -207,11 +216,7 @@ export class ExternalMusicApiService {
 
   async getEmotionDataFromFeatures(features: IKeyAudioFeatures) {
     try {
-      const baseUrl = this.configService.getOrThrow<string>(
-        'emotionAnalysis.apiUrl',
-      );
-
-      const url = `${baseUrl}/api/v1/analyze`;
+      const url = `${this.emotionAnalysisBaseUrl}/api/v1/analyze`;
 
       this.logger.log(
         `Fetching emotion analysis from audio features: ${JSON.stringify(features)}`,

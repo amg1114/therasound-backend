@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters';
+import { HttpLoggingInterceptor } from './common/interceptors';
 
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -25,6 +26,9 @@ async function bootstrap() {
 
   // Global exception filter for logging
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  // Global HTTP logging interceptor
+  app.useGlobalInterceptors(new HttpLoggingInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({

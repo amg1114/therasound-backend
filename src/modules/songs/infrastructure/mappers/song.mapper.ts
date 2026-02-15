@@ -1,4 +1,5 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
+import { ISeedTrack } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { IKeyAudioFeatures } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
@@ -16,8 +17,17 @@ export class SongMapper {
     if (!url) return null;
 
     // Match Spotify track URLs
-    const match = url.match(/spotify\.com\/track\/([a-zA-Z0-9]+)/);
-    return match ? match[1] : null;
+    const matchUrl = url.match(/spotify\.com\/track\/([a-zA-Z0-9]+)/);
+    if (matchUrl && matchUrl[1]) {
+      return matchUrl[1];
+    }
+
+    const matchUri = url.match(/spotify:track:([a-zA-Z0-9]+)/);
+    if (matchUri && matchUri[1]) {
+      return matchUri[1];
+    }
+
+    return null;
   }
 
   static toEntity(raw: SongEntityORM): SongEntity {
@@ -127,6 +137,36 @@ export class SongMapper {
   static audioFeaturesToKeyFeatures(
     entity: SongEntity['audioFeatures'],
   ): IKeyAudioFeatures {
+    return {
+      acousticness: entity.acousticness,
+      danceability: entity.danceability,
+      energy: entity.energy,
+      instrumentalness: entity.instrumentalness,
+      liveness: entity.liveness,
+      loudness: entity.loudness,
+      speechiness: entity.speechiness,
+      tempo: entity.tempo,
+      valence: entity.valence,
+    };
+  }
+
+  static seedAudioFeaturesToKeyFeatures(entity: ISeedTrack): IKeyAudioFeatures {
+    return {
+      acousticness: entity.acousticness,
+      danceability: entity.danceability,
+      energy: entity.energy,
+      instrumentalness: entity.instrumentalness,
+      liveness: entity.liveness,
+      loudness: entity.loudness,
+      speechiness: entity.speechiness,
+      tempo: entity.tempo,
+      valence: entity.valence,
+    };
+  }
+
+  static seedAudioFeaturesToSongFeatures(
+    entity: ISeedTrack,
+  ): SongEntity['audioFeatures'] {
     return {
       acousticness: entity.acousticness,
       danceability: entity.danceability,

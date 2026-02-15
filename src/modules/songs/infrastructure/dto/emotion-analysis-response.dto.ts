@@ -22,5 +22,5 @@ export interface EmotionAnalysisResponseDto {
   confidence: number;
   emotion: string;
   probabilities: EmotionProbabilitiesDto;
-  reccobeats_id: string;
+  reccobeats_id?: string;
 }

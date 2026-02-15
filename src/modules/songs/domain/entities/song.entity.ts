@@ -7,18 +7,18 @@ export class SongEntity {
   spotifyId: string;
   title: string;
   artist: string;
-  emotion: EmotionVO;
   durationMs: number;
   spotifyUrl: string;
   genres: string[];
   imageUrl: string;
   releaseDate: Date;
+  audioFeatures: AudioFeaturesVO;
 
   // Emotion analysis data
-  audioFeatures: AudioFeaturesVO;
+  emotion: EmotionVO;
   emotionConfidence: number;
   emotionProbabilities: EmotionProbabilitiesVO;
-  reccobeatsId: string;
+  reccobeatsId?: string;
 
   // Statistics
   likesCount: number;

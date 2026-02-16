@@ -4,17 +4,22 @@ import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 export interface PlaylistProps {
   id: string;
   userId: string;
+  title: string;
   songs: SongEntity[];
   createdAt: Date;
   emotion: EmotionVO;
   durationMs: number;
 }
 
-export type CreatePlaylistProps = Omit<PlaylistProps, 'id' | 'createdAt'>;
+export type CreatePlaylistProps = Omit<
+  PlaylistProps,
+  'id' | 'createdAt' | 'title'
+>;
 
 export class PlaylistEntity implements PlaylistProps {
   id: string;
   userId: string;
+  title: string;
   songs: SongEntity[];
   emotion: EmotionVO;
   createdAt: Date;
@@ -23,6 +28,7 @@ export class PlaylistEntity implements PlaylistProps {
   private constructor(props: PlaylistProps) {
     this.id = props.id;
     this.userId = props.userId;
+    this.title = props.title;
     this.songs = props.songs;
     this.emotion = props.emotion;
     this.createdAt = props.createdAt;

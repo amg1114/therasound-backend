@@ -28,6 +28,12 @@ export class PlaylistRepositoryImpl implements IPlaylistRepository {
     let createdPlaylist = new this.model(ormData);
     createdPlaylist = await createdPlaylist.save();
 
+    // Auto-generate title if not provided
+    if (!createdPlaylist.title) {
+      createdPlaylist.title = `Playlist #${createdPlaylist._id.toString()}`;
+      await createdPlaylist.save();
+    }
+
     return PlaylistMapper.toDomain(createdPlaylist);
   }
 

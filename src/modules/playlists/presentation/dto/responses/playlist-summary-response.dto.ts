@@ -8,6 +8,12 @@ export class PlaylistSummaryResponseDto {
   id: string;
 
   @ApiProperty({
+    description: 'Título de la lista de reproducción',
+    example: 'Playlist #abc123',
+  })
+  title: string;
+
+  @ApiProperty({
     description: 'Emoción de la lista de reproducción',
     example: 'happy',
     enum: ['happy', 'sad', 'energetic', 'calm', 'romantic', 'angry'],

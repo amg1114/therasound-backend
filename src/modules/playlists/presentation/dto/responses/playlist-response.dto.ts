@@ -15,6 +15,12 @@ export class PlaylistResponseDto {
   userId: string;
 
   @ApiProperty({
+    description: 'Playlist title',
+    example: 'Playlist #abc123',
+  })
+  title: string;
+
+  @ApiProperty({
     description: 'List of songs in the playlist',
     type: [SongResponseDto],
   })

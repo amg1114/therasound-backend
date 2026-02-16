@@ -25,6 +25,7 @@ export class PlaylistMapper {
 
     return PlaylistEntity.reconstruct({
       id: ormEntity._id.toString(),
+      title: ormEntity.title,
       userId: ormEntity.userId.toString(),
       songs,
       emotion: EmotionVO.create(ormEntity.emotion),
@@ -40,6 +41,7 @@ export class PlaylistMapper {
       userId: domainEntity.userId
         ? new Types.ObjectId(domainEntity.userId)
         : undefined,
+      title: domainEntity.title,
       songs: domainEntity.songs
         ? domainEntity.songs.map((song) => ({
             songId: new Types.ObjectId(song.id),
@@ -62,6 +64,7 @@ export class PlaylistMapper {
     return {
       id: entity.id,
       userId: entity.userId,
+      title: entity.title,
       songs: entity.songs.map((song) => SongMapper.toResponseDto(song)),
       emotion: entity.emotion.getValue(),
       durationMs: entity.durationMs,
@@ -72,6 +75,7 @@ export class PlaylistMapper {
   static toSummaryDto(entity: PlaylistEntity): PlaylistSummaryResponseDto {
     return {
       id: entity.id,
+      title: entity.title,
       emotion: entity.emotion.getValue(),
       songCount: entity.songs.length,
       createdAt: entity.createdAt,

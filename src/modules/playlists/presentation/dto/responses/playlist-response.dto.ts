@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PlaylistResponseDto {
   @ApiProperty({

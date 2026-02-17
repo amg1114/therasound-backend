@@ -1,4 +1,4 @@
-import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
+import { EmbeddedSongVO } from '@modules/playlists/domain/value-objects/embedded-song.vo';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PlaylistResponseDto {
@@ -22,9 +22,9 @@ export class PlaylistResponseDto {
 
   @ApiProperty({
     description: 'List of songs in the playlist',
-    type: [SongResponseDto],
+    type: [Object],
   })
-  songs: SongResponseDto[];
+  songs: EmbeddedSongVO[];
 
   @ApiProperty({
     description: 'Playlist emotion',

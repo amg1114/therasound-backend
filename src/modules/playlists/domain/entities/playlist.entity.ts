@@ -1,11 +1,11 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
-import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { EmbeddedSongVO } from '../value-objects/embedded-song.vo';
 
 export interface PlaylistProps {
   id: string;
   userId: string;
   title: string;
-  songs: SongEntity[];
+  songs: EmbeddedSongVO[];
   createdAt: Date;
   emotion: EmotionVO;
   durationMs: number;
@@ -20,7 +20,7 @@ export class PlaylistEntity implements PlaylistProps {
   id: string;
   userId: string;
   title: string;
-  songs: SongEntity[];
+  songs: EmbeddedSongVO[];
   emotion: EmotionVO;
   createdAt: Date;
   durationMs: number;

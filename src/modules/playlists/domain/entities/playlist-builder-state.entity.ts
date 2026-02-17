@@ -1,5 +1,6 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { BadRequestException, Logger } from '@nestjs/common';
 import {
@@ -95,7 +96,7 @@ export class PlaylistBuilderState {
 
     return PlaylistEntity.create({
       userId: this.userPreferences.userId,
-      songs: this.playlist,
+      songs: this.playlist.map((s) => SongMapper.toEmbeddedSongVO(s)),
       durationMs: duration,
       emotion: this.targetEmotion,
     });

@@ -1,5 +1,6 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { ISeedTrack } from '@modules/admin/application/use-cases/seed-from-local.usecase';
+import { EmbeddedSongVO } from '@modules/playlists/domain/value-objects/embedded-song.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { IKeyAudioFeatures } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
@@ -177,6 +178,20 @@ export class SongMapper {
       speechiness: entity.speechiness,
       tempo: entity.tempo,
       valence: entity.valence,
+    };
+  }
+
+  static toEmbeddedSongVO(entity: SongEntity): EmbeddedSongVO {
+    return {
+      id: entity.id,
+      title: entity.title,
+      artist: entity.artist,
+      emotion: entity.emotion.getValue(),
+      durationMs: entity.durationMs,
+      spotifyUrl: entity.spotifyUrl,
+      genres: entity.genres,
+      imageUrl: entity.imageUrl,
+      releaseDate: entity.releaseDate,
     };
   }
 }

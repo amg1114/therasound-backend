@@ -1,5 +1,5 @@
 import { EmbeddedSongVO } from '@modules/playlists/domain/value-objects/embedded-song.vo';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PlaylistResponseDto {
   @ApiProperty({
@@ -14,11 +14,11 @@ export class PlaylistResponseDto {
   })
   userId: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Playlist title',
     example: 'Playlist #abc123',
   })
-  title: string;
+  title?: string;
 
   @ApiProperty({
     description: 'List of songs in the playlist',

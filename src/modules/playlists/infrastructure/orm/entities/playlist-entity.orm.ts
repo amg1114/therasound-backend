@@ -17,7 +17,7 @@ export class PlaylistEntityORM extends Document {
   songs: EmbeddedSongVO[];
 
   @Prop({ required: false })
-  title: string;
+  title?: string;
 
   @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
   emotion: string;

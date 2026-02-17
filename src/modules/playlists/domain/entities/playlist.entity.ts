@@ -4,7 +4,7 @@ import { EmbeddedSongVO } from '../value-objects/embedded-song.vo';
 export interface PlaylistProps {
   id: string;
   userId: string;
-  title: string;
+  title?: string;
   songs: EmbeddedSongVO[];
   createdAt: Date;
   emotion: EmotionVO;
@@ -19,7 +19,7 @@ export type CreatePlaylistProps = Omit<
 export class PlaylistEntity implements PlaylistProps {
   id: string;
   userId: string;
-  title: string;
+  title?: string;
   songs: EmbeddedSongVO[];
   emotion: EmotionVO;
   createdAt: Date;

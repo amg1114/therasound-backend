@@ -1,5 +1,6 @@
 export type EmbeddedSongVO = {
   id: string;
+  spotifyId: string;
   title: string;
   artist: string;
   emotion: string;

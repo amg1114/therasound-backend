@@ -184,6 +184,7 @@ export class SongMapper {
   static toEmbeddedSongVO(entity: SongEntity): EmbeddedSongVO {
     return {
       id: entity.id,
+      spotifyId: entity.spotifyId,
       title: entity.title,
       artist: entity.artist,
       emotion: entity.emotion.getValue(),

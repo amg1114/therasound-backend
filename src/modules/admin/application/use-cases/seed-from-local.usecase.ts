@@ -27,7 +27,10 @@ export class SeedFromLocalUseCase {
 
   constructor(private readonly songProcessingService: SongProcessingService) {}
 
-  async execute(limit?: number): Promise<{ processed: number; total: number }> {
+  async execute(
+    limit?: number,
+    label?: string,
+  ): Promise<{ processed: number; total: number }> {
     const csvPath = join(
       process.cwd(),
       'src/modules/admin/infrastructure/seeds/278k_labelled_uri.csv',
@@ -39,8 +42,22 @@ export class SeedFromLocalUseCase {
 
     this.logger.log(`Parsed ${records.length} records from CSV`);
 
-    // Apply limit if provided
-    const recordsToProcess = limit ? records.slice(0, limit) : records;
+    let recordsToProcess = records;
+
+    // If a label is provided, filter records by that label
+    if (label) {
+      this.logger.log(`Filtering records by label: ${label}`);
+      recordsToProcess = recordsToProcess.filter(
+        (record) => record.labels === label,
+      );
+      this.logger.log(`Filtered to ${recordsToProcess.length} records`);
+    }
+
+    if (limit && limit > 0) {
+      this.logger.log(`Applying limit: ${limit}`);
+      recordsToProcess = recordsToProcess.slice(0, limit);
+      this.logger.log(`Limited to ${recordsToProcess.length} records`);
+    }
 
     this.logger.log(`Processing ${recordsToProcess.length} records...`);
 

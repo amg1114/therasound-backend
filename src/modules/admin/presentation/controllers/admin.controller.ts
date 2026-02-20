@@ -117,6 +117,12 @@ export class AdminController {
         description: 'Maximum number of records to process from the CSV',
         required: false,
       },
+      {
+        name: 'label',
+        description:
+          'Optional label to filter records by (e.g., "0" = Sad, "1" = Happy, "2" = Energetic, "3" = Calm). If provided, only records with the matching label will be processed.',
+        required: false,
+      },
     ],
 
     responses: [
@@ -140,7 +146,8 @@ export class AdminController {
       }),
     )
     limit?: number,
+    @Query('label') label?: string,
   ) {
-    return this.seedFromLocalUseCase.execute(limit);
+    return this.seedFromLocalUseCase.execute(limit, label);
   }
 }

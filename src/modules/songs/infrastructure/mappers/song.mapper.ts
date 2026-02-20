@@ -1,4 +1,7 @@
-import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
+import {
+  EmotionType,
+  EmotionVO,
+} from '@common/domain/value-objects/emotion.vo';
 import { ISeedTrack } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { EmbeddedSongVO } from '@modules/playlists/domain/value-objects/embedded-song.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
@@ -194,5 +197,15 @@ export class SongMapper {
       imageUrl: entity.imageUrl,
       releaseDate: entity.releaseDate,
     };
+  }
+
+  static mapEmotionToKey(emotion: EmotionType): string {
+    const emotionMap: Record<EmotionType, string> = {
+      sad: '0',
+      happy: '1',
+      energetic: '2',
+      calm: '3',
+    };
+    return emotionMap[emotion];
   }
 }

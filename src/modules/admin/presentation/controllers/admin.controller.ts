@@ -1,4 +1,5 @@
 import { ApiEndpoint } from '@common/decorators';
+import { RecalculateEmotionAnalysisUseCase } from '@modules/admin/application/use-cases/recalculate-emotion-analysis.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { SeedFromSpotifyIdUseCase } from '@modules/admin/application/use-cases/seed-from-spotify-id.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
@@ -6,6 +7,7 @@ import { type IReccoBeatsAudioFeaturesQueries } from '@modules/songs/infrastruct
 import {
   Body,
   Controller,
+  Get,
   ParseArrayPipe,
   ParseIntPipe,
   Post,
@@ -18,6 +20,7 @@ export class AdminController {
   constructor(
     private readonly seedFromSpotifyIdUseCase: SeedFromSpotifyIdUseCase,
     private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
+    private readonly recalculateEmotionAnalysisUseCase: RecalculateEmotionAnalysisUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -149,5 +152,11 @@ export class AdminController {
     @Query('label') label?: string,
   ) {
     return this.seedFromLocalUseCase.execute(limit, label);
+  }
+
+  @Get('/recalculate-emotion-analysis')
+  @PublicRoute()
+  async recalculateEmotionAnalysis() {
+    return this.recalculateEmotionAnalysisUseCase.execute();
   }
 }

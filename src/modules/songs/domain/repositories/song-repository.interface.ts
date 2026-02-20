@@ -22,6 +22,7 @@ export interface ISongRepository {
   findAll(): Promise<SongEntity[]>;
 
   create(song: Partial<SongEntity>): Promise<SongEntity>;
+  save(song: SongEntity): Promise<SongEntity>;
 
   createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]>;
 

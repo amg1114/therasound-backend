@@ -12,10 +12,7 @@ export interface PlaylistProps {
   durationMs: number;
 }
 
-export type CreatePlaylistProps = Omit<
-  PlaylistProps,
-  'id' | 'createdAt' | 'title'
->;
+export type CreatePlaylistProps = Omit<PlaylistProps, 'id' | 'createdAt'>;
 
 export class PlaylistEntity implements PlaylistProps {
   id: string;

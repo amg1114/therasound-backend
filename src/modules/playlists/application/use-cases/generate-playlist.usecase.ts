@@ -50,7 +50,7 @@ export class GeneratePlaylistUseCase {
     { conversationHistory }: GeneratePlaylistRequestDto,
   ): Promise<PlaylistEntity> {
     // 1. Analyze emotion from conversation history
-    const emotionAnalysis =
+    const { emotion: emotionAnalysis, playlistTitle } =
       await this.chatbotService.getEmotionAnalysis(conversationHistory);
 
     // 2. Map analyzed emotion to song emotion
@@ -108,6 +108,12 @@ export class GeneratePlaylistUseCase {
       currentEmotion,
       targetEmotion,
       userPreferences,
+    );
+
+    playlist.title = playlistTitle;
+
+    this.logger.debug(
+      `Generated playlist for user ${userId}: ${JSON.stringify(playlist)}`,
     );
 
     return await this.playlistRepository.create(playlist);

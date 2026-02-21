@@ -20,7 +20,10 @@ export class PlaylistEntityORM extends Document {
   title?: string;
 
   @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
-  emotion: string;
+  targetEmotion: string;
+
+  @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
+  initialEmotion: string;
 
   @Prop({ required: true })
   durationMs: number;

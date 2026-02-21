@@ -98,7 +98,8 @@ export class PlaylistBuilderState {
       userId: this.userPreferences.userId,
       songs: this.playlist.map((s) => SongMapper.toEmbeddedSongVO(s)),
       durationMs: duration,
-      emotion: this.targetEmotion,
+      initialEmotion: this.currentEmotion,
+      targetEmotion: this.targetEmotion,
     });
   }
 

@@ -7,7 +7,8 @@ export interface PlaylistProps {
   title?: string;
   songs: EmbeddedSongVO[];
   createdAt: Date;
-  emotion: EmotionVO;
+  initialEmotion: EmotionVO;
+  targetEmotion: EmotionVO;
   durationMs: number;
 }
 
@@ -21,7 +22,8 @@ export class PlaylistEntity implements PlaylistProps {
   userId: string;
   title?: string;
   songs: EmbeddedSongVO[];
-  emotion: EmotionVO;
+  initialEmotion: EmotionVO;
+  targetEmotion: EmotionVO;
   createdAt: Date;
   durationMs: number;
 
@@ -30,7 +32,8 @@ export class PlaylistEntity implements PlaylistProps {
     this.userId = props.userId;
     this.title = props.title;
     this.songs = props.songs;
-    this.emotion = props.emotion;
+    this.initialEmotion = props.initialEmotion;
+    this.targetEmotion = props.targetEmotion;
     this.createdAt = props.createdAt;
     this.durationMs = props.durationMs;
   }

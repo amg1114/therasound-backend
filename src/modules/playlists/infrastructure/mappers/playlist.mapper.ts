@@ -28,6 +28,7 @@ export class PlaylistMapper {
         : undefined,
       title: domainEntity.title,
       songs: domainEntity.songs,
+      initialEmotion: domainEntity.initialEmotion?.getValue(),
       targetEmotion: domainEntity.targetEmotion?.getValue(),
       durationMs: domainEntity.durationMs,
     };
@@ -39,7 +40,8 @@ export class PlaylistMapper {
       userId: entity.userId,
       title: entity.title,
       songs: entity.songs,
-      emotion: entity.targetEmotion.getValue(),
+      targetEmotion: entity.targetEmotion.getValue(),
+      initialEmotion: entity.initialEmotion.getValue(),
       durationMs: entity.durationMs,
       createdAt: entity.createdAt,
     };

@@ -27,10 +27,16 @@ export class PlaylistResponseDto {
   songs: EmbeddedSongVO[];
 
   @ApiProperty({
-    description: 'Playlist emotion',
+    description: 'Playlist target emotion',
     example: 'happy',
   })
-  emotion: string;
+  targetEmotion: string;
+
+  @ApiProperty({
+    description: 'Playlist initial emotion',
+    example: 'sad',
+  })
+  initialEmotion: string;
 
   @ApiProperty({
     description: 'Total duration in milliseconds',

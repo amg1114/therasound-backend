@@ -14,11 +14,18 @@ export class PlaylistSummaryResponseDto {
   title?: string;
 
   @ApiProperty({
-    description: 'Emoción de la lista de reproducción',
-    example: 'happy',
-    enum: ['happy', 'sad', 'energetic', 'calm', 'romantic', 'angry'],
+    description: 'Emoción inicial de la lista de reproducción',
+    example: 'sad',
+    enum: ['happy', 'sad', 'energetic', 'calm'],
   })
-  emotion: string;
+  initialEmotion: string;
+
+  @ApiProperty({
+    description: 'Emoción objetivo de la lista de reproducción',
+    example: 'happy',
+    enum: ['happy', 'sad', 'energetic', 'calm'],
+  })
+  targetEmotion: string;
 
   @ApiProperty({
     description: 'Número de canciones en la lista',

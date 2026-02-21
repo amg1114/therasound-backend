@@ -46,19 +46,24 @@ export class RecalculateEmotionAnalysisUseCase {
         emotionAnalysis &&
         emotionAnalysis.emotion !== song.emotion.getValue()
       ) {
+        const oldEmotion = song.emotion.getValue();
         const newEmotion = EmotionVO.create(emotionAnalysis.emotion);
+
         song.updateEmotionAnalysis(
           newEmotion,
           emotionAnalysis.confidence,
           emotionAnalysis.probabilities,
           song.reccobeatsId, // Keep existing ReccoBeats ID if present
         );
-        const oldEmotion = song.emotion.getValue();
+
         if (!updatedReport[oldEmotion]) {
           updatedReport[oldEmotion] = {} as (typeof updatedReport)[EmotionType];
         }
+
         updatedReport[oldEmotion][newEmotion.getValue()] =
           (updatedReport[oldEmotion][newEmotion.getValue()] || 0) + 1;
+
+        await this.songRepository.save(song);
       }
     }
     return { processed: processedCount, updatedReport };

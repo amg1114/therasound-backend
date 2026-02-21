@@ -12,7 +12,7 @@ import { SongScoringService } from '../../domain/services/song-scoring.service';
 @Injectable()
 export class PlaylistBuilderService {
   private readonly config: BuilderConfig = {
-    minDurationMs: 15 * 60 * 1000, // 15 min
+    minDurationMs: 30 * 60 * 1000, // 15 min
     maxStepIncrement: 0.05,
     initialMaxStep: 0.15,
     maxTotalIterations: 1000, // Prevent runaway loops

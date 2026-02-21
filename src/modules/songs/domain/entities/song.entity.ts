@@ -31,4 +31,18 @@ export class SongEntity {
     Object.assign(song, data);
     return song;
   }
+
+  updateEmotionAnalysis(
+    emotion: EmotionVO,
+    confidence: number,
+    probabilities: EmotionProbabilitiesVO,
+    reccobeatsId?: string,
+  ) {
+    this.emotion = emotion;
+    this.emotionConfidence = confidence;
+    this.emotionProbabilities = probabilities;
+    if (reccobeatsId) {
+      this.reccobeatsId = reccobeatsId;
+    }
+  }
 }

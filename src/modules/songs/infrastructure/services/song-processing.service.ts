@@ -108,7 +108,22 @@ export class SongProcessingService {
       return null;
     }
 
-    return this.buildProcessedTrack(spotifyId, emotionAnalysis, details);
+    const processedTrack = await this.buildProcessedTrack(
+      spotifyId,
+      emotionAnalysis,
+      details,
+    );
+
+    if (
+      SongMapper.mapEmotionToKey(processedTrack.emotion.getValue()) !==
+      track.labels
+    ) {
+      this.logger.warn(
+        `Emotion mismatch for seed track: ${track.uri}, expected: ${track.labels}, got: ${SongMapper.mapEmotionToKey(processedTrack.emotion.getValue())}`,
+      );
+    }
+
+    return processedTrack;
   }
 
   private async buildProcessedTrack(

@@ -74,6 +74,18 @@ export class SongRepositoryImpl implements ISongRepository {
     return songEntity;
   }
 
+  save(song: SongEntity): Promise<SongEntity> {
+    const ormData = SongMapper.toORM(song);
+    return this.model
+      .findByIdAndUpdate(song.id, ormData, { new: true })
+      .then((updated) => {
+        if (!updated) {
+          throw new Error(`Song with id ${song.id} not found for update`);
+        }
+        return SongMapper.toEntity(updated);
+      });
+  }
+
   async createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]> {
     const createdSongs: SongEntity[] = [];
     for (const song of songs) {

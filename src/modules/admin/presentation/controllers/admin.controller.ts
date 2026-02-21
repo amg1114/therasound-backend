@@ -1,4 +1,5 @@
 import { ApiEndpoint } from '@common/decorators';
+import { RecalculateEmotionAnalysisUseCase } from '@modules/admin/application/use-cases/recalculate-emotion-analysis.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { SeedFromSpotifyIdUseCase } from '@modules/admin/application/use-cases/seed-from-spotify-id.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
@@ -6,6 +7,7 @@ import { type IReccoBeatsAudioFeaturesQueries } from '@modules/songs/infrastruct
 import {
   Body,
   Controller,
+  Get,
   ParseArrayPipe,
   ParseIntPipe,
   Post,
@@ -18,6 +20,7 @@ export class AdminController {
   constructor(
     private readonly seedFromSpotifyIdUseCase: SeedFromSpotifyIdUseCase,
     private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
+    private readonly recalculateEmotionAnalysisUseCase: RecalculateEmotionAnalysisUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -117,6 +120,12 @@ export class AdminController {
         description: 'Maximum number of records to process from the CSV',
         required: false,
       },
+      {
+        name: 'label',
+        description:
+          'Optional label to filter records by (e.g., "0" = Sad, "1" = Happy, "2" = Energetic, "3" = Calm). If provided, only records with the matching label will be processed.',
+        required: false,
+      },
     ],
 
     responses: [
@@ -140,7 +149,14 @@ export class AdminController {
       }),
     )
     limit?: number,
+    @Query('label') label?: string,
   ) {
-    return this.seedFromLocalUseCase.execute(limit);
+    return this.seedFromLocalUseCase.execute(limit, label);
+  }
+
+  @Get('/recalculate-emotion-analysis')
+  @PublicRoute()
+  async recalculateEmotionAnalysis() {
+    return this.recalculateEmotionAnalysisUseCase.execute();
   }
 }

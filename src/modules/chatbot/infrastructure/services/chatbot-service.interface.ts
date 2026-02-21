@@ -1,4 +1,5 @@
-import { IsString, IsIn } from 'class-validator';
+import { IsIn, IsString } from 'class-validator';
+import { IChatbotAnalysisResponse } from '../interfaces/chatbot-analysis-reponse.interface';
 
 export const CHATBOT_SERVICE_TOKEN = Symbol('CHATBOT_SERVICE');
 export enum ChatbotRole {
@@ -23,5 +24,7 @@ export class IHistoryMessage {
 export interface IChatbotService {
   getResponse(payload: IConversationMessage[]): Promise<string>;
 
-  getEmotionAnalysis(history: IHistoryMessage[]): Promise<string>;
+  getEmotionAnalysis(
+    history: IHistoryMessage[],
+  ): Promise<IChatbotAnalysisResponse>;
 }

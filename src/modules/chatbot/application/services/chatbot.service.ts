@@ -1,3 +1,4 @@
+import { IChatbotAnalysisResponse } from '@modules/chatbot/infrastructure/interfaces/chatbot-analysis-reponse.interface';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenRouter } from '@openrouter/sdk';
@@ -57,7 +58,9 @@ export class ChatbotService implements IChatbotService {
     return content;
   }
 
-  async getEmotionAnalysis(history: IHistoryMessage[]): Promise<string> {
+  async getEmotionAnalysis(
+    history: IHistoryMessage[],
+  ): Promise<IChatbotAnalysisResponse> {
     const conversation = history.reduce((acc, msg) => {
       return acc + `${msg.role}: ${msg.content}\n`;
     }, '');
@@ -70,15 +73,30 @@ export class ChatbotService implements IChatbotService {
       ],
     });
 
-    const content = res.choices[0].message.content;
+    const result = res.choices[0].message.content;
 
-    if (typeof content !== 'string') {
+    if (typeof result !== 'string') {
       throw new InternalServerErrorException(
         'Respuesta inválida del chatbot: el contenido no es una cadena',
       );
     }
 
-    if (content.trim().length === 0) {
+    const content = JSON.parse(result) as IChatbotAnalysisResponse;
+
+    if (
+      typeof content !== 'object' ||
+      !content.emotion ||
+      !content.playlistTitle
+    ) {
+      throw new InternalServerErrorException(
+        'Respuesta inválida del chatbot: el contenido no es un objeto JSON válido',
+      );
+    }
+
+    if (
+      content.emotion.trim().length === 0 ||
+      content.playlistTitle.trim().length === 0
+    ) {
       throw new InternalServerErrorException(
         'Respuesta inválida del chatbot: el contenido está vacío',
       );

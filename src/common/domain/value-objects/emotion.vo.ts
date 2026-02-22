@@ -13,8 +13,11 @@ export class EmotionVO {
     return new EmotionVO(emotion as EmotionType);
   }
 
-  equals(other: EmotionVO): boolean {
-    return this.value === other.value;
+  equals(other: EmotionVO | string): boolean {
+    if (other instanceof EmotionVO) {
+      return this.value === other.value;
+    }
+    return this.value === other;
   }
 
   getValue(): EmotionType {

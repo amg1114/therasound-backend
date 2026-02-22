@@ -134,7 +134,6 @@ export class ExternalMusicApiService {
 
       const url = `${this.acrCloudBaseUrl}/external-metadata/tracks?source_url=https://open.spotify.com/track/${spotifyId}`;
 
-      this.logger.log(`Fetching song details from ACRCloud: ${spotifyId}`);
       const response = await firstValueFrom(
         this.httpService.get<AcrCloudResponseDto>(url, {
           headers: {
@@ -146,9 +145,6 @@ export class ExternalMusicApiService {
 
       const track = response.data.data[0];
       if (!track) {
-        this.logger.warn(
-          `No track data found in ACRCloud response for: ${spotifyId}`,
-        );
         throw new NotFoundException(
           `No se encontraron datos para la canción en ACRCloud: ${spotifyId}`,
         );
@@ -183,10 +179,6 @@ export class ExternalMusicApiService {
     try {
       const url = `${this.emotionAnalysisBaseUrl}/api/v1/analyze/${reccobeatsId}`;
 
-      this.logger.log(
-        `Fetching emotion analysis for ReccoBeats ID: ${reccobeatsId}`,
-      );
-
       const response = await firstValueFrom(
         this.httpService.get<EmotionAnalysisResponseDto>(url, {
           headers: {
@@ -217,10 +209,6 @@ export class ExternalMusicApiService {
   async getEmotionDataFromFeatures(features: IKeyAudioFeatures) {
     try {
       const url = `${this.emotionAnalysisBaseUrl}/api/v1/analyze`;
-
-      this.logger.log(
-        `Fetching emotion analysis from audio features: ${JSON.stringify(features)}`,
-      );
 
       const response = await firstValueFrom(
         this.httpService.post<EmotionAnalysisResponseDto>(url, features, {

@@ -1,4 +1,8 @@
 import { GenresModule } from '@modules/genres/genres.module';
+import {
+  FailedSpotifyTrackOrmEntity,
+  FailedSpotifyTrackSchema,
+} from '@modules/songs/infrastructure/orm/entities/failed-spotify-entity.orm';
 import { UsersModule } from '@modules/users/users.module';
 import { HttpModule } from '@nestjs/axios';
 import { Module, forwardRef } from '@nestjs/common';
@@ -10,6 +14,7 @@ import {
   SongEntityORM,
   SongSchema,
 } from './infrastructure/orm/entities/song-entity.orm';
+import { FailedSpotifyTrackRepository } from './infrastructure/orm/repositories/failed-spotify.repository';
 import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repository';
 import { ExternalMusicApiService } from './infrastructure/services/external-music-api.service';
 import { SongProcessingService } from './infrastructure/services/song-processing.service';
@@ -22,6 +27,10 @@ import { SongsController } from './presentation/controllers/songs.controller';
       {
         name: SongEntityORM.name,
         schema: SongSchema,
+      },
+      {
+        name: FailedSpotifyTrackOrmEntity.name,
+        schema: FailedSpotifyTrackSchema,
       },
     ]),
     GenresModule,
@@ -39,6 +48,7 @@ import { SongsController } from './presentation/controllers/songs.controller';
 
     GetSongByIdUseCase,
     SongCreatedListener,
+    FailedSpotifyTrackRepository,
   ],
   exports: [SONG_REPOSITORY, ExternalMusicApiService, SongProcessingService],
 })

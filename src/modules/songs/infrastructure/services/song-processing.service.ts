@@ -5,6 +5,7 @@ import {
   type ISongRepository,
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
+import { FailedSpotifyTrackRepository } from '@modules/songs/infrastructure/orm/repositories/failed-spotify.repository';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EmotionAnalysisResponseDto } from '../dto/emotion-analysis-response.dto';
 import { ReccoBeatsTrackDto } from '../dto/reccobeats-response.dto';
@@ -22,6 +23,7 @@ export class SongProcessingService {
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
     private readonly externalMusicApiService: ExternalMusicApiService,
+    private readonly failedSpotifyTrackRepository: FailedSpotifyTrackRepository,
   ) {}
 
   /**
@@ -43,29 +45,35 @@ export class SongProcessingService {
       return null;
     }
 
-    const songExists = await this.songRepository.existsBySpotifyId(spotifyId);
-
-    if (songExists) {
-      this.logger.log(
-        `Song with Spotify ID ${spotifyId} already exists, skipping`,
-      );
+    const skip = await this.checkIfExistsOrFailed(spotifyId);
+    if (skip) {
       return null;
     }
 
     // Fetch song details from Soundcharts
-    const details =
-      await this.externalMusicApiService.getExternalSongDetails(spotifyId);
+    const [emotionAnalysis, details] = await Promise.all([
+      this.externalMusicApiService.getEmotionDataForReccoBeats(track.id),
+      this.externalMusicApiService.getExternalSongDetails(spotifyId),
+    ]);
 
     if (!details) {
       this.logger.warn(
         `Could not fetch details for song: ${spotifyId}, skipping`,
       );
+
+      await this.registerFailedTrack(spotifyId, 'details_error');
       return null;
     }
 
-    // Fetch emotion analysis first
-    const emotionAnalysis =
-      await this.externalMusicApiService.getEmotionDataForReccoBeats(track.id);
+    if (!emotionAnalysis) {
+      this.logger.warn(
+        `Could not fetch emotion analysis for song: ${spotifyId}, skipping`,
+      );
+
+      await this.registerFailedTrack(spotifyId, 'emotion_error');
+      return null;
+    }
+
     return this.buildProcessedTrack(spotifyId, emotionAnalysis, details);
   }
 
@@ -78,52 +86,39 @@ export class SongProcessingService {
       return null;
     }
 
-    const exists = await this.songRepository.existsBySpotifyId(spotifyId);
-    if (exists) {
-      this.logger.log(
-        `Song with Spotify ID ${spotifyId} already exists, skipping`,
-      );
+    const skip = await this.checkIfExistsOrFailed(spotifyId);
+    if (skip) {
       return null;
     }
 
-    const emotionAnalysis =
-      await this.externalMusicApiService.getEmotionDataFromFeatures(
-        SongMapper.seedAudioFeaturesToKeyFeatures(track),
-      );
+    const audioFeatures = SongMapper.seedAudioFeaturesToKeyFeatures(track);
+
+    const [emotionAnalysis, details] = await Promise.all([
+      this.externalMusicApiService.getEmotionDataFromFeatures(audioFeatures),
+      this.externalMusicApiService.getExternalSongDetails(spotifyId),
+    ]);
 
     if (!emotionAnalysis) {
       this.logger.warn(
         `Could not fetch emotion analysis for seed track: ${track.uri}, skipping`,
       );
+
+      await this.registerFailedTrack(spotifyId, 'emotion_error');
+
       return null;
     }
-
-    const details =
-      await this.externalMusicApiService.getExternalSongDetails(spotifyId);
 
     if (!details) {
       this.logger.warn(
-        `Could not fetch details from ACRCloud for seed track: ${track.uri}, skipping`,
+        `Could not fetch details for seed track: ${track.uri}, skipping`,
       );
+
+      await this.registerFailedTrack(spotifyId, 'details_error');
+
       return null;
     }
 
-    const processedTrack = await this.buildProcessedTrack(
-      spotifyId,
-      emotionAnalysis,
-      details,
-    );
-
-    if (
-      SongMapper.mapEmotionToKey(processedTrack.emotion.getValue()) !==
-      track.labels
-    ) {
-      this.logger.warn(
-        `Emotion mismatch for seed track: ${track.uri}, expected: ${track.labels}, got: ${SongMapper.mapEmotionToKey(processedTrack.emotion.getValue())}`,
-      );
-    }
-
-    return processedTrack;
+    return this.buildProcessedTrack(spotifyId, emotionAnalysis, details);
   }
 
   private async buildProcessedTrack(
@@ -148,5 +143,42 @@ export class SongProcessingService {
     });
 
     return this.songRepository.create(newSong);
+  }
+
+  private async checkIfExistsOrFailed(spotifyId: string): Promise<boolean> {
+    const [exists, failed] = await Promise.all([
+      this.songRepository.existsBySpotifyId(spotifyId),
+      this.failedSpotifyTrackRepository.findBySpotifyId(spotifyId),
+    ]);
+
+    if (exists) {
+      this.logger.log(
+        `Song with Spotify ID ${spotifyId} already exists, skipping`,
+      );
+      return true;
+    }
+
+    if (failed) {
+      this.logger.warn(
+        `Previous processing attempt for Spotify ID ${spotifyId} failed with reason: ${failed.reason}, skipping`,
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+  private registerFailedTrack(
+    spotifyId: string,
+    reason: 'not_found' | 'emotion_error' | 'details_error',
+  ) {
+    this.logger.warn(
+      `Registering failed track. Spotify ID: ${spotifyId}, Reason: ${reason}`,
+    );
+    return this.failedSpotifyTrackRepository.create({
+      spotifyId,
+      reason,
+      createdAt: new Date(),
+    });
   }
 }

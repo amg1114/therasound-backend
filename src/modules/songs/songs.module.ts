@@ -1,4 +1,5 @@
 import { GenresModule } from '@modules/genres/genres.module';
+import { SongScoringService } from '@modules/playlists/domain/services/song-scoring.service';
 import {
   FailedSpotifyTrackOrmEntity,
   FailedSpotifyTrackSchema,
@@ -45,11 +46,17 @@ import { SongsController } from './presentation/controllers/songs.controller';
 
     ExternalMusicApiService,
     SongProcessingService,
+    SongScoringService,
 
     GetSongByIdUseCase,
     SongCreatedListener,
     FailedSpotifyTrackRepository,
   ],
-  exports: [SONG_REPOSITORY, ExternalMusicApiService, SongProcessingService],
+  exports: [
+    SONG_REPOSITORY,
+    ExternalMusicApiService,
+    SongProcessingService,
+    SongScoringService,
+  ],
 })
 export class SongsModule {}

@@ -17,6 +17,10 @@ import {
 } from './infrastructure/orm/entities/song-entity.orm';
 import { FailedSpotifyTrackRepository } from './infrastructure/orm/repositories/failed-spotify.repository';
 import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repository';
+import {
+  AudioProcessingService,
+  SongEmotionService,
+} from './infrastructure/services';
 import { ExternalMusicApiService } from './infrastructure/services/external-music-api.service';
 import { SongProcessingService } from './infrastructure/services/song-processing.service';
 import { SongsController } from './presentation/controllers/songs.controller';
@@ -45,6 +49,9 @@ import { SongsController } from './presentation/controllers/songs.controller';
     },
 
     ExternalMusicApiService,
+
+    AudioProcessingService,
+    SongEmotionService,
     SongProcessingService,
     SongScoringService,
 
@@ -55,8 +62,10 @@ import { SongsController } from './presentation/controllers/songs.controller';
   exports: [
     SONG_REPOSITORY,
     ExternalMusicApiService,
+    AudioProcessingService,
     SongProcessingService,
     SongScoringService,
+    SongEmotionService,
   ],
 })
 export class SongsModule {}

@@ -5,15 +5,16 @@ import {
   type ISongRepository,
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
+import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { FailedSpotifyTrackRepository } from '@modules/songs/infrastructure/orm/repositories/failed-spotify.repository';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { EmotionAnalysisResponseDto } from '../dto/emotion-analysis-response.dto';
 import { ReccoBeatsTrackDto } from '../dto/reccobeats-response.dto';
 import { SongMapper } from '../mappers/song.mapper';
 import {
   ExternalMusicApiService,
   IExternalDetails,
 } from './external-music-api.service';
+import { SongEmotionService } from './song-emotion.service';
 
 @Injectable()
 export class SongProcessingService {
@@ -24,6 +25,7 @@ export class SongProcessingService {
     private readonly songRepository: ISongRepository,
     private readonly externalMusicApiService: ExternalMusicApiService,
     private readonly failedSpotifyTrackRepository: FailedSpotifyTrackRepository,
+    private readonly songEmotionService: SongEmotionService,
   ) {}
 
   /**
@@ -51,10 +53,8 @@ export class SongProcessingService {
     }
 
     // Fetch song details from Soundcharts
-    const [emotionAnalysis, details] = await Promise.all([
-      this.externalMusicApiService.getEmotionDataForReccoBeats(track.id),
-      this.externalMusicApiService.getExternalSongDetails(spotifyId),
-    ]);
+    const details =
+      await this.externalMusicApiService.getExternalSongDetails(spotifyId);
 
     if (!details) {
       this.logger.warn(
@@ -65,16 +65,7 @@ export class SongProcessingService {
       return null;
     }
 
-    if (!emotionAnalysis) {
-      this.logger.warn(
-        `Could not fetch emotion analysis for song: ${spotifyId}, skipping`,
-      );
-
-      await this.registerFailedTrack(spotifyId, 'emotion_error');
-      return null;
-    }
-
-    return this.buildProcessedTrack(spotifyId, emotionAnalysis, details);
+    return this.buildProcessedTrack(spotifyId, {} as AudioFeaturesVO, details);
   }
 
   async processSeedTrack(track: ISeedTrack): Promise<SongEntity | null> {
@@ -118,28 +109,40 @@ export class SongProcessingService {
       return null;
     }
 
-    return this.buildProcessedTrack(spotifyId, emotionAnalysis, details);
+    return this.buildProcessedTrack(spotifyId, audioFeatures, details);
   }
 
   private async buildProcessedTrack(
     spotifyId: string,
-    emotionAnalysis: EmotionAnalysisResponseDto,
+    audioFeatures: AudioFeaturesVO,
     details: IExternalDetails,
+    reccobeatsId?: string,
   ) {
+    const { dominantEmotion, emotionDistances, emotionProbabilities } =
+      this.songEmotionService.calculateFeaturesEmotionAnalysis(audioFeatures);
+
+    if (!dominantEmotion) {
+      this.logger.warn(
+        `Could not determine dominant emotion for song: ${spotifyId}`,
+      );
+      await this.registerFailedTrack(spotifyId, 'emotion_error');
+      return null;
+    }
+
     const newSong = SongEntity.create({
       spotifyId: spotifyId,
       title: details.title,
       artist: details.artist,
-      emotion: EmotionVO.create(emotionAnalysis.emotion),
+      emotion: EmotionVO.create(dominantEmotion),
       durationMs: details.durationMs,
       spotifyUrl: details.spotifyUrl,
       genres: details.genres,
       imageUrl: details.imageUrl || '',
       releaseDate: details.releaseDate,
-      audioFeatures: emotionAnalysis.audio_features,
-      emotionConfidence: emotionAnalysis.confidence,
-      emotionProbabilities: emotionAnalysis.probabilities,
-      reccobeatsId: emotionAnalysis.reccobeats_id,
+      audioFeatures: audioFeatures,
+      emotionDistances: emotionDistances,
+      emotionProbabilities: emotionProbabilities,
+      reccobeatsId: reccobeatsId,
     });
 
     return this.songRepository.create(newSong);

@@ -1,6 +1,7 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
+import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
+import { AudioProcessingService } from '@modules/songs/infrastructure/services';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -25,7 +26,10 @@ export interface ScoringContext {
 export class SongScoringService {
   private readonly logger = new Logger(SongScoringService.name);
   static MIN_FEATURE_IMPORTANCE = 0.15;
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly audioProcessingService: AudioProcessingService,
+  ) {}
 
   /**
    * Calcula score combinado de una canción
@@ -87,21 +91,19 @@ export class SongScoringService {
       );
     }
 
-    const songFeatures = this.normalizeSongFeatures(song);
+    const songFeatures = this.audioProcessingService.normalizeSongFeatures(
+      song.audioFeatures,
+    );
 
     let totalWeightedDistance = 0;
     let totalWeight = 0;
 
     for (const [feature, idealValue] of Object.entries(idealFeatures)) {
       const weight = (weights[feature] ?? 0) as number;
-      // this.logger.debug(
-      //   `Feature: ${feature}, Ideal: ${idealValue.toFixed(
-      //     3,
-      //   )}, Song: ${songFeatures[feature]}, Weight: ${weight.toFixed(3)}`,
-      // );
       if (weight < SongScoringService.MIN_FEATURE_IMPORTANCE) continue;
 
-      const songValue = songFeatures[feature];
+      const songValue = songFeatures[feature as keyof AudioFeaturesVO];
+
       totalWeightedDistance += Math.abs(songValue - idealValue) * weight;
       totalWeight += weight;
     }
@@ -110,10 +112,6 @@ export class SongScoringService {
 
     const normalizedDistance = totalWeightedDistance / totalWeight;
     const transitionScore = 1 - Math.min(normalizedDistance, 1);
-
-    // this.logger.debug(
-    //   `Transition score for ${song.title}: ${transitionScore.toFixed(3)} (progress: ${context.playlistProgress.toFixed(2)}, target: ${targetEmotionKey})`,
-    // );
 
     return transitionScore;
   }
@@ -139,37 +137,6 @@ export class SongScoringService {
     return result;
   }
 
-  calculateTargetDistance(song: SongEntity, targetEmotion: EmotionVO): number {
-    const normalizedSongFeatures = this.normalizeSongFeatures(song);
-
-    const targetEmotionKey = targetEmotion.getValue();
-
-    const targetFeatures = this.configService.get<EmotionFeatureValues>(
-      'emotion_analysis.targets',
-    )![targetEmotionKey];
-
-    const featureWeights = this.configService.get<Record<string, number>>(
-      `emotion_analysis.weights.${targetEmotionKey}`,
-    )!;
-
-    let weightedDistance = 0;
-    let totalWeight = 0;
-
-    for (const [featureName, targetValue] of Object.entries(targetFeatures)) {
-      const songValue = normalizedSongFeatures[featureName] as
-        | number
-        | undefined;
-
-      const weight = featureWeights[featureName] ?? 0;
-
-      if (songValue !== undefined && weight > 0) {
-        weightedDistance += Math.abs(songValue - targetValue) * weight;
-        totalWeight += weight;
-      }
-    }
-
-    return totalWeight > 0 ? weightedDistance / totalWeight : 1.0;
-  }
   /**
    * Pesos adaptativos: al inicio prioriza transición, al final preferencias
    */
@@ -269,39 +236,5 @@ export class SongScoringService {
     }
 
     return Math.max(score, 0);
-  }
-
-  private normalizeSongFeatures(song: SongEntity): Record<string, number> {
-    const features = SongMapper.songFeaturesToKeyFeatures(song);
-    const normalized: Record<string, number> = {};
-
-    for (const [feature, value] of Object.entries(features)) {
-      // Normalizar según rangos típicos de Spotify
-      switch (feature) {
-        case 'danceability':
-        case 'energy':
-        case 'speechiness':
-        case 'acousticness':
-        case 'instrumentalness':
-        case 'liveness':
-        case 'valence':
-          normalized[feature] = value; // Ya están entre 0 y 1
-          break;
-        case 'tempo':
-          normalized[feature] = this.normalize(value, 50, 200); // Normalizar tempo entre 50 y 200 BPM
-          break;
-        case 'loudness':
-          normalized[feature] = this.normalize(value, -60, 0); // Normalizar loudness entre -60 dB y 0 dB
-          break;
-        default:
-          normalized[feature] = value; // Otros features se dejan igual
-      }
-    }
-
-    return normalized;
-  }
-
-  private normalize(value: number, min: number, max: number): number {
-    return (value - min) / (max - min);
   }
 }

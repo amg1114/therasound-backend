@@ -39,4 +39,14 @@ export class EmotionMapper {
 
     return EmotionVO.create(targetMap[normalized] ?? 'calm');
   }
+
+  static emotionToKeyMapper(emotion: EmotionType): string {
+    const emotionMap: Record<EmotionType, string> = {
+      sad: '0',
+      happy: '1',
+      energetic: '2',
+      calm: '3',
+    };
+    return emotionMap[emotion];
+  }
 }

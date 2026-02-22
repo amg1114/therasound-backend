@@ -17,9 +17,11 @@ import {
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { EmotionMapper } from '../../infrastructure/mappers/emotion.mapper';
+import { EmotionMapper } from '../../../../common/infrastructure/mappers/emotion.mapper';
 import { PlaylistBuilderService } from '../services/playlist-builder.service';
+
 const MIN_SONGS_THRESHOLD = 20;
+
 @Injectable()
 export class GeneratePlaylistUseCase {
   private readonly logger = new Logger(GeneratePlaylistUseCase.name);

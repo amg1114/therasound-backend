@@ -1,39 +1,13 @@
-import {
-  EmotionType,
-  EmotionVO,
-} from '@common/domain/value-objects/emotion.vo';
-import { ISeedTrack } from '@modules/admin/application/use-cases/seed-from-local.usecase';
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { EmbeddedSongVO } from '@modules/playlists/domain/value-objects/embedded-song.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
-import { IKeyAudioFeatures } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
 import { SongResponseDto } from '@modules/songs/presentation/dto/responses/song-response.dto';
 import { BadRequestException } from '@nestjs/common';
+import { extractSpotifyId } from 'src/utils/extractSpotifyID';
 import { SongEntityORM } from '../orm/entities/song-entity.orm';
 
 export class SongMapper {
-  /**
-   * Extracts Spotify ID from a Spotify URL
-   * @param url - Spotify URL (e.g., https://open.spotify.com/track/3n3Ppam7vgaVa1iaRUc9Lp)
-   * @returns Spotify ID or null if not found
-   */
-  static extractSpotifyId(url: string): string | null {
-    if (!url) return null;
-
-    // Match Spotify track URLs
-    const matchUrl = url.match(/spotify\.com\/track\/([a-zA-Z0-9]+)/);
-    if (matchUrl && matchUrl[1]) {
-      return matchUrl[1];
-    }
-
-    const matchUri = url.match(/spotify:track:([a-zA-Z0-9]+)/);
-    if (matchUri && matchUri[1]) {
-      return matchUri[1];
-    }
-
-    return null;
-  }
-
   static toEntity(raw: SongEntityORM): SongEntity {
     const song = new SongEntity();
 
@@ -63,7 +37,7 @@ export class SongMapper {
     // If spotifyId is not provided but spotifyUrl is, extract it from the URL
     let spotifyId = entity.spotifyId;
     if (!spotifyId && entity.spotifyUrl) {
-      const id = this.extractSpotifyId(entity.spotifyUrl);
+      const id = extractSpotifyId(entity.spotifyUrl);
       if (!id)
         throw new BadRequestException('URL de Spotify inválida proporcionada');
       spotifyId = id;
@@ -123,66 +97,6 @@ export class SongMapper {
     };
   }
 
-  static songFeaturesToKeyFeatures(entity: SongEntity): IKeyAudioFeatures {
-    return {
-      acousticness: entity.audioFeatures.acousticness,
-      danceability: entity.audioFeatures.danceability,
-      energy: entity.audioFeatures.energy,
-      instrumentalness: entity.audioFeatures.instrumentalness,
-      liveness: entity.audioFeatures.liveness,
-      loudness: entity.audioFeatures.loudness,
-      speechiness: entity.audioFeatures.speechiness,
-      tempo: entity.audioFeatures.tempo,
-      valence: entity.audioFeatures.valence,
-    };
-  }
-
-  static audioFeaturesToKeyFeatures(
-    entity: SongEntity['audioFeatures'],
-  ): IKeyAudioFeatures {
-    return {
-      acousticness: entity.acousticness,
-      danceability: entity.danceability,
-      energy: entity.energy,
-      instrumentalness: entity.instrumentalness,
-      liveness: entity.liveness,
-      loudness: entity.loudness,
-      speechiness: entity.speechiness,
-      tempo: entity.tempo,
-      valence: entity.valence,
-    };
-  }
-
-  static seedAudioFeaturesToKeyFeatures(entity: ISeedTrack): IKeyAudioFeatures {
-    return {
-      acousticness: entity.acousticness,
-      danceability: entity.danceability,
-      energy: entity.energy,
-      instrumentalness: entity.instrumentalness,
-      liveness: entity.liveness,
-      loudness: entity.loudness,
-      speechiness: entity.speechiness,
-      tempo: entity.tempo,
-      valence: entity.valence,
-    };
-  }
-
-  static seedAudioFeaturesToSongFeatures(
-    entity: ISeedTrack,
-  ): SongEntity['audioFeatures'] {
-    return {
-      acousticness: entity.acousticness,
-      danceability: entity.danceability,
-      energy: entity.energy,
-      instrumentalness: entity.instrumentalness,
-      liveness: entity.liveness,
-      loudness: entity.loudness,
-      speechiness: entity.speechiness,
-      tempo: entity.tempo,
-      valence: entity.valence,
-    };
-  }
-
   static toEmbeddedSongVO(entity: SongEntity): EmbeddedSongVO {
     return {
       id: entity.id,
@@ -197,15 +111,5 @@ export class SongMapper {
       imageUrl: entity.imageUrl,
       releaseDate: entity.releaseDate,
     };
-  }
-
-  static mapEmotionToKey(emotion: EmotionType): string {
-    const emotionMap: Record<EmotionType, string> = {
-      sad: '0',
-      happy: '1',
-      energetic: '2',
-      calm: '3',
-    };
-    return emotionMap[emotion];
   }
 }

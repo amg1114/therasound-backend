@@ -1,5 +1,4 @@
 import { GenresModule } from '@modules/genres/genres.module';
-import { SongScoringService } from '@modules/playlists/domain/services/song-scoring.service';
 import {
   FailedSpotifyTrackOrmEntity,
   FailedSpotifyTrackSchema,
@@ -17,12 +16,14 @@ import {
 } from './infrastructure/orm/entities/song-entity.orm';
 import { FailedSpotifyTrackRepository } from './infrastructure/orm/repositories/failed-spotify.repository';
 import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repository';
+
 import {
   AudioProcessingService,
+  ExternalMusicApiService,
   SongEmotionService,
-} from './infrastructure/services';
-import { ExternalMusicApiService } from './infrastructure/services/external-music-api.service';
-import { SongProcessingService } from './infrastructure/services/song-processing.service';
+  SongProcessingService,
+  SongScoringService,
+} from './application/services';
 import { SongsController } from './presentation/controllers/songs.controller';
 
 @Module({

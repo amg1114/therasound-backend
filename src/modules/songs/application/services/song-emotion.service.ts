@@ -3,10 +3,10 @@ import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { EmotionDistancesVO } from '@modules/songs/domain/value-objects/emotion-distances.vo';
 import { EmotionProbabilitiesVO } from '@modules/songs/domain/value-objects/emotion-probabilities.vo';
+import { ISongEmotionAnalysis } from '@modules/songs/infrastructure/interfaces/song-emotion-analysis.interface';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmotionFeatureValues } from 'src/config/app.config';
-import { ISongEmotionAnalysis } from '../interfaces/song-emotion-analysis.interface';
 import { AudioProcessingService } from './audio-processing.service';
 
 @Injectable()

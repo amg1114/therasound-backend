@@ -1,9 +1,9 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
+import { SongEmotionService } from '@modules/songs/application/services';
 import {
   type ISongRepository,
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { SongEmotionService } from '@modules/songs/infrastructure/services';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import pLimit from 'p-limit';
 

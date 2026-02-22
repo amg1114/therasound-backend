@@ -7,7 +7,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   ScoringContext,
   SongScoringService,
-} from '../../domain/services/song-scoring.service';
+} from '../../../songs/application/services/song-scoring.service';
 
 interface BuilderConfig {
   minDurationMs: number;

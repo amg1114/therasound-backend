@@ -1,4 +1,4 @@
-import { ApiEndpoint } from '@common/decorators';
+import { ApiEndpoint } from '@common/infrastructure/decorators';
 import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-user.decorator';
 import { GeneratePlaylistUseCase } from '@modules/playlists/application/use-cases/generate-playlist.usecase';
 import { GetPlaylistByIdUseCase } from '@modules/playlists/application/use-cases/get-playlist-by-id.usecase';

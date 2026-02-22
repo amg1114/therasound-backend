@@ -48,7 +48,6 @@ export class SongMapper {
     song.imageUrl = raw.imageUrl;
     song.releaseDate = raw.releaseDate;
     song.audioFeatures = raw.audioFeatures;
-    song.emotionConfidence = raw.emotionConfidence;
     song.emotionProbabilities = raw.emotionProbabilities;
     song.emotionDistances = raw.emotionDistances;
     song.reccobeatsId = raw.reccobeatsId;
@@ -81,7 +80,6 @@ export class SongMapper {
       imageUrl: entity.imageUrl,
       releaseDate: entity.releaseDate,
       audioFeatures: entity.audioFeatures,
-      emotionConfidence: entity.emotionConfidence,
       emotionProbabilities: entity.emotionProbabilities,
       emotionDistances: entity.emotionDistances,
       reccobeatsId: entity.reccobeatsId,
@@ -106,7 +104,6 @@ export class SongMapper {
     response.imageUrl = entity.imageUrl;
     response.releaseDate = entity.releaseDate;
     response.audioFeatures = entity.audioFeatures;
-    response.emotionConfidence = entity.emotionConfidence;
     response.emotionProbabilities = entity.emotionProbabilities;
     response.reccobeatsId = entity.reccobeatsId;
     response.likesCount = entity.likesCount;

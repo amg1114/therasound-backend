@@ -151,12 +151,6 @@ export class SongResponseDto {
   audioFeatures?: AudioFeaturesDto;
 
   @ApiPropertyOptional({
-    description: 'Confidence score of emotion analysis (0.0 to 1.0)',
-    example: 0.85,
-  })
-  emotionConfidence?: number;
-
-  @ApiPropertyOptional({
     description: 'Probabilities for each emotion category',
     type: EmotionProbabilitiesDto,
   })

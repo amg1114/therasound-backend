@@ -43,9 +43,6 @@ export class SongEntityORM extends Document {
   @Prop({ required: true, type: Object })
   audioFeatures: AudioFeaturesVO;
 
-  @Prop({ required: true })
-  emotionConfidence: number;
-
   @Prop({ required: true, type: Object })
   emotionProbabilities: EmotionProbabilitiesVO;
 

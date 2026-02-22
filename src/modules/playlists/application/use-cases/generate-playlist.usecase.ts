@@ -67,7 +67,10 @@ export class GeneratePlaylistUseCase {
       );
     }
 
-    const availableSongs = await this.songRepository.findAll();
+    const availableSongs = await this.songRepository.findPlaylistCandidates(
+      1000,
+      0.5,
+    );
 
     if (availableSongs.length < MIN_SONGS_THRESHOLD) {
       const [positiveSeeds, negativeSeeds] = await Promise.all([

@@ -11,6 +11,11 @@ export interface SongFilters {
 }
 
 export interface ISongRepository {
+  findPlaylistCandidates(
+    limit?: number,
+    maxDistance?: number,
+  ): Promise<SongEntity[]>;
+
   findById(id: string): Promise<SongEntity | null>;
 
   findManyBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]>;

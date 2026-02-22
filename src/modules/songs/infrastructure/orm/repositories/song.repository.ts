@@ -1,10 +1,11 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   ISongRepository,
   SongFilters,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryFilter, Types } from 'mongoose';
@@ -13,6 +14,8 @@ import { SongEntityORM } from '../entities/song-entity.orm';
 
 @Injectable()
 export class SongRepositoryImpl implements ISongRepository {
+  private readonly logger = new Logger(SongRepositoryImpl.name);
+
   constructor(
     @InjectModel(SongEntityORM.name)
     private readonly model: Model<SongEntityORM>,
@@ -115,6 +118,58 @@ export class SongRepositoryImpl implements ISongRepository {
   async existsBySpotifyId(spotifyId: string): Promise<boolean> {
     const count = await this.model.countDocuments({ spotifyId });
     return count > 0;
+  }
+
+  async findPlaylistCandidates(
+    limitPerEmotion = 125,
+    initialMaxDistance = 0.35,
+  ): Promise<SongEntity[]> {
+    const emotions = EmotionVO.SONG_EMOTIONS;
+
+    const results = await Promise.all(
+      emotions.map(async (emotion) => {
+        let maxDistance = initialMaxDistance;
+        let songs: any[] = [];
+
+        // Relajar distancia hasta tener suficientes canciones
+        while (songs.length < limitPerEmotion && maxDistance <= 1.0) {
+          songs = await this.model
+            .aggregate([
+              {
+                $match: {
+                  [`emotionDistances.${emotion}`]: { $lte: maxDistance },
+                },
+              },
+              { $sample: { size: limitPerEmotion } },
+            ])
+            .exec();
+
+          if (songs.length < limitPerEmotion) {
+            maxDistance += 0.1;
+            this.logger.warn(
+              `Not enough songs for ${emotion} (${songs.length}/${limitPerEmotion}), relaxing to ${maxDistance.toFixed(1)}`,
+            );
+          }
+        }
+
+        return songs;
+      }),
+    );
+
+    // Deduplicar
+    const seen = new Set<string>();
+    const songs: SongEntity[] = [];
+
+    for (const batch of results) {
+      for (const song of batch) {
+        if (!seen.has(song.spotifyId)) {
+          seen.add(song.spotifyId);
+          songs.push(SongMapper.toEntity(song));
+        }
+      }
+    }
+
+    return songs;
   }
 
   private buildQueryFilters(filters?: SongFilters): QueryFilter<SongEntityORM> {

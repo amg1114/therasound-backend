@@ -191,7 +191,6 @@ export class SongMapper {
       artist: entity.artist,
       emotion: entity.emotion.getValue(),
       emotionProbabilities: entity.emotionProbabilities,
-      emotionDistances: entity.emotionDistances,
       durationMs: entity.durationMs,
       spotifyUrl: entity.spotifyUrl,
       genres: entity.genres,

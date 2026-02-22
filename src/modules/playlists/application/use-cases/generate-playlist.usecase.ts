@@ -12,14 +12,11 @@ import {
   SONG_REPOSITORY,
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
-import { SongProcessingService } from '@modules/songs/infrastructure/services/song-processing.service';
 import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { EmotionMapper } from '../../infrastructure/mappers/emotion.mapper';
 import { PlaylistBuilderService } from '../services/playlist-builder.service';
 const MIN_SONGS_THRESHOLD = 20;
@@ -29,9 +26,6 @@ export class GeneratePlaylistUseCase {
 
   constructor(
     private readonly playlistBuilderService: PlaylistBuilderService,
-    private readonly externalMusicApi: ExternalMusicApiService,
-    private readonly songProcessingService: SongProcessingService,
-    private readonly configService: ConfigService,
 
     @Inject(CHATBOT_SERVICE_TOKEN)
     private readonly chatbotService: IChatbotService,

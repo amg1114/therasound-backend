@@ -6,14 +6,14 @@ import {
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
+import { ReccoBeatsTrackDto } from '@modules/songs/infrastructure/dto/reccobeats-response.dto';
+import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
 import { FailedSpotifyTrackRepository } from '@modules/songs/infrastructure/orm/repositories/failed-spotify.repository';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ReccoBeatsTrackDto } from '../dto/reccobeats-response.dto';
-import { SongMapper } from '../mappers/song.mapper';
 import {
   ExternalMusicApiService,
   IExternalDetails,
-} from './external-music-api.service';
+} from '../../infrastructure/services/external-music-api.service';
 import { SongEmotionService } from './song-emotion.service';
 
 @Injectable()

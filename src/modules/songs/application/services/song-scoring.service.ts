@@ -1,11 +1,11 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
-import { AudioProcessingService } from '@modules/songs/infrastructure/services';
 import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmotionFeatureValues } from 'src/config/app.config';
+import { AudioProcessingService } from './audio-processing.service';
 
 export interface SongScoringWeights {
   emotion: number;

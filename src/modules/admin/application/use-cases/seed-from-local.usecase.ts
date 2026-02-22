@@ -1,4 +1,4 @@
-import { SongProcessingService } from '@modules/songs/infrastructure/services/song-processing.service';
+import { SongProcessingService } from '@modules/songs/application/services/song-processing.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { parse } from 'csv-parse';
 import { createReadStream } from 'fs';

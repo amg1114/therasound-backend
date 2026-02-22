@@ -6,8 +6,7 @@ import {
   type ISongRepository,
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { EmotionAnalysisResponseDto } from '@modules/songs/infrastructure/dto/emotion-analysis-response.dto';
-import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
+import { SongEmotionService } from '@modules/songs/infrastructure/services';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class RecalculateEmotionAnalysisUseCase {
   constructor(
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
-    private readonly externalMusicApiService: ExternalMusicApiService,
+    private readonly songEmotionAnalysisService: SongEmotionService,
   ) {}
 
   async execute() {
@@ -28,43 +27,30 @@ export class RecalculateEmotionAnalysisUseCase {
 
     for (const song of allSongs) {
       processedCount++;
-      let emotionAnalysis: EmotionAnalysisResponseDto | null = null;
+      const { dominantEmotion, emotionProbabilities, emotionDistances } =
+        this.songEmotionAnalysisService.calculateSongEmotionAnalysis(song);
 
-      if (song.reccobeatsId) {
-        emotionAnalysis =
-          await this.externalMusicApiService.getEmotionDataForReccoBeats(
-            song.reccobeatsId,
-          );
-      } else if (song.spotifyId) {
-        emotionAnalysis =
-          await this.externalMusicApiService.getEmotionDataFromFeatures(
-            song.audioFeatures,
-          );
+      if (!dominantEmotion) {
+        continue; // Skip if emotion analysis fails
       }
 
-      if (
-        emotionAnalysis &&
-        emotionAnalysis.emotion !== song.emotion.getValue()
-      ) {
-        const oldEmotion = song.emotion.getValue();
-        const newEmotion = EmotionVO.create(emotionAnalysis.emotion);
+      const oldEmotion = song.emotion.getValue();
+      const newEmotion = EmotionVO.create(dominantEmotion);
 
-        song.updateEmotionAnalysis(
-          newEmotion,
-          emotionAnalysis.confidence,
-          emotionAnalysis.probabilities,
-          song.reccobeatsId, // Keep existing ReccoBeats ID if present
-        );
+      song.updateEmotionAnalysis(
+        newEmotion,
+        emotionProbabilities,
+        emotionDistances,
+      );
 
-        if (!updatedReport[oldEmotion]) {
-          updatedReport[oldEmotion] = {} as (typeof updatedReport)[EmotionType];
-        }
-
-        updatedReport[oldEmotion][newEmotion.getValue()] =
-          (updatedReport[oldEmotion][newEmotion.getValue()] || 0) + 1;
-
-        await this.songRepository.save(song);
+      if (!updatedReport[oldEmotion]) {
+        updatedReport[oldEmotion] = {} as (typeof updatedReport)[EmotionType];
       }
+
+      updatedReport[oldEmotion][newEmotion.getValue()] =
+        (updatedReport[oldEmotion][newEmotion.getValue()] || 0) + 1;
+
+      await this.songRepository.save(song);
     }
     return { processed: processedCount, updatedReport };
   }

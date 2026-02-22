@@ -1,10 +1,8 @@
-import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
-import { SongScoringService } from '@modules/playlists/domain/services/song-scoring.service';
 import {
   type ISongRepository,
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
-import { EmotionDistancesVO } from '@modules/songs/domain/value-objects/emotion-distances.vo';
+import { SongEmotionService } from '@modules/songs/infrastructure/services';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import pLimit from 'p-limit';
 
@@ -17,12 +15,11 @@ export class RecalculateTransitionScoringUseCase {
   constructor(
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
-    private readonly scoringService: SongScoringService,
+    private readonly songEmotionService: SongEmotionService,
   ) {}
 
   async execute() {
     const limit = pLimit(20);
-    const emotions = EmotionVO.SONG_EMOTIONS;
     const batchSize = 500;
     let processed = 0;
     let skip = 0;
@@ -35,17 +32,8 @@ export class RecalculateTransitionScoringUseCase {
       await Promise.all(
         songs.map((song) =>
           limit(async () => {
-            const emotionDistances: EmotionDistancesVO =
-              {} as EmotionDistancesVO;
-
-            for (const emotion of emotions) {
-              const targetEmotion = EmotionVO.create(emotion);
-              emotionDistances[emotion] =
-                this.scoringService.calculateTargetDistance(
-                  song,
-                  targetEmotion,
-                );
-            }
+            const emotionDistances =
+              this.songEmotionService.calculateSongEmotionDistances(song);
 
             song.emotionDistances = emotionDistances;
             processed++;

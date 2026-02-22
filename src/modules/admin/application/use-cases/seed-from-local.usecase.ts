@@ -2,6 +2,7 @@ import { SongProcessingService } from '@modules/songs/infrastructure/services/so
 import { Injectable, Logger } from '@nestjs/common';
 import { parse } from 'csv-parse';
 import { createReadStream } from 'fs';
+import pLimit from 'p-limit';
 import { join } from 'path';
 
 export interface ISeedTrack {
@@ -61,37 +62,41 @@ export class SeedFromLocalUseCase {
 
     this.logger.log(`Processing ${recordsToProcess.length} records...`);
 
-    // Process in batches of 100 to prevent rate limiting
     const batchSize = 100;
     const batches = this.chunkArray(recordsToProcess, batchSize);
+    const parallelLimit = pLimit(30);
     let processed = 0;
 
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
-      this.logger.log(
-        `Processing batch ${i + 1}/${batches.length} (${batch.length} songs)`,
+
+      const results = await Promise.all(
+        batch.map((record) =>
+          parallelLimit(async () => {
+            try {
+              const song =
+                await this.songProcessingService.processSeedTrack(record);
+              if (song) processed++;
+              return 'ok';
+            } catch (error) {
+              this.logger.error(
+                `Error processing: ${record.uri}, error: ${error.message}`,
+              );
+              return 'error';
+            }
+          }),
+        ),
       );
 
-      for (const record of batch) {
-        try {
-          await this.songProcessingService.processSeedTrack(record);
-          processed++;
-        } catch (error) {
-          this.logger.error(
-            `Error processing record: ${record.uri}`,
-            error instanceof Error ? error.stack : undefined,
-          );
-        }
+      const failures = results.filter((r) => r === 'error').length;
+      this.logger.log(
+        `Batch ${i + 1}/${batches.length} done. Processed: ${processed}, Failures: ${failures}`,
+      );
+
+      if (failures === batch.length) {
+        throw new Error(`Batch ${i + 1} failed completely, stopping.`);
       }
-
-      this.logger.log(
-        `Batch ${i + 1}/${batches.length} completed. Total processed: ${processed}/${recordsToProcess.length}`,
-      );
     }
-
-    this.logger.log(
-      `Completed: ${processed}/${recordsToProcess.length} records processed`,
-    );
 
     return {
       processed,

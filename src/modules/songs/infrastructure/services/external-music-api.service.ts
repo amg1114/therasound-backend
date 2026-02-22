@@ -1,7 +1,5 @@
-import { IKeyAudioFeatures } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { HttpService } from '@nestjs/axios';
 import {
-  BadGatewayException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -10,8 +8,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { AcrCloudResponseDto } from '../dto/acr-cloud-response.dto';
-import { EmotionAnalysisResponseDto } from '../dto/emotion-analysis-response.dto';
-import { ReccoBeatsResponseDto } from '../dto/reccobeats-response.dto';
 
 export interface IReccoBeatsAudioFeaturesQueries {
   danceability?: number;
@@ -42,83 +38,15 @@ export interface IExternalDetails {
 export class ExternalMusicApiService {
   private readonly logger = new Logger(ExternalMusicApiService.name);
 
-  private readonly reccobeatsBaseUrl: string;
   private readonly acrCloudBaseUrl: string;
-  private readonly emotionAnalysisBaseUrl: string;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
   ) {
-    this.reccobeatsBaseUrl = this.configService.getOrThrow<string>(
-      'external_apis.urls.recco_beats',
-    );
     this.acrCloudBaseUrl = this.configService.getOrThrow<string>(
       'external_apis.urls.acr_cloud',
     );
-    this.emotionAnalysisBaseUrl = this.configService.getOrThrow<string>(
-      'external_apis.urls.emotion_analysis',
-    );
-  }
-
-  async fetchRecommendations(
-    seeds: string[],
-    negativeSeeds: string[],
-    size = 50,
-    audioFeatures?: IReccoBeatsAudioFeaturesQueries,
-  ) {
-    this.logger.log(
-      `Fetching recommendations with seeds: ${seeds.join(', ')} and negative seeds: ${negativeSeeds.join(', ')}`,
-    );
-
-    try {
-      const params = new URLSearchParams();
-      params.append('size', size.toString());
-
-      // Add seeds (liked songs)
-      if (seeds.length > 0) {
-        params.append('seeds', seeds.slice(0, 5).join(','));
-      }
-
-      // Add negative seeds (disliked songs)
-      if (negativeSeeds.length > 0) {
-        params.append('negativeSeeds', negativeSeeds.slice(0, 5).join(','));
-      }
-
-      if (audioFeatures) {
-        Object.entries(audioFeatures).forEach(
-          ([key, value]: [string, number]) => {
-            if (value !== undefined) {
-              params.append(key, value.toString());
-            }
-          },
-        );
-      }
-
-      const url = `${this.reccobeatsBaseUrl}/track/recommendation?${params.toString()}`;
-
-      this.logger.log(`Fetching recommendations from ReccoBeats: ${url}`);
-
-      const response = await firstValueFrom(
-        this.httpService.get<ReccoBeatsResponseDto>(url, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }),
-      );
-
-      this.logger.log(
-        `Received ${response.data.content.length} recommendations from ReccoBeats`,
-      );
-
-      return response.data.content;
-    } catch (error) {
-      this.logger.error(
-        `Failed to fetch recommendations from ReccoBeats: ${error.message}`,
-        error.stack,
-      );
-      throw error;
-    }
   }
 
   async getExternalSongDetails(spotifyId: string): Promise<IExternalDetails> {
@@ -170,70 +98,6 @@ export class ExternalMusicApiService {
         error.stack,
       );
       throw error;
-    }
-  }
-
-  async getEmotionDataForReccoBeats(
-    reccobeatsId: string,
-  ): Promise<EmotionAnalysisResponseDto> {
-    try {
-      const url = `${this.emotionAnalysisBaseUrl}/api/v1/analyze/${reccobeatsId}`;
-
-      const response = await firstValueFrom(
-        this.httpService.get<EmotionAnalysisResponseDto>(url, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }),
-      );
-
-      this.logger.log(
-        `Successfully fetched emotion analysis for ${reccobeatsId}: ${response.data.emotion} (confidence: ${response.data.confidence})`,
-      );
-
-      return response.data;
-    } catch (error) {
-      this.logger.error(
-        `Failed to fetch emotion analysis: ${error.message}`,
-        error.stack,
-      );
-      if (error instanceof BadGatewayException) {
-        throw error;
-      }
-      throw new InternalServerErrorException(
-        'Error al obtener análisis de emociones debido a un error inesperado',
-      );
-    }
-  }
-
-  async getEmotionDataFromFeatures(features: IKeyAudioFeatures) {
-    try {
-      const url = `${this.emotionAnalysisBaseUrl}/api/v1/analyze`;
-
-      const response = await firstValueFrom(
-        this.httpService.post<EmotionAnalysisResponseDto>(url, features, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }),
-      );
-
-      this.logger.log(
-        `Successfully fetched emotion analysis from features: ${response.data.emotion} (confidence: ${response.data.confidence})`,
-      );
-
-      return response.data;
-    } catch (error) {
-      this.logger.error(
-        `Failed to fetch emotion analysis from features: ${error.message}`,
-        error.stack,
-      );
-      if (error instanceof BadGatewayException) {
-        throw error;
-      }
-      throw new InternalServerErrorException(
-        'Error al obtener análisis de emociones por características debido a un error inesperado',
-      );
     }
   }
 }

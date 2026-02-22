@@ -10,12 +10,10 @@ import {
 import { GeneratePlaylistRequestDto } from '@modules/playlists/presentation/dto/requests/generate-playlist-request.dto';
 import {
   SONG_REPOSITORY,
-  SongFilters,
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { ExternalMusicApiService } from '@modules/songs/infrastructure/services/external-music-api.service';
 import { SongProcessingService } from '@modules/songs/infrastructure/services/song-processing.service';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
 import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
@@ -73,37 +71,9 @@ export class GeneratePlaylistUseCase {
     );
 
     if (availableSongs.length < MIN_SONGS_THRESHOLD) {
-      const [positiveSeeds, negativeSeeds] = await Promise.all([
-        this.getPositiveSeeds(userPreferences),
-        this.getNegativeSeeds(userPreferences),
-      ]);
-
-      if (!positiveSeeds.length) {
-        positiveSeeds.push(
-          ...this.configService
-            .get<string>('defaultSeedRecommendations')!
-            .split(','),
-        );
-        this.logger.warn(
-          `No positive seeds found for user ${userId}, using default seeds.`,
-        );
-      }
-
-      const recommendations = await this.externalMusicApi.fetchRecommendations(
-        positiveSeeds,
-        negativeSeeds,
-        MIN_SONGS_THRESHOLD,
+      throw new NotFoundException(
+        `Not enough songs available to generate a playlist.`,
       );
-
-      const processedRecommendations = (
-        await Promise.all(
-          recommendations.map((rec) =>
-            this.songProcessingService.processTrackRecommendation(rec),
-          ),
-        )
-      ).filter((processed) => processed !== null && processed !== undefined);
-
-      availableSongs.push(...processedRecommendations);
     }
 
     const newPlaylist = this.playlistBuilderService.buildPlaylist(
@@ -121,41 +91,5 @@ export class GeneratePlaylistUseCase {
     );
 
     return playlist;
-  }
-
-  private async getPositiveSeeds(preferences: UserPreferencesEntity) {
-    if (preferences.likedSongs.length > 0) {
-      return preferences.likedSongs.map((song) => song.spotifyId);
-    }
-
-    const filters: SongFilters = {
-      excludedSongIds: preferences.dislikedSongs.map((song) => song.id),
-      excludedArtists: preferences.dislikedArtists,
-      excludedGenres: preferences.dislikedGenres,
-      deseableArtists: preferences.likedArtists,
-      deseableGenres: preferences.likedGenres,
-    };
-
-    const songs = await this.songRepository.findPopular(5, filters);
-
-    return songs.map((song) => song.spotifyId);
-  }
-
-  private async getNegativeSeeds(preferences: UserPreferencesEntity) {
-    if (preferences.dislikedSongs.length > 0) {
-      return preferences.dislikedSongs.map((song) => song.spotifyId);
-    }
-
-    const filters: SongFilters = {
-      excludedSongIds: preferences.likedSongs.map((song) => song.id),
-      excludedArtists: preferences.likedArtists,
-      excludedGenres: preferences.likedGenres,
-      deseableArtists: preferences.dislikedArtists,
-      deseableGenres: preferences.dislikedGenres,
-    };
-
-    const songs = await this.songRepository.findPopular(5, filters);
-
-    return songs.map((song) => song.spotifyId);
   }
 }

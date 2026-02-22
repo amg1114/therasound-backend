@@ -84,20 +84,8 @@ export class SongProcessingService {
 
     const audioFeatures = SongMapper.seedAudioFeaturesToKeyFeatures(track);
 
-    const [emotionAnalysis, details] = await Promise.all([
-      this.externalMusicApiService.getEmotionDataFromFeatures(audioFeatures),
-      this.externalMusicApiService.getExternalSongDetails(spotifyId),
-    ]);
-
-    if (!emotionAnalysis) {
-      this.logger.warn(
-        `Could not fetch emotion analysis for seed track: ${track.uri}, skipping`,
-      );
-
-      await this.registerFailedTrack(spotifyId, 'emotion_error');
-
-      return null;
-    }
+    const details =
+      await this.externalMusicApiService.getExternalSongDetails(spotifyId);
 
     if (!details) {
       this.logger.warn(

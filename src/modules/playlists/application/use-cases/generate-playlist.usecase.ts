@@ -106,20 +106,21 @@ export class GeneratePlaylistUseCase {
       availableSongs.push(...processedRecommendations);
     }
 
-    const playlist = this.playlistBuilderService.buildPlaylist(
+    const newPlaylist = this.playlistBuilderService.buildPlaylist(
       availableSongs,
       currentEmotion,
       targetEmotion,
       userPreferences,
     );
 
-    playlist.title = playlistTitle;
+    newPlaylist.title = playlistTitle;
 
-    this.logger.debug(
-      `Generated playlist for user ${userId}: ${JSON.stringify(playlist)}`,
+    const playlist = await this.playlistRepository.create(newPlaylist);
+    this.logger.log(
+      `Generated playlist for user ${userId} with ${playlist.songs.length} songs, from ${currentEmotion.getValue()} to ${targetEmotion.getValue()}`,
     );
 
-    return await this.playlistRepository.create(playlist);
+    return playlist;
   }
 
   private async getPositiveSeeds(preferences: UserPreferencesEntity) {

@@ -7,6 +7,7 @@ export type EmbeddedSongVO = {
   artist: string;
   emotion: string;
   emotionProbabilities: EmotionProbabilitiesVO;
+  emotionDistances?: Record<string, number>;
   durationMs: number;
   spotifyUrl: string;
   genres: string[];

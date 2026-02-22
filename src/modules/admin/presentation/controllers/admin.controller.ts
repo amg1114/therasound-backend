@@ -1,5 +1,6 @@
 import { ApiEndpoint } from '@common/decorators';
 import { RecalculateEmotionAnalysisUseCase } from '@modules/admin/application/use-cases/recalculate-emotion-analysis.usecase';
+import { RecalculateTransitionScoringUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { SeedFromSpotifyIdUseCase } from '@modules/admin/application/use-cases/seed-from-spotify-id.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
@@ -21,6 +22,7 @@ export class AdminController {
     private readonly seedFromSpotifyIdUseCase: SeedFromSpotifyIdUseCase,
     private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
     private readonly recalculateEmotionAnalysisUseCase: RecalculateEmotionAnalysisUseCase,
+    private readonly recalculateTransitionScoringUseCase: RecalculateTransitionScoringUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -158,5 +160,11 @@ export class AdminController {
   @PublicRoute()
   async recalculateEmotionAnalysis() {
     return this.recalculateEmotionAnalysisUseCase.execute();
+  }
+
+  @Get('/recalculate-transition-scoring')
+  @PublicRoute()
+  async recalculateTransitionScoring() {
+    return this.recalculateTransitionScoringUseCase.execute();
   }
 }

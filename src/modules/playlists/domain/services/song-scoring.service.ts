@@ -60,61 +60,116 @@ export class SongScoringService {
   /**
    * Calcula la puntuación de transición entre emociones
    */
-  calculateTransitionScore(song: SongEntity, context: ScoringContext): number {
+  calculateTransitionScore(
+    song: SongEntity,
+    context: ScoringContext,
+    disableInterpolation: boolean = false,
+  ): number {
     const emotionFeatureWeights = this.configService.get<EmotionFeatureValues>(
       'emotion_analysis.weights',
     )!;
 
-    const emotionFeatureTargets = this.configService.get<EmotionFeatureValues>(
-      'emotion_analysis.targets',
-    )!;
-
-    const songFeatures = SongMapper.songFeaturesToKeyFeatures(song);
-
     const targetEmotionKey = context.targetEmotion.getValue();
+    const weights = emotionFeatureWeights[targetEmotionKey];
+
+    // Punto ideal interpolado según progreso
+    let idealFeatures: Record<string, number>;
+
+    if (disableInterpolation) {
+      idealFeatures = this.configService.get<EmotionFeatureValues>(
+        'emotion_analysis.targets',
+      )![targetEmotionKey];
+    } else {
+      idealFeatures = this.interpolateFeatures(
+        context.currentEmotion,
+        context.targetEmotion,
+        context.playlistProgress,
+      );
+    }
+
+    const songFeatures = this.normalizeSongFeatures(song);
 
     let totalWeightedDistance = 0;
     let totalWeight = 0;
 
-    for (const [featureName, songFeatureValue] of Object.entries(
-      songFeatures,
-    )) {
-      const featureImportance = (emotionFeatureWeights[targetEmotionKey]?.[
-        featureName
-      ] ?? 0) as number;
+    for (const [feature, idealValue] of Object.entries(idealFeatures)) {
+      const weight = (weights[feature] ?? 0) as number;
+      this.logger.debug(
+        `Feature: ${feature}, Ideal: ${idealValue.toFixed(
+          3,
+        )}, Song: ${songFeatures[feature]}, Weight: ${weight.toFixed(3)}`,
+      );
+      if (weight < SongScoringService.MIN_FEATURE_IMPORTANCE) continue;
 
-      if (featureImportance < SongScoringService.MIN_FEATURE_IMPORTANCE) {
-        continue; // feature irrelevante para esta emoción
-      }
-
-      const targetFeatureValue = emotionFeatureTargets[targetEmotionKey][
-        featureName
-      ] as number;
-
-      const featureDistance = Math.abs(songFeatureValue - targetFeatureValue);
-
-      totalWeightedDistance += featureDistance * featureImportance;
-      totalWeight += featureImportance;
+      const songValue = songFeatures[feature];
+      totalWeightedDistance += Math.abs(songValue - idealValue) * weight;
+      totalWeight += weight;
     }
 
-    if (totalWeight === 0) {
-      return 0.5; // neutral seguro
-    }
+    if (totalWeight === 0) return 0.5;
 
     const normalizedDistance = totalWeightedDistance / totalWeight;
-
-    // Convertimos distancia en afinidad (1 = perfecto, 0 = lejano)
     const transitionScore = 1 - Math.min(normalizedDistance, 1);
 
-    this.logger.debug(
-      `Transition score for song ${song.title}: ${transitionScore.toFixed(
-        3,
-      )} (targetEmotion: ${targetEmotionKey})`,
-    );
+    // this.logger.debug(
+    //   `Transition score for ${song.title}: ${transitionScore.toFixed(3)} (progress: ${context.playlistProgress.toFixed(2)}, target: ${targetEmotionKey})`,
+    // );
 
     return transitionScore;
   }
 
+  private interpolateFeatures(
+    current: EmotionVO,
+    target: EmotionVO,
+    progress: number,
+  ): Record<string, number> {
+    const emotionTargets = this.configService.get<EmotionFeatureValues>(
+      'emotion_analysis.targets',
+    )!;
+
+    const currentTargets = emotionTargets[current.getValue()];
+    const targetTargets = emotionTargets[target.getValue()];
+
+    const result: Record<string, number> = {};
+    for (const feature of Object.keys(targetTargets)) {
+      const currentValue = (currentTargets[feature] ?? 0) as number;
+      const targetValue = (targetTargets[feature] ?? 0) as number;
+      result[feature] = currentValue * (1 - progress) + targetValue * progress;
+    }
+    return result;
+  }
+
+  calculateTargetDistance(song: SongEntity, targetEmotion: EmotionVO): number {
+    const normalizedSongFeatures = this.normalizeSongFeatures(song);
+
+    const targetEmotionKey = targetEmotion.getValue();
+
+    const targetFeatures = this.configService.get<EmotionFeatureValues>(
+      'emotion_analysis.targets',
+    )![targetEmotionKey];
+
+    const featureWeights = this.configService.get<Record<string, number>>(
+      `emotion_analysis.weights.${targetEmotionKey}`,
+    )!;
+
+    let weightedDistance = 0;
+    let totalWeight = 0;
+
+    for (const [featureName, targetValue] of Object.entries(targetFeatures)) {
+      const songValue = normalizedSongFeatures[featureName] as
+        | number
+        | undefined;
+
+      const weight = featureWeights[featureName] ?? 0;
+
+      if (songValue !== undefined && weight > 0) {
+        weightedDistance += Math.abs(songValue - targetValue) * weight;
+        totalWeight += weight;
+      }
+    }
+
+    return totalWeight > 0 ? weightedDistance / totalWeight : 1.0;
+  }
   /**
    * Pesos adaptativos: al inicio prioriza transición, al final preferencias
    */
@@ -214,6 +269,36 @@ export class SongScoringService {
     }
 
     return Math.max(score, 0);
+  }
+
+  private normalizeSongFeatures(song: SongEntity): Record<string, number> {
+    const features = SongMapper.songFeaturesToKeyFeatures(song);
+    const normalized: Record<string, number> = {};
+
+    for (const [feature, value] of Object.entries(features)) {
+      // Normalizar según rangos típicos de Spotify
+      switch (feature) {
+        case 'danceability':
+        case 'energy':
+        case 'speechiness':
+        case 'acousticness':
+        case 'instrumentalness':
+        case 'liveness':
+        case 'valence':
+          normalized[feature] = value; // Ya están entre 0 y 1
+          break;
+        case 'tempo':
+          normalized[feature] = this.normalize(value, 50, 200); // Normalizar tempo entre 50 y 200 BPM
+          break;
+        case 'loudness':
+          normalized[feature] = this.normalize(value, -60, 0); // Normalizar loudness entre -60 dB y 0 dB
+          break;
+        default:
+          normalized[feature] = value; // Otros features se dejan igual
+      }
+    }
+
+    return normalized;
   }
 
   private normalize(value: number, min: number, max: number): number {

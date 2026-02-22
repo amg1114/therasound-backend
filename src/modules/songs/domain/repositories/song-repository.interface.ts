@@ -21,6 +21,8 @@ export interface ISongRepository {
 
   findAll(): Promise<SongEntity[]>;
 
+  findPaginated(skip: number, limit: number): Promise<SongEntity[]>;
+
   create(song: Partial<SongEntity>): Promise<SongEntity>;
   save(song: SongEntity): Promise<SongEntity>;
 

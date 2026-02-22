@@ -1,5 +1,6 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { type AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
+import { type EmotionDistancesVO } from '@modules/songs/domain/value-objects/emotion-distances.vo';
 import { type EmotionProbabilitiesVO } from '@modules/songs/domain/value-objects/emotion-probabilities.vo';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
@@ -47,6 +48,9 @@ export class SongEntityORM extends Document {
 
   @Prop({ required: true, type: Object })
   emotionProbabilities: EmotionProbabilitiesVO;
+
+  @Prop({ required: true, type: Object })
+  emotionDistances: EmotionDistancesVO;
 
   @Prop({ required: false, unique: true, index: true })
   reccobeatsId?: string;

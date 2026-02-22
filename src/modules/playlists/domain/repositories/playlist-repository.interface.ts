@@ -11,11 +11,6 @@ export interface IPlaylistRepository {
 
   findRecentByUserId(userId: string, limit: number): Promise<PlaylistEntity[]>;
 
-  findLastByUserIdAndEmotion(
-    userId: string,
-    emotion: string,
-  ): Promise<PlaylistEntity | null>;
-
   update(playlist: PlaylistEntity): Promise<PlaylistEntity>;
 
   delete(id: string): Promise<void>;

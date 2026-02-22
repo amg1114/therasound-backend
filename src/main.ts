@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters';
-import { HttpLoggingInterceptor } from './common/interceptors';
+import { HttpExceptionFilter } from './common/infrastructure/filters';
+import { HttpLoggingInterceptor } from './common/infrastructure/interceptors';
 
 function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()

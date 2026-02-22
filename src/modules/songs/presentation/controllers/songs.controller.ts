@@ -1,4 +1,4 @@
-import { ApiEndpoint } from '@common/decorators';
+import { ApiEndpoint } from '@common/infrastructure/decorators';
 import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 import { GetSongByIdUseCase } from '@modules/songs/application/use-cases/get-song-by-id.usecase';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';

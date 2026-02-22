@@ -1,16 +1,16 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiEndpoint } from '@common/infrastructure/decorators';
+import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-user.decorator';
 import { CreateUserPreferencesUseCase } from '@modules/users/application/use-cases/create-user-preferences.usecase';
 import { GetUserPreferencesUseCase } from '@modules/users/application/use-cases/get-user-preferences.usecase';
-import { UserPreferencesResponseDto } from '../dto/responses/user-preferences-response.dto';
-import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
-import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-user.decorator';
 import { ToggleSongPreferencesUseCase } from '@modules/users/application/use-cases/toggle-song-preferences.usecase';
-import { ApiEndpoint } from '@common/decorators';
-import { UpdateGenresPreferencesUseCase } from '@modules/users/application/use-cases/update-genres-preferences.usecase';
 import { UpdateArtistsPreferencesUseCase } from '@modules/users/application/use-cases/update-artists-prefereces.usecase';
-import { UpdateGenrePreferencesRequestDto } from '../dto/requests/update-genre-preferences-request.dto';
+import { UpdateGenresPreferencesUseCase } from '@modules/users/application/use-cases/update-genres-preferences.usecase';
+import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateArtistPreferencesRequestDto } from '../dto/requests/update-artist-preferences-request.dto';
+import { UpdateGenrePreferencesRequestDto } from '../dto/requests/update-genre-preferences-request.dto';
+import { UserPreferencesResponseDto } from '../dto/responses/user-preferences-response.dto';
 
 /**
  * Controller for managing user preferences

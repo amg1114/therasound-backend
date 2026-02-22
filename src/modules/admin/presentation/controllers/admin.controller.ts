@@ -1,4 +1,4 @@
-import { ApiEndpoint } from '@common/decorators';
+import { ApiEndpoint } from '@common/infrastructure/decorators';
 import { RecalculateSongEmotionUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';

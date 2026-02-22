@@ -6,10 +6,10 @@ import {
   SONG_REPOSITORY,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
-import { ReccoBeatsTrackDto } from '@modules/songs/infrastructure/dto/reccobeats-response.dto';
-import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
+import { AudioFeaturesMapper } from '@modules/songs/infrastructure/mappers/audio-features.mapper';
 import { FailedSpotifyTrackRepository } from '@modules/songs/infrastructure/orm/repositories/failed-spotify.repository';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { extractSpotifyId } from 'src/utils/extractSpotifyID';
 import {
   ExternalMusicApiService,
   IExternalDetails,
@@ -28,48 +28,8 @@ export class SongProcessingService {
     private readonly songEmotionService: SongEmotionService,
   ) {}
 
-  /**
-   * Processes a single ReccoBeats track and enriches it with emotion analysis
-   * and Soundcharts metadata. Returns null if song should be filtered out.
-   * @param track - ReccoBeats track to process
-   * @param targetEmotion - The emotion to assign to the song
-   * @returns Enriched partial song entity or null if filtered
-   */
-  async processTrackRecommendation(
-    track: ReccoBeatsTrackDto,
-  ): Promise<SongEntity | null> {
-    const spotifyId = SongMapper.extractSpotifyId(track.href);
-
-    if (!spotifyId) {
-      this.logger.warn(
-        `Could not extract Spotify ID from track href: ${track.href}`,
-      );
-      return null;
-    }
-
-    const skip = await this.checkIfExistsOrFailed(spotifyId);
-    if (skip) {
-      return null;
-    }
-
-    // Fetch song details from Soundcharts
-    const details =
-      await this.externalMusicApiService.getExternalSongDetails(spotifyId);
-
-    if (!details) {
-      this.logger.warn(
-        `Could not fetch details for song: ${spotifyId}, skipping`,
-      );
-
-      await this.registerFailedTrack(spotifyId, 'details_error');
-      return null;
-    }
-
-    return this.buildProcessedTrack(spotifyId, {} as AudioFeaturesVO, details);
-  }
-
   async processSeedTrack(track: ISeedTrack): Promise<SongEntity | null> {
-    const spotifyId = SongMapper.extractSpotifyId(track.uri);
+    const spotifyId = extractSpotifyId(track.uri);
     if (!spotifyId) {
       this.logger.warn(
         `Could not extract Spotify ID from track URI: ${track.uri}`,
@@ -82,7 +42,8 @@ export class SongProcessingService {
       return null;
     }
 
-    const audioFeatures = SongMapper.seedAudioFeaturesToKeyFeatures(track);
+    const audioFeatures =
+      AudioFeaturesMapper.mapSeedTrackToAudioFeatures(track);
 
     const details =
       await this.externalMusicApiService.getExternalSongDetails(spotifyId);

@@ -2,7 +2,8 @@ import { ApiEndpoint } from '@common/decorators';
 import { RecalculateSongEmotionUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
-import { Controller, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Controller, Patch, Post, Query } from '@nestjs/common';
+import { SeedLocalQueryDto } from '../dto/queries/seed-queries.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -29,7 +30,6 @@ export class AdminController {
         required: false,
       },
     ],
-
     responses: [
       {
         status: 201,
@@ -44,18 +44,27 @@ export class AdminController {
   @Post('/seed/local')
   @PublicRoute()
   async seedFromLocal(
-    @Query(
-      'limit',
-      new ParseIntPipe({
-        optional: true,
-      }),
-    )
-    limit?: number,
-    @Query('label') label?: string,
+    @Query()
+    queries: SeedLocalQueryDto,
   ) {
-    return this.seedFromLocalUseCase.execute(limit, label);
+    return this.seedFromLocalUseCase.execute(queries.limit, queries.label);
   }
 
+  @ApiEndpoint({
+    summary: 'Recalculate song emotion scores',
+    description:
+      'Triggers a recalculation of emotion scores for all songs in the database. This is useful if the scoring algorithm has been updated or if there are new songs that need to be scored.',
+    responses: [
+      {
+        status: 200,
+        description: 'Recalculation completed successfully',
+      },
+      {
+        status: 500,
+        description: 'Error during recalculation process',
+      },
+    ],
+  })
   @Patch('/recalculate-song-emotion')
   @PublicRoute()
   async recalculateSongEmotion() {

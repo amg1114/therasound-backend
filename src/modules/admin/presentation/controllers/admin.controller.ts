@@ -1,16 +1,14 @@
 import { ApiEndpoint } from '@common/decorators';
-import { RecalculateEmotionAnalysisUseCase } from '@modules/admin/application/use-cases/recalculate-emotion-analysis.usecase';
-import { RecalculateTransitionScoringUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
+import { RecalculateSongEmotionUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
-import { Controller, Get, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Controller, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
-    private readonly recalculateEmotionAnalysisUseCase: RecalculateEmotionAnalysisUseCase,
-    private readonly recalculateTransitionScoringUseCase: RecalculateTransitionScoringUseCase,
+    private readonly recalculateSongEmotionUseCase: RecalculateSongEmotionUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -58,15 +56,9 @@ export class AdminController {
     return this.seedFromLocalUseCase.execute(limit, label);
   }
 
-  @Get('/recalculate-emotion-analysis')
+  @Patch('/recalculate-song-emotion')
   @PublicRoute()
-  async recalculateEmotionAnalysis() {
-    return this.recalculateEmotionAnalysisUseCase.execute();
-  }
-
-  @Get('/recalculate-transition-scoring')
-  @PublicRoute()
-  async recalculateTransitionScoring() {
-    return this.recalculateTransitionScoringUseCase.execute();
+  async recalculateSongEmotion() {
+    return this.recalculateSongEmotionUseCase.execute();
   }
 }

@@ -50,6 +50,7 @@ export class SongMapper {
     song.audioFeatures = raw.audioFeatures;
     song.emotionConfidence = raw.emotionConfidence;
     song.emotionProbabilities = raw.emotionProbabilities;
+    song.emotionDistances = raw.emotionDistances;
     song.reccobeatsId = raw.reccobeatsId;
     song.likesCount = raw.likesCount;
     song.skipCount = raw.skipCount;
@@ -82,6 +83,7 @@ export class SongMapper {
       audioFeatures: entity.audioFeatures,
       emotionConfidence: entity.emotionConfidence,
       emotionProbabilities: entity.emotionProbabilities,
+      emotionDistances: entity.emotionDistances,
       reccobeatsId: entity.reccobeatsId,
       likesCount: entity.likesCount,
       skipCount: entity.skipCount,
@@ -191,6 +193,7 @@ export class SongMapper {
       title: entity.title,
       artist: entity.artist,
       emotion: entity.emotion.getValue(),
+      emotionProbabilities: entity.emotionProbabilities,
       durationMs: entity.durationMs,
       spotifyUrl: entity.spotifyUrl,
       genres: entity.genres,

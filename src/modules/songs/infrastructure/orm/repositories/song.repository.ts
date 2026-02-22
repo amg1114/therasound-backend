@@ -30,6 +30,11 @@ export class SongRepositoryImpl implements ISongRepository {
     return songs.map((song) => SongMapper.toEntity(song));
   }
 
+  async findPaginated(skip: number, limit: number): Promise<SongEntity[]> {
+    const songs = await this.model.find().skip(skip).limit(limit);
+    return songs.map((song) => SongMapper.toEntity(song));
+  }
+
   async findManyBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]> {
     const songs = await this.model.find({
       spotifyId: { $in: spotifyIds },

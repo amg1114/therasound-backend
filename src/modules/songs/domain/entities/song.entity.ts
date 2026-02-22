@@ -1,5 +1,6 @@
 import { EmotionVO } from '../../../../common/domain/value-objects/emotion.vo';
 import { AudioFeaturesVO } from '../value-objects/audio-features.vo';
+import { EmotionDistancesVO } from '../value-objects/emotion-distances.vo';
 import { EmotionProbabilitiesVO } from '../value-objects/emotion-probabilities.vo';
 
 export class SongEntity {
@@ -19,6 +20,7 @@ export class SongEntity {
   emotionConfidence: number;
   emotionProbabilities: EmotionProbabilitiesVO;
   reccobeatsId?: string;
+  emotionDistances: EmotionDistancesVO;
 
   // Statistics
   likesCount: number;
@@ -37,12 +39,16 @@ export class SongEntity {
     confidence: number,
     probabilities: EmotionProbabilitiesVO,
     reccobeatsId?: string,
+    transitionScoring?: EmotionDistancesVO,
   ) {
     this.emotion = emotion;
     this.emotionConfidence = confidence;
     this.emotionProbabilities = probabilities;
     if (reccobeatsId) {
       this.reccobeatsId = reccobeatsId;
+    }
+    if (transitionScoring) {
+      this.emotionDistances = transitionScoring;
     }
   }
 }

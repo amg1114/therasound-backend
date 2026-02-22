@@ -94,11 +94,11 @@ export class SongScoringService {
 
     for (const [feature, idealValue] of Object.entries(idealFeatures)) {
       const weight = (weights[feature] ?? 0) as number;
-      this.logger.debug(
-        `Feature: ${feature}, Ideal: ${idealValue.toFixed(
-          3,
-        )}, Song: ${songFeatures[feature]}, Weight: ${weight.toFixed(3)}`,
-      );
+      // this.logger.debug(
+      //   `Feature: ${feature}, Ideal: ${idealValue.toFixed(
+      //     3,
+      //   )}, Song: ${songFeatures[feature]}, Weight: ${weight.toFixed(3)}`,
+      // );
       if (weight < SongScoringService.MIN_FEATURE_IMPORTANCE) continue;
 
       const songValue = songFeatures[feature];

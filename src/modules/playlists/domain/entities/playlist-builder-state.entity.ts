@@ -51,11 +51,9 @@ export class PlaylistBuilderState {
     private readonly scoringService: SongScoringService,
     private readonly config: BuilderConfig,
   ) {
-    this.remainingSongs = [...availableSongs];
+    this.remainingSongs = this.balanceAvailableSongs(availableSongs);
+
     this.maxStep = config.initialMaxStep;
-    this.logger.debug(
-      `Initializing PlaylistBuilder: ${availableSongs.length} songs, minDuration: ${config.minDurationMs}ms`,
-    );
     this.context = {
       currentEmotion,
       targetEmotion,
@@ -63,6 +61,8 @@ export class PlaylistBuilderState {
       selectedSongs: this.playlist,
       playlistProgress: 0,
     };
+
+    this.logInitializationDetails();
   }
 
   build(): Partial<PlaylistEntity> {
@@ -104,24 +104,31 @@ export class PlaylistBuilderState {
   }
 
   private addFirstSong(): void {
-    const sorted = this.remainingSongs
-      .map((song) => ({
-        song,
-        score: this.scoringService.calculateTransitionScore(song, this.context),
-      }))
-      .sort((a, b) => a.score - b.score);
+    const sorted = this.remainingSongs.sort(
+      (a, b) =>
+        a.getEmotionDistance(this.currentEmotion) -
+        b.getEmotionDistance(this.currentEmotion),
+    );
 
     if (sorted.length === 0) {
       throw new BadRequestException('No songs available for playlist');
     }
 
+    const selected = {
+      song: sorted[0],
+      score: this.scoringService.calculateTransitionScore(
+        sorted[0],
+        this.context,
+      ),
+    };
+
     this.logger.debug(
-      `Added first song: ${sorted[0].song.title} (transitionScore: ${sorted[0].score.toFixed(2)})`,
+      `Added first song: ${selected.song.title} (transitionScore: ${selected.score.toFixed(2)})`,
     );
 
-    this.playlist.push(sorted[0].song);
-    this.lastTransitionScore = sorted[0].score;
-    this.removeFromRemaining(sorted[0].song.id);
+    this.playlist.push(selected.song);
+    this.lastTransitionScore = selected.score;
+    this.removeFromRemaining(selected.song.id);
   }
 
   private addNextSong(): boolean {
@@ -159,9 +166,9 @@ export class PlaylistBuilderState {
       const candidateTransitionScore =
         this.scoringService.calculateTransitionScore(song, this.context);
 
+      // Penalización por retroceder — compara con el score de la canción anterior
       const transitionDelta =
         candidateTransitionScore - this.lastTransitionScore;
-
       const transitionPenalty =
         transitionDelta < 0 ? Math.abs(transitionDelta) : 0;
 
@@ -184,6 +191,7 @@ export class PlaylistBuilderState {
     this.logger.debug(
       `Found ${candidates.length} valid candidates of ${this.remainingSongs.length} remaining songs (maxStep: ${this.maxStep.toFixed(2)})`,
     );
+
     return candidates;
   }
 
@@ -267,5 +275,36 @@ export class PlaylistBuilderState {
           `Try adjusting your preferences or selecting a different emotion.`,
       );
     }
+  }
+
+  private balanceAvailableSongs(availableSongs: SongEntity[]): SongEntity[] {
+    const grouped = SongEntity.groupByDominantEmotion(availableSongs);
+
+    const counts = Object.fromEntries(
+      Object.entries(grouped).map(([e, songs]) => [e, songs.length]),
+    );
+    const minCount = Math.min(...Object.values(counts));
+
+    this.logger.debug(
+      `Emotion distribution by distance: ${JSON.stringify(counts)}, minCount: ${minCount}`,
+    );
+
+    return EmotionVO.SONG_EMOTIONS.flatMap((emotion) =>
+      grouped[emotion].slice(0, minCount),
+    );
+  }
+
+  private logInitializationDetails(): void {
+    const groupedByEmotion = SongEntity.groupByDominantEmotion(
+      this.remainingSongs,
+    );
+    const stats = Object.fromEntries(
+      Object.entries(groupedByEmotion).map(([e, songs]) => [e, songs.length]),
+    );
+
+    this.logger.debug(
+      `Initializing PlaylistBuilder: ${this.remainingSongs.length} songs, minDuration: ${this.config.minDurationMs}ms`,
+    );
+    this.logger.debug(JSON.stringify(stats, null, 2));
   }
 }

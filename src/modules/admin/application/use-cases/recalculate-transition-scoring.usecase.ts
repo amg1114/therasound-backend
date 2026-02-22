@@ -1,3 +1,4 @@
+import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import {
   type ISongRepository,
   SONG_REPOSITORY,
@@ -7,10 +8,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import pLimit from 'p-limit';
 
 @Injectable()
-export class RecalculateTransitionScoringUseCase {
-  private readonly logger = new Logger(
-    RecalculateTransitionScoringUseCase.name,
-  );
+export class RecalculateSongEmotionUseCase {
+  private readonly logger = new Logger(RecalculateSongEmotionUseCase.name);
 
   constructor(
     @Inject(SONG_REPOSITORY)
@@ -32,11 +31,21 @@ export class RecalculateTransitionScoringUseCase {
       await Promise.all(
         songs.map((song) =>
           limit(async () => {
-            const emotionDistances =
-              this.songEmotionService.calculateSongEmotionDistances(song);
+            const { dominantEmotion, emotionDistances, emotionProbabilities } =
+              this.songEmotionService.calculateSongEmotionAnalysis(song);
 
+            if (!dominantEmotion) {
+              this.logger.error(
+                `Emotion analysis failed for song ID: ${song.id}`,
+              );
+              return; // Skip if emotion analysis fails
+            }
+
+            song.emotion = EmotionVO.create(dominantEmotion);
             song.emotionDistances = emotionDistances;
+            song.emotionProbabilities = emotionProbabilities;
             processed++;
+
             return this.songRepository.save(song);
           }),
         ),

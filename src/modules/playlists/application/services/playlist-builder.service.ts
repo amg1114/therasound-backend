@@ -2,7 +2,7 @@ import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.entity';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   ScoringContext,

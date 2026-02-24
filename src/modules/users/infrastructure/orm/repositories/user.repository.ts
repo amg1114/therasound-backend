@@ -1,14 +1,14 @@
+import { UserEntity } from '@modules/users/domain/entities';
 import { IUserRepository } from '@modules/users/domain/repositories/user-repository.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserEntityORM } from '../entities/user-entity.orm';
-import { UserEntity } from '@modules/users/domain/entities/user.entity';
-import { Model } from 'mongoose';
 import {
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { UserMapper } from '../../mappers/user.mapper';
+import { UserEntityORM } from '../entities/user-entity.orm';
 
 /**
  * Implementation of the User Repository using Mongoose ORM.

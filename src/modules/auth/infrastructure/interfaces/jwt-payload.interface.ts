@@ -1,4 +1,4 @@
-import { UserPreferencesProps } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserPreferencesProps } from '@modules/users/domain/entities';
 
 export interface IJwtPayload {
   sub: string;

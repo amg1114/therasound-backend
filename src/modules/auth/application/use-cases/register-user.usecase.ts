@@ -2,7 +2,7 @@ import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload
 import { RegisterRequestDto } from '@modules/auth/presentation/dto/requests/register-request.dto';
 import { AuthResponseDto } from '@modules/auth/presentation/dto/responses/auth-response.dto';
 import { CreateUserPreferencesUseCase } from '@modules/users/application/use-cases/preferences';
-import { UserEntity } from '@modules/users/domain/entities/user.entity';
+import { UserEntity } from '@modules/users/domain/entities';
 import {
   USER_REPOSITORY,
   type IUserRepository,

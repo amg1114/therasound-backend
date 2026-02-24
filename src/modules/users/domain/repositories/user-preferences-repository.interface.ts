@@ -1,4 +1,4 @@
-import { UserPreferencesEntity } from '../entities/user-preferences.entity';
+import { UserPreferencesEntity } from '../entities';
 
 export const USER_PREFERENCES_REPOSITORY = 'USER_PREFERENCES_REPOSITORY';
 

@@ -1,26 +1,26 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
-import { UserMapper } from 'src/modules/users/infrastructure/mappers/user.mapper';
+import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
 import { LoginRequestDto } from '@modules/auth/presentation/dto/requests/login-request.dto';
 import { AuthResponseDto } from '@modules/auth/presentation/dto/responses/auth-response.dto';
 import {
-  USER_REPOSITORY,
-  type IUserRepository,
-} from '@modules/users/domain/repositories/user-repository.interface';
+  PLAYLIST_REPOSITORY,
+  type IPlaylistRepository,
+} from '@modules/playlists/domain/repositories/playlist-repository.interface';
+import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import {
-  PLAYLIST_REPOSITORY,
-  type IPlaylistRepository,
-} from '@modules/playlists/domain/repositories/playlist-repository.interface';
-import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
+  USER_REPOSITORY,
+  type IUserRepository,
+} from '@modules/users/domain/repositories/user-repository.interface';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
-import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserMapper } from 'src/modules/users/infrastructure/mappers/user.mapper';
 
 @Injectable()
 export class LoginUserUseCase {

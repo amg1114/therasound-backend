@@ -9,7 +9,7 @@ export class UserStatisticsEntityORM {
   declare _id: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'users', unique: true })
-  userId: string;
+  userId: Types.ObjectId;
 
   @Prop({ required: false, default: 0 })
   totalPlaylists: number;

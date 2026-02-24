@@ -2,7 +2,7 @@ import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.enti
 import { IPlaylistRepository } from '@modules/playlists/domain/repositories/playlist-repository.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { PlaylistMapper } from '../../mappers/playlist.mapper';
 import { PlaylistEntityORM } from '../entities/playlist-entity.orm';
 
@@ -54,9 +54,10 @@ export class PlaylistRepositoryImpl implements IPlaylistRepository {
     limit: number,
   ): Promise<PlaylistEntity[]> {
     const ormEntities = await this.model
-      .find({ userId })
+      .find({ userId: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
-      .limit(limit);
+      .limit(limit)
+      .exec();
 
     return ormEntities.map((entity) => PlaylistMapper.toDomain(entity));
   }

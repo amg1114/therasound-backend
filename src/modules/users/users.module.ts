@@ -12,12 +12,12 @@ import { USER_PREFERENCES_REPOSITORY } from './domain/repositories/user-preferen
 import { USER_REPOSITORY } from './domain/repositories/user-repository.interface';
 import {
   UserEntityORM,
-  UserSchema,
-} from './infrastructure/orm/entities/user-entity.orm';
-import {
   UserPreferencesEntityORM,
   UserPreferencesSchema,
-} from './infrastructure/orm/entities/user-preferences-entity.orm';
+  UserSchema,
+  UserStatisticsEntityORM,
+  UserStatisticsSchema,
+} from './infrastructure/orm/entities';
 import { UserPreferencesRepositoryImpl } from './infrastructure/orm/repositories/user-preferences.repository';
 import { UserRepositoryImpl } from './infrastructure/orm/repositories/user.repository';
 import { UserPreferencesController } from './presentation/controllers/user-preferences.controller';
@@ -32,6 +32,10 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
       {
         name: UserPreferencesEntityORM.name,
         schema: UserPreferencesSchema,
+      },
+      {
+        name: UserStatisticsEntityORM.name,
+        schema: UserStatisticsSchema,
       },
     ]),
     forwardRef(() => SongsModule),

@@ -17,10 +17,10 @@ export class UserStatisticsEntityORM {
   @Prop({ required: false, default: 0 })
   totalListeningTimeMs: number;
 
-  @Prop({ required: false, default: null })
+  @Prop({ required: false, default: null, type: Date })
   lastListeningDate: Date | null;
 
-  @Prop({ required: false, default: null })
+  @Prop({ required: false, default: null, type: Date })
   streakActivationDate: Date | null;
 }
 

@@ -1,6 +1,7 @@
 import { SongsModule } from '@modules/songs/songs.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UserProfileService } from './application/services/user-profile.service';
 import {
   CreateUserPreferencesUseCase,
   GetUserPreferencesUseCase,
@@ -61,6 +62,8 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
       useClass: UserStatisticsRepositoryImpl,
     },
 
+    UserProfileService,
+
     CreateUserPreferencesUseCase,
     GetUserPreferencesUseCase,
     ToggleSongPreferencesUseCase,
@@ -71,6 +74,7 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
     USER_REPOSITORY,
     USER_PREFERENCES_REPOSITORY,
     USER_STATISTICS_REPOSITORY,
+    UserProfileService,
     CreateUserPreferencesUseCase,
     GetUserPreferencesUseCase,
   ],

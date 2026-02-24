@@ -1,4 +1,4 @@
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import {
   type IUserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,

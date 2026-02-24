@@ -1,21 +1,21 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ProfileResponseDto } from '@modules/auth/presentation/dto/responses/profile-response.dto';
 import {
-  type IUserRepository,
-  USER_REPOSITORY,
-} from '@modules/users/domain/repositories/user-repository.interface';
+  type IPlaylistRepository,
+  PLAYLIST_REPOSITORY,
+} from '@modules/playlists/domain/repositories/playlist-repository.interface';
+import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import {
   type IUserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import {
-  PLAYLIST_REPOSITORY,
-  type IPlaylistRepository,
-} from '@modules/playlists/domain/repositories/playlist-repository.interface';
-import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
+  type IUserRepository,
+  USER_REPOSITORY,
+} from '@modules/users/domain/repositories/user-repository.interface';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
-import { PlaylistMapper } from '@modules/playlists/infrastructure/mappers/playlist.mapper';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
-import { ProfileResponseDto } from '@modules/auth/presentation/dto/responses/profile-response.dto';
+import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class GetCurrentUserUseCase {

@@ -1,4 +1,4 @@
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import { IUserPreferencesRepository } from '@modules/users/domain/repositories/user-preferences-repository.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';

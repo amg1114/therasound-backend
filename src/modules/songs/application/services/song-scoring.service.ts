@@ -1,7 +1,7 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmotionFeatureValues } from 'src/config/app.config';

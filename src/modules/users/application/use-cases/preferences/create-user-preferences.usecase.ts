@@ -1,9 +1,9 @@
-import { Inject, Injectable, ConflictException } from '@nestjs/common';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import {
   type IUserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CreateUserPreferencesUseCase {

@@ -3,7 +3,7 @@ import {
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { SongMapper } from '@modules/songs/infrastructure/mappers/song.mapper';
-import { UserPreferencesEntity } from '@modules/users/domain/entities/user-preferences.entity';
+import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,

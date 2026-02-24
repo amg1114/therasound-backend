@@ -1,21 +1,20 @@
+import { GetCurrentUserUseCase } from '@modules/auth/application/use-cases/get-current-user.usecase';
 import { LoginUserUseCase } from '@modules/auth/application/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from '@modules/auth/application/use-cases/register-user.usecase';
-import { GetCurrentUserUseCase } from '@modules/auth/application/use-cases/get-current-user.usecase';
-import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
 import { CurrentUser } from '@modules/auth/infrastructure/decorators/current-user.decorator';
+import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
+import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
+import { UserEntity } from '@modules/users/domain/entities';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoginRequestDto } from '../dto/requests/login-request.dto';
 import { RegisterRequestDto } from '../dto/requests/register-request.dto';
 import { AuthResponseDto } from '../dto/responses/auth-response.dto';
-import {
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
-import { type IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
-import { UserEntity } from '@modules/users/domain/entities/user.entity';
 
 @ApiTags('Authentication')
 @Controller('auth')

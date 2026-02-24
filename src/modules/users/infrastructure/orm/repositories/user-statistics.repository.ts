@@ -23,7 +23,7 @@ export class UserStatisticsRepositoryImpl implements IUserStatisticsRepository {
   ) {}
 
   async create(
-    userStatistics: UserStatisticsEntity,
+    userStatistics: Partial<UserStatisticsEntity>,
   ): Promise<UserStatisticsEntity> {
     const ormData = UserStatisticsMapper.toORM(userStatistics);
 

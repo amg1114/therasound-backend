@@ -17,7 +17,7 @@ export class UserStatisticsMapper {
   }
 
   static toORM(
-    domainEntity: UserStatisticsEntity,
+    domainEntity: Partial<UserStatisticsEntity>,
   ): Partial<UserStatisticsEntityORM> {
     return {
       _id: new Types.ObjectId(domainEntity.id),

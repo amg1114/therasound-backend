@@ -49,7 +49,6 @@ export class RegisterUserUseCase {
       sub: user.id!,
       email: user.email,
       name: user.name,
-      userPreferences: userPreferences.getValues(),
     };
 
     return {

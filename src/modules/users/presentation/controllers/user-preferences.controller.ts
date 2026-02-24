@@ -1,10 +1,12 @@
 import { ApiEndpoint } from '@common/infrastructure/decorators';
 import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-user.decorator';
-import { CreateUserPreferencesUseCase } from '@modules/users/application/use-cases/create-user-preferences.usecase';
-import { GetUserPreferencesUseCase } from '@modules/users/application/use-cases/get-user-preferences.usecase';
-import { ToggleSongPreferencesUseCase } from '@modules/users/application/use-cases/toggle-song-preferences.usecase';
-import { UpdateArtistsPreferencesUseCase } from '@modules/users/application/use-cases/update-artists-prefereces.usecase';
-import { UpdateGenresPreferencesUseCase } from '@modules/users/application/use-cases/update-genres-preferences.usecase';
+import {
+  CreateUserPreferencesUseCase,
+  GetUserPreferencesUseCase,
+  ToggleSongPreferencesUseCase,
+  UpdateArtistsPreferencesUseCase,
+  UpdateGenresPreferencesUseCase,
+} from '@modules/users/application/use-cases/preferences';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';

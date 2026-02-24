@@ -1,11 +1,13 @@
 import { SongsModule } from '@modules/songs/songs.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CreateUserPreferencesUseCase } from './application/use-cases/create-user-preferences.usecase';
-import { GetUserPreferencesUseCase } from './application/use-cases/get-user-preferences.usecase';
-import { ToggleSongPreferencesUseCase } from './application/use-cases/toggle-song-preferences.usecase';
-import { UpdateArtistsPreferencesUseCase } from './application/use-cases/update-artists-prefereces.usecase';
-import { UpdateGenresPreferencesUseCase } from './application/use-cases/update-genres-preferences.usecase';
+import {
+  CreateUserPreferencesUseCase,
+  GetUserPreferencesUseCase,
+  ToggleSongPreferencesUseCase,
+  UpdateArtistsPreferencesUseCase,
+  UpdateGenresPreferencesUseCase,
+} from './application/use-cases/preferences';
 import { USER_PREFERENCES_REPOSITORY } from './domain/repositories/user-preferences-repository.interface';
 import { USER_REPOSITORY } from './domain/repositories/user-repository.interface';
 import {

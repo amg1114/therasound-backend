@@ -1,29 +1,23 @@
 import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload.interface';
 import { RegisterRequestDto } from '@modules/auth/presentation/dto/requests/register-request.dto';
 import { AuthResponseDto } from '@modules/auth/presentation/dto/responses/auth-response.dto';
+import { CreateUserPreferencesUseCase } from '@modules/users/application/use-cases/preferences';
 import { UserEntity } from '@modules/users/domain/entities/user.entity';
 import {
-  type IUserRepository,
   USER_REPOSITORY,
+  type IUserRepository,
 } from '@modules/users/domain/repositories/user-repository.interface';
-import {
-  PLAYLIST_REPOSITORY,
-  type IPlaylistRepository,
-} from '@modules/playlists/domain/repositories/playlist-repository.interface';
-import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
+import { UserMapper } from '@modules/users/infrastructure/mappers/user.mapper';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { CreateUserPreferencesUseCase } from '@modules/users/application/use-cases/create-user-preferences.usecase';
 
 @Injectable()
 export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(PLAYLIST_REPOSITORY)
-    private readonly playlistRepository: IPlaylistRepository,
     private readonly jwtService: JwtService,
     private readonly createUserPreferencesUseCase: CreateUserPreferencesUseCase,
   ) {}

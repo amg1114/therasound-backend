@@ -1,9 +1,8 @@
 import { ChatbotModule } from '@modules/chatbot/chatbot.module';
 import { SongsModule } from '@modules/songs/songs.module';
 import { UsersModule } from '@modules/users/users.module';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SongScoringService } from '../songs/application/services/song-scoring.service';
 import { PlaylistBuilderService } from './application/services/playlist-builder.service';
 import { GeneratePlaylistUseCase } from './application/use-cases/generate-playlist.usecase';
 import { GetPlaylistByIdUseCase } from './application/use-cases/get-playlist-by-id.usecase';
@@ -25,8 +24,8 @@ import { PlaylistsController } from './presentation/controllers/playlists.contro
       },
     ]),
     ChatbotModule,
-    SongsModule,
-    UsersModule,
+    forwardRef(() => SongsModule),
+    forwardRef(() => UsersModule),
   ],
   controllers: [PlaylistsController],
   providers: [
@@ -35,7 +34,6 @@ import { PlaylistsController } from './presentation/controllers/playlists.contro
       useClass: PlaylistRepositoryImpl,
     },
 
-    SongScoringService,
     PlaylistBuilderService,
 
     GeneratePlaylistUseCase,

@@ -23,6 +23,12 @@ export class UserStatisticsResponseDto {
   totalPlaylists: number;
 
   @ApiProperty({
+    description: 'Total number of songs listened to by the user',
+    example: 150,
+  })
+  totalSongsListened: number;
+
+  @ApiProperty({
     description: 'Total listening time in milliseconds',
     example: 3600000, // 1 hour in milliseconds
   })

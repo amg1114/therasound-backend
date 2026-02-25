@@ -1,3 +1,4 @@
+import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.entity';
 import {
   UserPreferencesEntity,
   UserStatisticsEntity,
@@ -10,4 +11,5 @@ export interface ICreateUserProfileResult {
 export interface IGetUserProfileResult {
   preferences: UserPreferencesEntity | null;
   statistics: UserStatisticsEntity | null;
+  recentPlaylists: PlaylistEntity[];
 }

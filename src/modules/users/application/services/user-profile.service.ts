@@ -1,4 +1,8 @@
 import {
+  PLAYLIST_REPOSITORY,
+  type IPlaylistRepository,
+} from '@modules/playlists/domain/repositories/playlist-repository.interface';
+import {
   UserPreferencesEntity,
   UserStatisticsEntity,
 } from '@modules/users/domain/entities';
@@ -21,6 +25,8 @@ export class UserProfileService {
     private readonly preferencesRepository: IUserPreferencesRepository,
     @Inject(USER_STATISTICS_REPOSITORY)
     private readonly statisticsRepository: IUserStatisticsRepository,
+    @Inject(PLAYLIST_REPOSITORY)
+    private readonly playlistRepository: IPlaylistRepository,
   ) {}
 
   async createUserProfile(userId: string): Promise<ICreateUserProfileResult> {
@@ -36,14 +42,16 @@ export class UserProfileService {
   }
 
   async getUserProfile(userId: string): Promise<IGetUserProfileResult> {
-    const [preferences, statistics] = await Promise.all([
+    const [preferences, statistics, recentPlaylists] = await Promise.all([
       this.preferencesRepository.findByUserId(userId),
       this.statisticsRepository.findByUserId(userId),
+      this.playlistRepository.findRecentByUserId(userId, 5),
     ]);
 
     return {
       preferences,
       statistics,
+      recentPlaylists,
     };
   }
 }

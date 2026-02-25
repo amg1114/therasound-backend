@@ -1,3 +1,4 @@
+import { PlaylistsModule } from '@modules/playlists/playlists.module';
 import { SongsModule } from '@modules/songs/songs.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -46,6 +47,7 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
       },
     ]),
     forwardRef(() => SongsModule),
+    forwardRef(() => PlaylistsModule),
   ],
   controllers: [UserPreferencesController],
   providers: [

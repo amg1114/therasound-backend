@@ -1,6 +1,9 @@
-import { UserResponseDto } from '@modules/users/presentation/dto/responses/user-response.dto';
-import { UserPreferencesResponseDto } from '@modules/users/presentation/dto/responses/user-preferences-response.dto';
-import { PlaylistSummaryResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-summary-response.dto';
+import { IPlaylistSummary } from '@modules/playlists/application/interfaces';
+import {
+  UserPreferencesResponseDto,
+  UserResponseDto,
+  UserStatisticsResponseDto,
+} from '@modules/users/presentation/dto/responses';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProfileResponseDto {
@@ -8,11 +11,14 @@ export class ProfileResponseDto {
   user: UserResponseDto;
 
   @ApiProperty({ type: () => UserPreferencesResponseDto })
-  userPreferences: UserPreferencesResponseDto;
+  preferences: UserPreferencesResponseDto;
+
+  @ApiProperty({ type: () => UserStatisticsResponseDto })
+  statistics: UserStatisticsResponseDto;
 
   @ApiProperty({
-    type: () => [PlaylistSummaryResponseDto],
+    isArray: true,
     description: 'Últimas 5 listas de reproducción del usuario',
   })
-  recentPlaylists: PlaylistSummaryResponseDto[];
+  recentPlaylists: IPlaylistSummary[];
 }

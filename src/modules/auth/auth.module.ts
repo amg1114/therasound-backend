@@ -1,15 +1,15 @@
-import { UsersModule } from '@modules/users/users.module';
 import { PlaylistsModule } from '@modules/playlists/playlists.module';
+import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './infrastructure/jwt.strategy';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtGuard } from './infrastructure/guards/jwt.guard';
+import { GetUserProfile } from './application/use-cases/get-user-profile.usecase';
 import { LoginUserUseCase } from './application/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from './application/use-cases/register-user.usecase';
-import { GetCurrentUserUseCase } from './application/use-cases/get-current-user.usecase';
+import { JwtGuard } from './infrastructure/guards/jwt.guard';
+import { JwtStrategy } from './infrastructure/jwt.strategy';
 import { AuthController } from './presentation/controllers/auth.controller';
 
 @Module({
@@ -28,7 +28,7 @@ import { AuthController } from './presentation/controllers/auth.controller';
     JwtStrategy,
     LoginUserUseCase,
     RegisterUserUseCase,
-    GetCurrentUserUseCase,
+    GetUserProfile,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

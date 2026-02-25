@@ -1,4 +1,4 @@
-import { GetCurrentUserUseCase } from '@modules/auth/application/use-cases/get-current-user.usecase';
+import { GetUserProfile } from '@modules/auth/application/use-cases/get-user-profile.usecase';
 import { LoginUserUseCase } from '@modules/auth/application/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from '@modules/auth/application/use-cases/register-user.usecase';
 import { CurrentUser } from '@modules/auth/infrastructure/decorators/current-user.decorator';
@@ -16,6 +16,7 @@ import {
 import { LoginRequestDto } from '../dto/requests/login-request.dto';
 import { RegisterRequestDto } from '../dto/requests/register-request.dto';
 import { AuthResponseDto } from '../dto/responses/auth-response.dto';
+import { ProfileResponseDto } from '../dto/responses/profile-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -23,7 +24,7 @@ export class AuthController {
   constructor(
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
-    private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+    private readonly getCurrentUserUseCase: GetUserProfile,
   ) {}
 
   @ApiOperation({ summary: 'User login' })
@@ -67,7 +68,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Datos del usuario obtenidos exitosamente',
-    type: AuthResponseDto,
+    type: ProfileResponseDto,
   })
   @ApiResponse({
     status: 401,
@@ -81,7 +82,7 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @Get('me')
   async getCurrentUser(@CurrentUser() currentUser: UserEntity) {
-    //return currentUser;
-    return this.getCurrentUserUseCase.execute(currentUser.id!);
+    const result = await this.getCurrentUserUseCase.execute(currentUser.id!);
+    return AuthMapper.toUserProfileResponse(result);
   }
 }

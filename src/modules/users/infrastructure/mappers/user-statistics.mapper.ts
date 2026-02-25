@@ -9,6 +9,7 @@ export class UserStatisticsMapper {
       userId: ormEntity.userId.toString(),
       lastListeningDate: ormEntity.lastListeningDate,
       streakActivationDate: ormEntity.streakActivationDate,
+      totalSongsListened: ormEntity.totalSongsListened,
       totalListeningTimeMs: ormEntity.totalListeningTimeMs,
       totalPlaylists: ormEntity.totalPlaylists,
     });
@@ -25,6 +26,7 @@ export class UserStatisticsMapper {
       lastListeningDate: domainEntity.lastListeningDate,
       streakActivationDate: domainEntity.streakActivationDate,
       totalListeningTimeMs: domainEntity.totalListeningTimeMs,
+      totalSongsListened: domainEntity.totalSongsListened,
       totalPlaylists: domainEntity.totalPlaylists,
     };
   }

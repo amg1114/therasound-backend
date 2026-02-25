@@ -12,6 +12,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginRequestDto } from '../dto/requests/login-request.dto';
 import { RegisterRequestDto } from '../dto/requests/register-request.dto';
 import { AuthResponseDto } from '../dto/responses/auth-response.dto';
+import { ProfileResponseDto } from '../dto/responses/profile-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -87,6 +88,7 @@ export class AuthController {
       {
         status: 200,
         description: 'Perfil del usuario obtenido exitosamente',
+        type: ProfileResponseDto,
       },
       {
         status: 401,

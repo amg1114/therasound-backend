@@ -15,6 +15,9 @@ export class UserStatisticsEntityORM {
   totalPlaylists: number;
 
   @Prop({ required: false, default: 0 })
+  totalSongsListened: number;
+
+  @Prop({ required: false, default: 0 })
   totalListeningTimeMs: number;
 
   @Prop({ required: false, default: null, type: Date })

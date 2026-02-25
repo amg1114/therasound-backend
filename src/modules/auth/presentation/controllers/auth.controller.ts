@@ -4,6 +4,7 @@ import { RegisterUserUseCase } from '@modules/auth/application/use-cases/registe
 import { CurrentUser } from '@modules/auth/infrastructure/decorators/current-user.decorator';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
 import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
+import { AuthMapper } from '@modules/auth/infrastructure/mappers/auth.mapper';
 import { UserEntity } from '@modules/users/domain/entities';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
@@ -37,8 +38,9 @@ export class AuthController {
   })
   @PublicRoute()
   @Post('login')
-  login(@Body() body: LoginRequestDto): Promise<AuthResponseDto> {
-    return this.loginUserUseCase.execute(body);
+  async login(@Body() body: LoginRequestDto): Promise<AuthResponseDto> {
+    const result = await this.loginUserUseCase.execute(body);
+    return AuthMapper.toAuthResponse(result);
   }
 
   @ApiOperation({ summary: 'User registration' })
@@ -53,8 +55,9 @@ export class AuthController {
   })
   @PublicRoute()
   @Post('register')
-  register(@Body() body: RegisterRequestDto): Promise<AuthResponseDto> {
-    return this.registerUserUseCase.execute(body);
+  async register(@Body() body: RegisterRequestDto): Promise<AuthResponseDto> {
+    const result = await this.registerUserUseCase.execute(body);
+    return AuthMapper.toAuthResponse(result);
   }
 
   @ApiOperation({

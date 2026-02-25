@@ -62,10 +62,11 @@ export class PlaylistMapper {
   static toSummary(entity: PlaylistEntity): IPlaylistSummary {
     return {
       id: entity.id,
-      titulo: entity.title,
+      title: entity.title,
       initialEmotion: entity.initialEmotion.getValue(),
       targetEmotion: entity.targetEmotion.getValue(),
       songCount: entity.songs.length,
+      createdAt: entity.createdAt,
     };
   }
 }

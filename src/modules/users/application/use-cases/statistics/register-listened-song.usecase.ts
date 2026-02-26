@@ -85,9 +85,19 @@ export class RegisterListenedSongUseCase {
       statistics.updateStreak();
     }
 
+    if (completionRate < 0.3) {
+      song.skipCount += 1;
+    }
+
+    song.playCount += 1;
+    song.averageCompletionRate =
+      (song.averageCompletionRate * (song.playCount - 1) + completionRate) /
+      song.playCount;
+
     await Promise.all([
       this.preferencesRepository.update(preferences),
       this.statisticsRepository.update(statistics),
+      this.songRepository.save(song),
     ]);
   }
 }

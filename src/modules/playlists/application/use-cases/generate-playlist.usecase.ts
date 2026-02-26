@@ -13,6 +13,10 @@ import {
   type ISongRepository,
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import {
+  USER_STATISTICS_REPOSITORY,
+  type IUserStatisticsRepository,
+} from '@modules/users/domain/repositories';
+import {
   USER_PREFERENCES_REPOSITORY,
   type IUserPreferencesRepository,
 } from '@modules/users/domain/repositories/user-preferences-repository.interface';
@@ -37,6 +41,8 @@ export class GeneratePlaylistUseCase {
     private readonly songRepository: ISongRepository,
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: IUserPreferencesRepository,
+    @Inject(USER_STATISTICS_REPOSITORY)
+    private readonly statisticsRepository: IUserStatisticsRepository,
   ) {}
 
   async execute(
@@ -85,6 +91,12 @@ export class GeneratePlaylistUseCase {
     this.logger.log(
       `Generated playlist for user ${userId} with ${playlist.songs.length} songs, from ${currentEmotion.getValue()} to ${targetEmotion.getValue()}`,
     );
+
+    const statistics = await this.statisticsRepository.findByUserId(userId);
+    if (statistics) {
+      statistics.totalPlaylists += 1;
+      await this.statisticsRepository.update(statistics);
+    }
 
     return playlist;
   }

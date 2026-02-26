@@ -10,6 +10,7 @@ import {
   UpdateArtistsPreferencesUseCase,
   UpdateGenresPreferencesUseCase,
 } from './application/use-cases/preferences';
+import { RegisterListenedSongUseCase } from './application/use-cases/statistics';
 import {
   USER_PREFERENCES_REPOSITORY,
   USER_REPOSITORY,
@@ -28,7 +29,10 @@ import {
   UserRepositoryImpl,
   UserStatisticsRepositoryImpl,
 } from './infrastructure/orm/repositories';
-import { UserPreferencesController } from './presentation/controllers/user-preferences.controller';
+import {
+  UserPreferencesController,
+  UserStatisticsController,
+} from './presentation/controllers';
 
 @Module({
   imports: [
@@ -49,7 +53,7 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
     forwardRef(() => SongsModule),
     forwardRef(() => PlaylistsModule),
   ],
-  controllers: [UserPreferencesController],
+  controllers: [UserPreferencesController, UserStatisticsController],
   providers: [
     {
       provide: USER_REPOSITORY,
@@ -71,6 +75,8 @@ import { UserPreferencesController } from './presentation/controllers/user-prefe
     ToggleSongPreferencesUseCase,
     UpdateArtistsPreferencesUseCase,
     UpdateGenresPreferencesUseCase,
+
+    RegisterListenedSongUseCase,
   ],
   exports: [
     USER_REPOSITORY,

@@ -53,4 +53,25 @@ export class UserStatisticsEntity implements UserStatisticsEntityProps {
       streakActivationDate: this.streakActivationDate,
     };
   }
+
+  updateStreak() {
+    const now = new Date();
+
+    if (!this.lastListeningDate) {
+      this.streakActivationDate = now;
+      this.lastListeningDate = now;
+      return;
+    }
+
+    const daysSinceLastListening = Math.floor(
+      (now.getTime() - this.lastListeningDate.getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+
+    if (daysSinceLastListening > 1 && this.streakActivationDate) {
+      this.streakActivationDate = now; // Reset streak if more than 1 day has passed since last listening
+    }
+
+    this.lastListeningDate = now;
+  }
 }

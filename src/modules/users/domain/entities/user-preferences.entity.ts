@@ -114,6 +114,9 @@ export class UserPreferencesEntity implements UserPreferencesProps {
       this.removeLikedSong(song.id);
     } else {
       this.likedSongs.push(song);
+      if (this.hasDislikedSong(song.id)) {
+        this.removeDislikedSong(song.id);
+      }
     }
   }
 
@@ -122,6 +125,9 @@ export class UserPreferencesEntity implements UserPreferencesProps {
       this.removeDislikedSong(song.id);
     } else {
       this.dislikedSongs.push(song);
+      if (this.hasLikedSong(song.id)) {
+        this.removeLikedSong(song.id);
+      }
     }
   }
 

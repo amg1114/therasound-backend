@@ -9,6 +9,7 @@ import {
   ApiResponseOptions,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { SwaggerEnumType } from '@nestjs/swagger/dist/types/swagger-enum.type';
 
 interface ApiResponseConfig {
   status: number;
@@ -22,6 +23,7 @@ interface ApiParamConfig {
   description: string;
   required?: boolean;
   type?: Type<any> | 'string' | 'number' | 'boolean';
+  enum?: SwaggerEnumType;
 }
 interface ApiQueryParamConfig {
   name: string;
@@ -112,6 +114,7 @@ export function ApiEndpoint(options: ApiEndpointOptions) {
           description: param.description,
           required: param.required ?? true,
           type: param.type,
+          enum: param.enum,
         }),
       );
     });

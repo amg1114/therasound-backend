@@ -18,6 +18,7 @@ import { FailedSpotifyTrackRepository } from './infrastructure/orm/repositories/
 import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repository';
 
 import { ArtistsModule } from '@modules/artists/artists.module';
+import { SongReactionListener } from './application/listeners/song-reaction.listener';
 import {
   AudioProcessingService,
   SongEmotionService,
@@ -60,8 +61,10 @@ import { SongsController } from './presentation/controllers/songs.controller';
     SongProcessingService,
     SongScoringService,
 
-    GetSongByIdUseCase,
     SongCreatedListener,
+    SongReactionListener,
+
+    GetSongByIdUseCase,
     FailedSpotifyTrackRepository,
   ],
   exports: [

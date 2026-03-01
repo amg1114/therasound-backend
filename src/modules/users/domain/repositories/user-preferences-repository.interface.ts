@@ -1,10 +1,10 @@
-import { UserPreferencesEntity } from '../entities';
+import { CreateUserPreferencesProps, UserPreferencesEntity } from '../entities';
 
 export const USER_PREFERENCES_REPOSITORY = 'USER_PREFERENCES_REPOSITORY';
 
 export interface IUserPreferencesRepository {
   create(
-    userPreferences: UserPreferencesEntity,
+    userPreferences: CreateUserPreferencesProps,
   ): Promise<UserPreferencesEntity>;
 
   findById(id: string): Promise<UserPreferencesEntity | null>;

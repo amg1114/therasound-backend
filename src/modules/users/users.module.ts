@@ -1,3 +1,5 @@
+import { ArtistsModule } from '@modules/artists/artists.module';
+import { GenresModule } from '@modules/genres/genres.module';
 import { PlaylistsModule } from '@modules/playlists/playlists.module';
 import { SongsModule } from '@modules/songs/songs.module';
 import { forwardRef, Module } from '@nestjs/common';
@@ -6,9 +8,7 @@ import { UserProfileService } from './application/services/user-profile.service'
 import {
   CreateUserPreferencesUseCase,
   GetUserPreferencesUseCase,
-  ToggleSongPreferencesUseCase,
-  UpdateArtistsPreferencesUseCase,
-  UpdateGenresPreferencesUseCase,
+  TogglePreferenceUseCase,
 } from './application/use-cases/preferences';
 import { RegisterListenedSongUseCase } from './application/use-cases/statistics';
 import {
@@ -50,6 +50,8 @@ import {
         schema: UserStatisticsSchema,
       },
     ]),
+    ArtistsModule,
+    GenresModule,
     forwardRef(() => SongsModule),
     forwardRef(() => PlaylistsModule),
   ],
@@ -72,9 +74,7 @@ import {
 
     CreateUserPreferencesUseCase,
     GetUserPreferencesUseCase,
-    ToggleSongPreferencesUseCase,
-    UpdateArtistsPreferencesUseCase,
-    UpdateGenresPreferencesUseCase,
+    TogglePreferenceUseCase,
 
     RegisterListenedSongUseCase,
   ],
@@ -83,8 +83,6 @@ import {
     USER_PREFERENCES_REPOSITORY,
     USER_STATISTICS_REPOSITORY,
     UserProfileService,
-    CreateUserPreferencesUseCase,
-    GetUserPreferencesUseCase,
   ],
 })
 export class UsersModule {}

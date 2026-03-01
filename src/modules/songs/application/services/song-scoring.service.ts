@@ -160,12 +160,12 @@ export class SongScoringService {
     // Señales fuertes (early return)
     if (preferences.hasLikedSong(song.id)) return 1.0;
     if (preferences.hasDislikedSong(song.id)) return 0.0;
-    if (preferences.hasDislikedArtist(songArtists)) return 0.1;
+    if (songArtists.some((a) => preferences.hasDislikedArtist(a))) return 0.1;
 
     let score = 0.5; // Baseline neutral
 
     // Artist (+30%)
-    if (preferences.hasLikedArtist(songArtists)) {
+    if (songArtists.some((a) => preferences.hasLikedArtist(a))) {
       score += 0.3;
     }
 

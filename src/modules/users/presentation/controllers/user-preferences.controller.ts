@@ -3,15 +3,24 @@ import { CurrentUserId } from '@modules/auth/infrastructure/decorators/current-u
 import {
   CreateUserPreferencesUseCase,
   GetUserPreferencesUseCase,
-  ToggleSongPreferencesUseCase,
-  UpdateArtistsPreferencesUseCase,
-  UpdateGenresPreferencesUseCase,
+  TogglePreferenceUseCase,
 } from '@modules/users/application/use-cases/preferences';
+import {
+  CONTENT_TYPES,
+  type ContentType,
+  PREFERENCE_TYPES,
+  type PreferenceType,
+} from '@modules/users/domain/entities/types/content-preference.type';
 import { UserPreferencesMapper } from '@modules/users/infrastructure/mappers/user-preferences.mapper';
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseEnumPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UpdateArtistPreferencesRequestDto } from '../dto/requests/update-artist-preferences-request.dto';
-import { UpdateGenrePreferencesRequestDto } from '../dto/requests/update-genre-preferences-request.dto';
 import { UserPreferencesResponseDto } from '../dto/responses/user-preferences-response.dto';
 
 /**
@@ -26,9 +35,7 @@ export class UserPreferencesController {
   constructor(
     private readonly createUserPreferencesUseCase: CreateUserPreferencesUseCase,
     private readonly getUserPreferencesUseCase: GetUserPreferencesUseCase,
-    private readonly toggleSongPreferencesUseCase: ToggleSongPreferencesUseCase,
-    private readonly updateArtistsPreferencesUseCase: UpdateArtistsPreferencesUseCase,
-    private readonly updateGenresPreferencesUseCase: UpdateGenresPreferencesUseCase,
+    private readonly togglePreferenceUseCase: TogglePreferenceUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -80,14 +87,33 @@ export class UserPreferencesController {
   }
 
   @ApiEndpoint({
-    summary: 'Toggle liked songs',
+    summary: 'Toggle content preferences',
     description:
-      "Add or remove a song from the authenticated user's liked songs list.",
-    params: [{ name: 'songId', description: 'ID of the song to toggle' }],
+      "Add or remove an entity from the authenticated user's liked/disliked songs, genres, or artists list.",
+    params: [
+      {
+        name: 'preferenceType',
+        description: 'Type of preference to toggle (like or dislike)',
+        required: true,
+        enum: PREFERENCE_TYPES,
+      },
+      {
+        name: 'contentType',
+        description:
+          'Type of content to toggle preference for (songs, genres, artists)',
+        required: true,
+        enum: CONTENT_TYPES,
+      },
+      {
+        name: 'contentId',
+        description: 'ID of the content item to toggle preference for',
+        required: true,
+      },
+    ],
     responses: [
       {
         status: 200,
-        description: 'Liked songs updated successfully',
+        description: 'Content preferences updated successfully',
         type: UserPreferencesResponseDto,
       },
       {
@@ -96,182 +122,21 @@ export class UserPreferencesController {
       },
     ],
   })
-  @Patch('songs/:songId/liked')
-  async updateLikedSongs(
+  @Patch(':preferenceType/:contentType/:contentId')
+  async updateContentPreferences(
     @CurrentUserId() userId: string,
-    @Param('songId') songId: string,
+    @Param('preferenceType', new ParseEnumPipe(PREFERENCE_TYPES))
+    preferenceType: PreferenceType,
+    @Param('contentType', new ParseEnumPipe(CONTENT_TYPES))
+    contentType: ContentType,
+    @Param('contentId') contentId: string,
   ): Promise<UserPreferencesResponseDto> {
-    const preferences = await this.toggleSongPreferencesUseCase.execute(
+    const preferences = await this.togglePreferenceUseCase.execute(
       userId,
-      songId,
-      'likedSongs',
+      contentType,
+      preferenceType,
+      contentId,
     );
-    return UserPreferencesMapper.toResponseDto(preferences);
-  }
-
-  @ApiEndpoint({
-    summary: 'Toggle disliked songs',
-    description:
-      "Add or remove a song from the authenticated user's disliked songs list.",
-    params: [{ name: 'songId', description: 'ID of the song to toggle' }],
-    responses: [
-      {
-        status: 200,
-        description: 'Disliked songs updated successfully',
-        type: UserPreferencesResponseDto,
-      },
-      {
-        status: 404,
-        description: 'User preferences not found',
-      },
-    ],
-  })
-  @Patch('songs/:songId/disliked')
-  async updateDislikedSongs(
-    @CurrentUserId() userId: string,
-    @Param('songId') songId: string,
-  ): Promise<UserPreferencesResponseDto> {
-    const preferences = await this.toggleSongPreferencesUseCase.execute(
-      userId,
-      songId,
-      'dislikedSongs',
-    );
-    return UserPreferencesMapper.toResponseDto(preferences);
-  }
-
-  @ApiEndpoint({
-    summary: 'Update liked genres',
-    description:
-      "Replace the authenticated user's liked genres list with a new list of genres.",
-    body: {
-      type: UpdateGenrePreferencesRequestDto,
-      description: 'List of genre names to set as liked genres',
-    },
-    responses: [
-      {
-        status: 200,
-        description: 'Liked genres updated successfully',
-        type: UserPreferencesResponseDto,
-      },
-      {
-        status: 404,
-        description: 'User preferences not found',
-      },
-    ],
-  })
-  @Patch('genres/liked')
-  async updateLikedGenres(
-    @CurrentUserId() userId: string,
-    @Body() dto: UpdateGenrePreferencesRequestDto,
-  ) {
-    const preferences = await this.updateGenresPreferencesUseCase.execute(
-      userId,
-      'likedGenres',
-      dto,
-    );
-
-    return UserPreferencesMapper.toResponseDto(preferences);
-  }
-
-  @ApiEndpoint({
-    summary: 'Update disliked genres',
-    description:
-      "Replace the authenticated user's disliked genres list with a new list of genres.",
-    body: {
-      type: UpdateGenrePreferencesRequestDto,
-      description: 'List of genre names to set as disliked genres',
-    },
-    responses: [
-      {
-        status: 200,
-        description: 'Disliked genres updated successfully',
-        type: UserPreferencesResponseDto,
-      },
-      {
-        status: 404,
-        description: 'User preferences not found',
-      },
-    ],
-  })
-  @Patch('genres/disliked')
-  async updateDislikedGenres(
-    @CurrentUserId() userId: string,
-    @Body() dto: UpdateGenrePreferencesRequestDto,
-  ) {
-    const preferences = await this.updateGenresPreferencesUseCase.execute(
-      userId,
-      'dislikedGenres',
-      dto,
-    );
-
-    return UserPreferencesMapper.toResponseDto(preferences);
-  }
-
-  @ApiEndpoint({
-    summary: 'Update liked artists',
-    description:
-      "Replace the authenticated user's liked artists list with a new list of artists.",
-    body: {
-      type: UpdateArtistPreferencesRequestDto,
-      description: 'List of artist names to set as liked artists',
-    },
-    responses: [
-      {
-        status: 200,
-        description: 'Liked artists updated successfully',
-        type: UserPreferencesResponseDto,
-      },
-      {
-        status: 404,
-        description: 'User preferences not found',
-      },
-    ],
-  })
-  @Patch('artists/liked')
-  async updateLikedArtists(
-    @CurrentUserId() userId: string,
-    @Body() dto: UpdateArtistPreferencesRequestDto,
-  ) {
-    const preferences = await this.updateArtistsPreferencesUseCase.execute(
-      userId,
-      'likedArtists',
-      dto,
-    );
-
-    return UserPreferencesMapper.toResponseDto(preferences);
-  }
-
-  @ApiEndpoint({
-    summary: 'Update disliked artists',
-    description:
-      "Replace the authenticated user's disliked artists list with a new list of artists.",
-    body: {
-      type: UpdateArtistPreferencesRequestDto,
-      description: 'List of artist names to set as disliked artists',
-    },
-    responses: [
-      {
-        status: 200,
-        description: 'Disliked artists updated successfully',
-        type: UserPreferencesResponseDto,
-      },
-      {
-        status: 404,
-        description: 'User preferences not found',
-      },
-    ],
-  })
-  @Patch('artists/disliked')
-  async updateDislikedArtists(
-    @CurrentUserId() userId: string,
-    @Body() dto: UpdateArtistPreferencesRequestDto,
-  ) {
-    const preferences = await this.updateArtistsPreferencesUseCase.execute(
-      userId,
-      'dislikedArtists',
-      dto,
-    );
-
     return UserPreferencesMapper.toResponseDto(preferences);
   }
 }

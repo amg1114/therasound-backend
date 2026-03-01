@@ -1,4 +1,4 @@
-import { SongSummaryVO } from '@modules/songs/domain/value-objects/song-summary.vo';
+import type { ContentPreferences } from '@modules/users/domain/entities/types/content-preference.type';
 import { HistorySongVO } from '@modules/users/domain/value-objects/history-song.vo';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
@@ -13,23 +13,11 @@ export class UserPreferencesEntityORM extends Document {
   @Prop({ required: true, type: Types.ObjectId, ref: 'users', unique: true })
   userId: Types.ObjectId;
 
-  @Prop({ required: true })
-  likedSongs: SongSummaryVO[];
+  @Prop({ required: true, type: Object })
+  likes: ContentPreferences;
 
-  @Prop({ required: true })
-  dislikedSongs: SongSummaryVO[];
-
-  @Prop({ required: true })
-  likedGenres: string[];
-
-  @Prop({ required: true })
-  dislikedGenres: string[];
-
-  @Prop({ required: true })
-  dislikedArtists: string[];
-
-  @Prop({ required: true })
-  likedArtists: string[];
+  @Prop({ required: true, type: Object })
+  dislikes: ContentPreferences;
 
   @Prop({ required: true })
   listenedHistory: HistorySongVO[];

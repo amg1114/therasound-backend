@@ -45,6 +45,16 @@ export class MongoArtistRepository implements ArtistRepository {
     return ArtistMapper.toDomain(found);
   }
 
+  async findBySpotifyId(spotifyId: string): Promise<ArtistEntity | null> {
+    const found = await this.model.findOne({ spotifyId }).exec();
+
+    if (!found) {
+      return null;
+    }
+
+    return ArtistMapper.toDomain(found);
+  }
+
   async findAll(): Promise<ArtistEntity[]> {
     const found = await this.model.find().exec();
     return found.map((a) => ArtistMapper.toDomain(a));

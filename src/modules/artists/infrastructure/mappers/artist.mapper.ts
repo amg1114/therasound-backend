@@ -11,12 +11,14 @@ export class ArtistMapper {
       name: data.name,
       songsCount: data.songsCount,
       avatarUrl: data.avatarUrl,
+      spotifyId: data.spotifyId,
     };
   }
 
   static toDomain(data: MongoArtistEntity): ArtistEntity {
     return ArtistEntity.reconstruct({
       id: data._id.toString(),
+      spotifyId: data.spotifyId,
       name: data.name,
       songsCount: data.songsCount,
       avatarUrl: data.avatarUrl,

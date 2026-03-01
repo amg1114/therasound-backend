@@ -30,7 +30,7 @@ export interface ArtistEntityProps {
   id: string;
   name: string;
   songsCount: number;
-  avatarUrl: string;
+  avatarUrl?: string;
   spotifyId: string;
 }
 
@@ -67,7 +67,7 @@ export class ArtistEntity implements ArtistEntityProps {
   id: string;
   name: string;
   songsCount: number;
-  avatarUrl: string;
+  avatarUrl?: string;
   spotifyId: string;
 
   constructor(props: ArtistEntityProps) {

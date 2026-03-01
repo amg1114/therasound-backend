@@ -3,6 +3,8 @@ import { GenreEntity } from '../entities/genre.entity';
 export const GENRE_REPOSITORY = Symbol('GENRE_REPOSITORY');
 
 export interface IGenreRepository {
+  save(genre: GenreEntity): Promise<GenreEntity>;
+
   /**
    * Find a genre by ID
    */

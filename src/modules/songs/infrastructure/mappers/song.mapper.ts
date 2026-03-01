@@ -14,7 +14,7 @@ export class SongMapper {
     song.id = raw._id.toString();
     song.spotifyId = raw.spotifyId;
     song.title = raw.title;
-    song.artist = raw.artist;
+    song.artists = raw.artists;
     song.emotion = EmotionVO.create(raw.emotion);
     song.durationMs = raw.durationMs;
     song.spotifyUrl = raw.spotifyUrl;
@@ -46,7 +46,7 @@ export class SongMapper {
     return {
       spotifyId: spotifyId || entity.spotifyId,
       title: entity.title,
-      artist: entity.artist,
+      artists: entity.artists,
       emotion: entity.emotion?.getValue(),
       durationMs: entity.durationMs,
       spotifyUrl: entity.spotifyUrl,
@@ -70,7 +70,6 @@ export class SongMapper {
     response.id = entity.id;
     response.spotifyId = entity.spotifyId;
     response.title = entity.title;
-    response.artist = entity.artist;
     response.emotion = entity.emotion.getValue();
     response.durationMs = entity.durationMs;
     response.spotifyUrl = entity.spotifyUrl;
@@ -90,7 +89,7 @@ export class SongMapper {
       id: entity.id,
       spotifyId: entity.spotifyId,
       title: entity.title,
-      artist: entity.artist,
+      artists: entity.artists,
       emotion: entity.emotion.getValue(),
       genres: entity.genres,
       imageUrl: entity.imageUrl,
@@ -102,7 +101,7 @@ export class SongMapper {
       id: entity.id,
       spotifyId: entity.spotifyId,
       title: entity.title,
-      artist: entity.artist,
+      artists: entity.artists,
       emotion: entity.emotion.getValue(),
       emotionProbabilities: entity.emotionProbabilities,
       durationMs: entity.durationMs,

@@ -1,4 +1,5 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
+import { ArtistSummary } from '@modules/artists/domain/entities';
 import { type AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { type EmotionDistancesVO } from '@modules/songs/domain/value-objects/emotion-distances.vo';
 import { type EmotionProbabilitiesVO } from '@modules/songs/domain/value-objects/emotion-probabilities.vo';
@@ -18,8 +19,8 @@ export class SongEntityORM extends Document {
   @Prop({ required: true })
   title: string;
 
-  @Prop({ required: true })
-  artist: string;
+  @Prop({ required: true, type: [Object] })
+  artists: ArtistSummary[];
 
   @Prop({ required: true, enum: EmotionVO.SONG_EMOTIONS })
   emotion: string;

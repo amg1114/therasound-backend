@@ -12,13 +12,14 @@ export type AppConfig = {
 
   external_apis: {
     urls: {
-      emotion_analysis: string;
-      recco_beats: string;
+      spotify: string;
       acr_cloud: string;
     };
     keys: {
       open_router: string;
       acr_cloud: string;
+      spotify_client_id: string;
+      spotify_client_secret: string;
     };
   };
 
@@ -83,11 +84,13 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   EMOTION_ANALYSIS_API_URL: Joi.string().default('http://localhost:8000'),
   DEFAULT_SEED_RECOMMENDATIONS: Joi.string().required(),
   ACR_CLOUD_ACCESS_KEY: Joi.string().required(),
+  SPOTIFY_CLIENT_ID: Joi.string().required(),
+  SPOTIFY_CLIENT_SECRET: Joi.string().required(),
 });
 
 const DEFAULT_PORT = 3000;
 const DEFAULT_JWT_SECRET = 'default_jwt_secret';
-const RECCO_BEATS_URL = 'https://api.reccobeats.com/v1';
+const SPOTIFY_API_URL = 'https://api.spotify.com/v1';
 const ACR_CLOUD_URL = 'https://eu-api-v2.acrcloud.com/api';
 
 export const appConfig = (): AppConfig => ({
@@ -97,13 +100,14 @@ export const appConfig = (): AppConfig => ({
   },
   external_apis: {
     urls: {
-      emotion_analysis: process.env.EMOTION_ANALYSIS_API_URL!,
-      recco_beats: RECCO_BEATS_URL,
+      spotify: SPOTIFY_API_URL,
       acr_cloud: ACR_CLOUD_URL,
     },
     keys: {
       open_router: process.env.OPENROUTER_API_KEY!,
       acr_cloud: process.env.ACR_CLOUD_ACCESS_KEY!,
+      spotify_client_id: process.env.SPOTIFY_CLIENT_ID!,
+      spotify_client_secret: process.env.SPOTIFY_CLIENT_SECRET!,
     },
   },
   database: {

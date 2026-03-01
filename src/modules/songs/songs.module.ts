@@ -17,13 +17,15 @@ import {
 import { FailedSpotifyTrackRepository } from './infrastructure/orm/repositories/failed-spotify.repository';
 import { SongRepositoryImpl } from './infrastructure/orm/repositories/song.repository';
 
+import { ArtistsModule } from '@modules/artists/artists.module';
 import {
   AudioProcessingService,
-  ExternalMusicApiService,
   SongEmotionService,
   SongProcessingService,
   SongScoringService,
 } from './application/services';
+import { AcrCloudMusicService } from './infrastructure/services/acr-cloud';
+import { SpotifyService } from './infrastructure/services/spotify';
 import { SongsController } from './presentation/controllers/songs.controller';
 
 @Module({
@@ -40,6 +42,7 @@ import { SongsController } from './presentation/controllers/songs.controller';
       },
     ]),
     GenresModule,
+    ArtistsModule,
     forwardRef(() => UsersModule),
   ],
   controllers: [SongsController],
@@ -49,7 +52,8 @@ import { SongsController } from './presentation/controllers/songs.controller';
       useClass: SongRepositoryImpl,
     },
 
-    ExternalMusicApiService,
+    AcrCloudMusicService,
+    SpotifyService,
 
     AudioProcessingService,
     SongEmotionService,
@@ -62,7 +66,7 @@ import { SongsController } from './presentation/controllers/songs.controller';
   ],
   exports: [
     SONG_REPOSITORY,
-    ExternalMusicApiService,
+    AcrCloudMusicService,
     AudioProcessingService,
     SongProcessingService,
     SongScoringService,

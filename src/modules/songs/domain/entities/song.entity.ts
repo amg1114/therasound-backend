@@ -1,4 +1,5 @@
 import { EmotionType } from '@common/domain/value-objects/emotion.vo';
+import { ArtistSummary } from '@modules/artists/domain/entities';
 import { EmotionVO } from '../../../../common/domain/value-objects/emotion.vo';
 import { AudioFeaturesVO } from '../value-objects/audio-features.vo';
 import { EmotionDistancesVO } from '../value-objects/emotion-distances.vo';
@@ -12,7 +13,7 @@ export class SongEntity {
   spotifyUrl: string;
 
   title: string;
-  artist: string;
+  artists: ArtistSummary[];
   durationMs: number;
   genres: string[];
   imageUrl: string;

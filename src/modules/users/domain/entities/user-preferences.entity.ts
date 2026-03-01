@@ -75,12 +75,16 @@ export class UserPreferencesEntity implements UserPreferencesProps {
     return this.likedSongs.some((song) => song.id === songId);
   }
 
-  hasLikedArtist(artist: string): boolean {
-    return this.likedArtists.includes(artist);
+  hasLikedArtist(artist: string[]): boolean {
+    return this.likedArtists.some((likedArtist) =>
+      artist.includes(likedArtist),
+    );
   }
 
-  hasDislikedArtist(artist: string): boolean {
-    return this.dislikedArtists.includes(artist);
+  hasDislikedArtist(artist: string[]): boolean {
+    return this.dislikedArtists.some((dislikedArtist) =>
+      artist.includes(dislikedArtist),
+    );
   }
 
   hasListenedSong(songId: string): boolean {

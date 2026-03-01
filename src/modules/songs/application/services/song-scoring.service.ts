@@ -156,15 +156,16 @@ export class SongScoringService {
     song: SongEntity,
     preferences: UserPreferencesEntity,
   ): number {
+    const songArtists = song.artists.map((a) => a.id);
     // Señales fuertes (early return)
     if (preferences.hasLikedSong(song.id)) return 1.0;
     if (preferences.hasDislikedSong(song.id)) return 0.0;
-    if (preferences.hasDislikedArtist(song.artist)) return 0.1;
+    if (preferences.hasDislikedArtist(songArtists)) return 0.1;
 
     let score = 0.5; // Baseline neutral
 
     // Artist (+30%)
-    if (preferences.hasLikedArtist(song.artist)) {
+    if (preferences.hasLikedArtist(songArtists)) {
       score += 0.3;
     }
 
@@ -227,8 +228,8 @@ export class SongScoringService {
     }
 
     // Penalizar si el mismo artista ya está en la playlist
-    const artistCount = selectedSongs.filter(
-      (s) => s.artist === song.artist,
+    const artistCount = selectedSongs.filter((s) =>
+      s.artists.some((a) => song.artists.map((sa) => sa.id).includes(a.id)),
     ).length;
 
     if (artistCount > 0) {

@@ -40,4 +40,8 @@ export interface ISongRepository {
   existsByReccoBeatsId(reccoBeatsId: string): Promise<boolean>;
 
   existsBySpotifyId(spotifyId: string): Promise<boolean>;
+
+  countByGenre(genre: string): Promise<number>;
+
+  countByArtistId(artistId: string): Promise<number>;
 }

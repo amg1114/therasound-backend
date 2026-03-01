@@ -1,5 +1,11 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { ISeedTrack } from '@modules/admin/application/use-cases/seed-from-local.usecase';
+import { ArtistEntity, ArtistSummary } from '@modules/artists/domain/entities';
+import {
+  ARTIST_REPOSITORY,
+  type ArtistRepository,
+} from '@modules/artists/domain/repositories';
+import { ArtistMapper } from '@modules/artists/infrastructure/mappers';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   type ISongRepository,
@@ -8,13 +14,15 @@ import {
 import { AudioFeaturesVO } from '@modules/songs/domain/value-objects/audio-features.vo';
 import { AudioFeaturesMapper } from '@modules/songs/infrastructure/mappers/audio-features.mapper';
 import { FailedSpotifyTrackRepository } from '@modules/songs/infrastructure/orm/repositories/failed-spotify.repository';
+import { AcrCloudMusicService } from '@modules/songs/infrastructure/services/acr-cloud';
+import { SpotifyService } from '@modules/songs/infrastructure/services/spotify';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { extractSpotifyId } from 'src/utils/extractSpotifyID';
-import {
-  ExternalMusicApiService,
-  IExternalDetails,
-} from '../../infrastructure/services/external-music-api.service';
 import { SongEmotionService } from './song-emotion.service';
+import {
+  ArtistExternalDetails,
+  SongExternalDetails,
+} from './song-processing.types';
 
 @Injectable()
 export class SongProcessingService {
@@ -23,7 +31,11 @@ export class SongProcessingService {
   constructor(
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
-    private readonly externalMusicApiService: ExternalMusicApiService,
+    @Inject(ARTIST_REPOSITORY)
+    private readonly artistRepository: ArtistRepository,
+
+    private readonly externalMusicService: AcrCloudMusicService,
+    private readonly spotifyService: SpotifyService,
     private readonly failedSpotifyTrackRepository: FailedSpotifyTrackRepository,
     private readonly songEmotionService: SongEmotionService,
   ) {}
@@ -45,10 +57,21 @@ export class SongProcessingService {
     const audioFeatures =
       AudioFeaturesMapper.mapSeedTrackToAudioFeatures(track);
 
-    const details =
-      await this.externalMusicApiService.getExternalSongDetails(spotifyId);
+    let trackDetails: SongExternalDetails | null = null;
 
-    if (!details) {
+    try {
+      trackDetails =
+        await this.externalMusicService.fetchSongDetails(spotifyId);
+    } catch (error) {
+      this.logger.error(
+        `Error fetching song details for Spotify ID ${spotifyId}: ${error}`,
+      );
+
+      await this.registerFailedTrack(spotifyId, 'details_error');
+      return null;
+    }
+
+    if (!trackDetails) {
       this.logger.warn(
         `Could not fetch details for seed track: ${track.uri}, skipping`,
       );
@@ -58,13 +81,32 @@ export class SongProcessingService {
       return null;
     }
 
-    return this.buildProcessedTrack(spotifyId, audioFeatures, details);
+    const artistDetails: ArtistExternalDetails[] = [];
+
+    for (const artistId of trackDetails.artistSpotifyIds) {
+      try {
+        const details = await this.spotifyService.getArtistDetails(artistId);
+        artistDetails.push(details);
+      } catch (error) {
+        this.logger.error(
+          `Error fetching artist details for Spotify ID ${artistId}: ${error}`,
+        );
+      }
+    }
+
+    return this.buildProcessedTrack(
+      spotifyId,
+      audioFeatures,
+      trackDetails,
+      artistDetails,
+    );
   }
 
   private async buildProcessedTrack(
     spotifyId: string,
     audioFeatures: AudioFeaturesVO,
-    details: IExternalDetails,
+    details: SongExternalDetails,
+    artistDetails: ArtistExternalDetails[],
     reccobeatsId?: string,
   ) {
     const { dominantEmotion, emotionDistances, emotionProbabilities } =
@@ -78,10 +120,14 @@ export class SongProcessingService {
       return null;
     }
 
+    const processedArtistDetails = await Promise.all(
+      artistDetails.map((details) => this.processArtistDetails(details)),
+    );
+
     const newSong = SongEntity.create({
       spotifyId: spotifyId,
       title: details.title,
-      artist: details.artist,
+      artists: processedArtistDetails,
       emotion: EmotionVO.create(dominantEmotion),
       durationMs: details.durationMs,
       spotifyUrl: details.spotifyUrl,
@@ -95,6 +141,28 @@ export class SongProcessingService {
     });
 
     return this.songRepository.create(newSong);
+  }
+
+  private async processArtistDetails(
+    details: ArtistExternalDetails,
+  ): Promise<ArtistSummary> {
+    const artist = await this.artistRepository.findBySpotifyId(
+      details.spotifyId,
+    );
+
+    if (!artist) {
+      const newArtist = await this.artistRepository.create(
+        ArtistEntity.create({
+          name: details.name,
+          avatarUrl: details.imageUrl,
+          spotifyId: details.spotifyId,
+        }),
+      );
+
+      return ArtistMapper.toSummary(newArtist);
+    }
+
+    return ArtistMapper.toSummary(artist);
   }
 
   private async checkIfExistsOrFailed(spotifyId: string): Promise<boolean> {

@@ -1,3 +1,4 @@
+import { ArtistSummary } from '@modules/artists/domain/entities';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AudioFeaturesDto {
@@ -102,10 +103,10 @@ export class SongResponseDto {
   title: string;
 
   @ApiProperty({
-    description: 'Artist name',
-    example: 'Queen',
+    description: 'List of artists involved in the song',
+    type: [Object],
   })
-  artist: string;
+  artists: ArtistSummary[];
 
   @ApiProperty({
     description: 'Primary emotion associated with the song',

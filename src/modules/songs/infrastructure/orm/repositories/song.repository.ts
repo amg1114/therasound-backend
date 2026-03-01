@@ -1,5 +1,4 @@
 import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
-import { SongCreatedEvent } from '@modules/songs/application/events/song-created.event';
 import { SongEntity } from '@modules/songs/domain/entities/song.entity';
 import {
   ISongRepository,
@@ -74,10 +73,7 @@ export class SongRepositoryImpl implements ISongRepository {
     const songEntity = SongMapper.toEntity(createdSong);
 
     // Emit song created event
-    this.eventEmitter.emit(
-      'song.created',
-      new SongCreatedEvent(songEntity.id, songEntity.genres),
-    );
+    this.eventEmitter.emit('song.created', songEntity);
 
     return songEntity;
   }
@@ -170,6 +166,18 @@ export class SongRepositoryImpl implements ISongRepository {
     }
 
     return songs;
+  }
+
+  async countByArtistId(artistId: string): Promise<number> {
+    const count = await this.model.countDocuments({
+      artists: { $elemMatch: { id: artistId } },
+    });
+    return count;
+  }
+
+  async countByGenre(genre: string): Promise<number> {
+    const count = await this.model.countDocuments({ genres: genre });
+    return count;
   }
 
   private buildQueryFilters(filters?: SongFilters): QueryFilter<SongEntityORM> {

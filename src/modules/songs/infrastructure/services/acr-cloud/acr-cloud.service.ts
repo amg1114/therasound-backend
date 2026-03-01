@@ -1,3 +1,4 @@
+import { SongExternalDetails } from '@modules/songs/application/services';
 import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
@@ -7,38 +8,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import { AcrCloudResponseDto } from '../dto/acr-cloud-response.dto';
-
-export interface IReccoBeatsAudioFeaturesQueries {
-  danceability?: number;
-  energy?: number;
-  instrumentalness?: number;
-  key?: number;
-  liveness?: number;
-  loudness?: number;
-  mode?: number;
-  speechiness?: number;
-  tempo?: number;
-  valence?: number;
-  popularity?: number;
-  featureWeight?: number;
-}
-
-export interface IExternalDetails {
-  title: string;
-  artist: string;
-  genres: string[];
-  releaseDate: Date;
-  imageUrl: string;
-  durationMs: number;
-  spotifyUrl: string;
-}
+import { AcrCloudResponseDto } from '../../dto/acr-cloud-response.dto';
 
 @Injectable()
-export class ExternalMusicApiService {
-  private readonly logger = new Logger(ExternalMusicApiService.name);
+export class AcrCloudMusicService {
+  private readonly logger = new Logger(AcrCloudMusicService.name);
 
   private readonly acrCloudBaseUrl: string;
+  private readonly acrCloudAccessKey: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -47,14 +24,14 @@ export class ExternalMusicApiService {
     this.acrCloudBaseUrl = this.configService.getOrThrow<string>(
       'external_apis.urls.acr_cloud',
     );
+    this.acrCloudAccessKey = this.configService.getOrThrow<string>(
+      'external_apis.keys.acr_cloud',
+    );
   }
 
-  async getExternalSongDetails(spotifyId: string): Promise<IExternalDetails> {
+  async fetchSongDetails(spotifyId: string): Promise<SongExternalDetails> {
     try {
-      const accessKey = this.configService.get<string>(
-        'external_apis.keys.acr_cloud',
-      );
-      if (!accessKey) {
+      if (!this.acrCloudAccessKey) {
         throw new InternalServerErrorException(
           'ACRCloud access key not configured',
         );
@@ -66,7 +43,7 @@ export class ExternalMusicApiService {
         this.httpService.get<AcrCloudResponseDto>(url, {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessKey}`,
+            Authorization: `Bearer ${this.acrCloudAccessKey}`,
           },
         }),
       );
@@ -74,16 +51,19 @@ export class ExternalMusicApiService {
       const track = response.data.data[0];
       if (!track) {
         throw new NotFoundException(
-          `No se encontraron datos para la canción en ACRCloud: ${spotifyId}`,
+          `No data found for song in ACRCloud: ${spotifyId}`,
         );
       }
       this.logger.log(
         `Successfully fetched details from ACRCloud for: ${spotifyId}`,
       );
 
-      const details: IExternalDetails = {
+      const details: SongExternalDetails = {
         title: track.name,
-        artist: track.artists[0].name,
+        artistSpotifyIds:
+          track.external_metadata.spotify?.[0]?.artists?.map(
+            (artist) => artist.id,
+          ) || [],
         genres: track.genres,
         releaseDate: new Date(track.release_date || track.album.release_date),
         imageUrl: track.album.cover,

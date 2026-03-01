@@ -17,8 +17,8 @@ export class MongoArtistEntity extends Document {
   @Prop({ required: true })
   songsCount: number;
 
-  @Prop({ required: true })
-  avatarUrl: string;
+  @Prop({ required: false })
+  avatarUrl?: string;
 }
 
 export const ArtistSchema = SchemaFactory.createForClass(MongoArtistEntity);

@@ -30,7 +30,8 @@ export interface ArtistEntityProps {
   id: string;
   name: string;
   songsCount: number;
-  avatarUrl?: string;
+  avatarUrl: string;
+  spotifyId: string;
 }
 
 /**
@@ -42,13 +43,15 @@ export interface ArtistEntityProps {
  * @property {string} id - The unique identifier of the artist
  * @property {string} name - The name of the artist
  * @property {number} songsCount - The total number of songs created by the artist
- * @property {string} [avatarUrl] - Optional URL to the artist's avatar image
+ * @property {string} avatarUrl - URL to the artist's avatar image
+ * @property {string} spotifyId - The Spotify ID of the artist
  *
  * @example
  * // Create a new artist entity
  * const props = ArtistEntity.create({
  *   name: "John Doe",
- *   avatarUrl: "https://example.com/avatar.jpg"
+ *   avatarUrl: "https://example.com/avatar.jpg",
+ *   spotifyId: "123456789"
  * });
  *
  * @example
@@ -64,13 +67,15 @@ export class ArtistEntity implements ArtistEntityProps {
   id: string;
   name: string;
   songsCount: number;
-  avatarUrl?: string;
+  avatarUrl: string;
+  spotifyId: string;
 
   constructor(props: ArtistEntityProps) {
     this.id = props.id;
     this.name = props.name;
     this.songsCount = props.songsCount;
     this.avatarUrl = props.avatarUrl;
+    this.spotifyId = props.spotifyId;
   }
 
   static create(
@@ -80,6 +85,7 @@ export class ArtistEntity implements ArtistEntityProps {
       name: props.name,
       songsCount: props.songsCount ?? 0,
       avatarUrl: props.avatarUrl,
+      spotifyId: props.spotifyId,
     };
   }
 

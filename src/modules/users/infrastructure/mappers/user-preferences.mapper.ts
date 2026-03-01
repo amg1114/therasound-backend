@@ -8,12 +8,8 @@ export class UserPreferencesMapper {
     const domainEntity = UserPreferencesEntity.reconstruct({
       id: ormEntity._id.toString(),
       userId: ormEntity.userId.toString(),
-      likedSongs: ormEntity.likedSongs,
-      dislikedSongs: ormEntity.dislikedSongs,
-      likedGenres: ormEntity.likedGenres,
-      dislikedGenres: ormEntity.dislikedGenres,
-      likedArtists: ormEntity.likedArtists,
-      dislikedArtists: ormEntity.dislikedArtists,
+      likes: ormEntity.likes,
+      dislikes: ormEntity.dislikes,
       listenedHistory: ormEntity.listenedHistory,
     });
 
@@ -25,12 +21,8 @@ export class UserPreferencesMapper {
   ): Partial<UserPreferencesEntityORM> {
     return {
       userId: new Types.ObjectId(domainEntity.userId),
-      likedSongs: domainEntity.likedSongs,
-      dislikedSongs: domainEntity.dislikedSongs,
-      likedGenres: domainEntity.likedGenres,
-      dislikedGenres: domainEntity.dislikedGenres,
-      likedArtists: domainEntity.likedArtists,
-      dislikedArtists: domainEntity.dislikedArtists,
+      likes: domainEntity.likes,
+      dislikes: domainEntity.dislikes,
       listenedHistory: domainEntity.listenedHistory,
     };
   }
@@ -41,12 +33,8 @@ export class UserPreferencesMapper {
     const response = new UserPreferencesResponseDto();
 
     response.id = domainEntity.id!;
-    response.likedSongs = domainEntity.likedSongs;
-    response.dislikedSongs = domainEntity.dislikedSongs;
-    response.likedGenres = domainEntity.likedGenres;
-    response.dislikedGenres = domainEntity.dislikedGenres;
-    response.likedArtists = domainEntity.likedArtists;
-    response.dislikedArtists = domainEntity.dislikedArtists;
+    response.likes = domainEntity.likes;
+    response.dislikes = domainEntity.dislikes;
     response.listenedHistory = domainEntity.listenedHistory;
 
     return response;

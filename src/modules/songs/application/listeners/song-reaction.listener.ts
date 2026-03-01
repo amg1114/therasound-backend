@@ -6,8 +6,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
-export class SongCreatedListener {
-  private readonly logger = new Logger(SongCreatedListener.name);
+export class SongReactionListener {
+  private readonly logger = new Logger(SongReactionListener.name);
 
   constructor(
     @Inject(SONG_REPOSITORY)

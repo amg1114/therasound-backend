@@ -11,6 +11,7 @@ import { GenresModule } from './modules/genres/genres.module';
 import { PlaylistsModule } from './modules/playlists/playlists.module';
 import { SongsModule } from './modules/songs/songs.module';
 import { UsersModule } from './modules/users/users.module';
+import { ArtistsModule } from './modules/artists/artists.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UsersModule } from './modules/users/users.module';
     GenresModule,
     AdminModule,
     CommonModule,
+    ArtistsModule,
   ],
   controllers: [],
   providers: [],

@@ -73,7 +73,7 @@ export class SongRepositoryImpl implements ISongRepository {
     const songEntity = SongMapper.toEntity(createdSong);
 
     // Emit song created event
-    this.eventEmitter.emit('song.created', songEntity);
+    // this.eventEmitter.emit('song.created', songEntity);
 
     return songEntity;
   }

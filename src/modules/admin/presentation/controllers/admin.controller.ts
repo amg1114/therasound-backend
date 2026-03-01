@@ -1,4 +1,5 @@
 import { ApiEndpoint } from '@common/infrastructure/decorators';
+import { UpdateArtistsDetails } from '@modules/admin/application/use-cases';
 import { RecalculateSongEmotionUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
@@ -10,6 +11,7 @@ export class AdminController {
   constructor(
     private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
     private readonly recalculateSongEmotionUseCase: RecalculateSongEmotionUseCase,
+    private readonly updateArtistsDetailsUseCase: UpdateArtistsDetails,
   ) {}
 
   @ApiEndpoint({
@@ -69,5 +71,26 @@ export class AdminController {
   @PublicRoute()
   async recalculateSongEmotion() {
     return this.recalculateSongEmotionUseCase.execute();
+  }
+
+  @ApiEndpoint({
+    summary: 'Update artists details',
+    description:
+      'Updates the details of all artists in the database with fresh data from Spotify.',
+    responses: [
+      {
+        status: 200,
+        description: 'Artists details updated successfully',
+      },
+      {
+        status: 500,
+        description: 'Error during artists details update process',
+      },
+    ],
+  })
+  @Patch('/update-artists-details')
+  @PublicRoute()
+  async updateArtistsDetails() {
+    return this.updateArtistsDetailsUseCase.execute();
   }
 }

@@ -81,32 +81,13 @@ export class SongProcessingService {
       return null;
     }
 
-    const artistDetails: ArtistExternalDetails[] = [];
-
-    for (const artistId of trackDetails.artistSpotifyIds) {
-      try {
-        const details = await this.spotifyService.getArtistDetails(artistId);
-        artistDetails.push(details);
-      } catch (error) {
-        this.logger.error(
-          `Error fetching artist details for Spotify ID ${artistId}: ${error}`,
-        );
-      }
-    }
-
-    return this.buildProcessedTrack(
-      spotifyId,
-      audioFeatures,
-      trackDetails,
-      artistDetails,
-    );
+    return this.buildProcessedTrack(spotifyId, audioFeatures, trackDetails);
   }
 
   private async buildProcessedTrack(
     spotifyId: string,
     audioFeatures: AudioFeaturesVO,
     details: SongExternalDetails,
-    artistDetails: ArtistExternalDetails[],
     reccobeatsId?: string,
   ) {
     const { dominantEmotion, emotionDistances, emotionProbabilities } =
@@ -121,7 +102,7 @@ export class SongProcessingService {
     }
 
     const processedArtistDetails = await Promise.all(
-      artistDetails.map((details) => this.processArtistDetails(details)),
+      details.artists.map((details) => this.processArtistDetails(details)),
     );
 
     const newSong = SongEntity.create({
@@ -143,12 +124,10 @@ export class SongProcessingService {
     return this.songRepository.create(newSong);
   }
 
-  private async processArtistDetails(
+  async processArtistDetails(
     details: ArtistExternalDetails,
   ): Promise<ArtistSummary> {
-    const artist = await this.artistRepository.findBySpotifyId(
-      details.spotifyId,
-    );
+    const artist = await this.artistRepository.findByName(details.name);
 
     if (!artist) {
       const newArtist = await this.artistRepository.create(
@@ -160,6 +139,11 @@ export class SongProcessingService {
       );
 
       return ArtistMapper.toSummary(newArtist);
+    }
+
+    if (details.spotifyId !== artist.spotifyId) {
+      artist.spotifyId = details.spotifyId;
+      await this.artistRepository.save(artist);
     }
 
     return ArtistMapper.toSummary(artist);

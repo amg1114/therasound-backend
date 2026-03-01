@@ -8,8 +8,8 @@ import { Document, Types } from 'mongoose';
 export class MongoArtistEntity extends Document {
   declare _id: Types.ObjectId;
 
-  @Prop({ required: true, unique: true, index: true })
-  spotifyId: string;
+  @Prop({ required: false })
+  spotifyId?: string;
 
   @Prop({ required: true, unique: true, index: true })
   name: string;

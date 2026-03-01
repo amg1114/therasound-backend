@@ -39,11 +39,9 @@ export class SpotifyService implements OnModuleInit {
       await this.authenticate();
     }
 
-    const response = await fetch(`${this.baseUrl}/artists/${spotifyId}`, {
-      headers: {
-        Authorization: `Bearer ${this.accessToken}`,
-      },
-    });
+    const response = await this.fetchWithRetry(
+      `${this.baseUrl}/artists/${spotifyId}`,
+    );
 
     if (!response.ok) {
       this.logger.error(
@@ -101,5 +99,21 @@ export class SpotifyService implements OnModuleInit {
     this.tokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
 
     this.logger.log('Successfully authenticated with Spotify API');
+  }
+
+  private async fetchWithRetry(url: string, retries = 3): Promise<Response> {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${this.accessToken}` },
+    });
+
+    if (response.status === 429 && retries > 0) {
+      const retryAfter = response.headers.get('Retry-After') ?? '5';
+      const waitMs = parseInt(retryAfter) * 1000;
+      this.logger.warn(`Spotify rate limit hit, waiting ${retryAfter}s...`);
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+      return this.fetchWithRetry(url, retries - 1);
+    }
+
+    return response;
   }
 }

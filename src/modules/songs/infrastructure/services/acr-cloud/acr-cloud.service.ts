@@ -60,10 +60,12 @@ export class AcrCloudMusicService {
 
       const details: SongExternalDetails = {
         title: track.name,
-        artistSpotifyIds:
-          track.external_metadata.spotify?.[0]?.artists?.map(
-            (artist) => artist.id,
-          ) || [],
+        artists:
+          track.artists?.map((artist) => ({
+            name: artist.name,
+            spotifyId: undefined,
+            imageUrl: undefined,
+          })) || [],
         genres: track.genres,
         releaseDate: new Date(track.release_date || track.album.release_date),
         imageUrl: track.album.cover,

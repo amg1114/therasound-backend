@@ -1,6 +1,6 @@
 export interface SongExternalDetails {
   title: string;
-  artistSpotifyIds: string[];
+  artists: ArtistExternalDetails[];
   genres: string[];
   releaseDate: Date;
   imageUrl: string;
@@ -10,6 +10,6 @@ export interface SongExternalDetails {
 
 export interface ArtistExternalDetails {
   name: string;
-  spotifyId: string;
+  spotifyId?: string;
   imageUrl?: string;
 }

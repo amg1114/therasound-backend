@@ -5,9 +5,12 @@ import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { GetUserProfile } from './application/use-cases/get-user-profile.usecase';
-import { LoginUserUseCase } from './application/use-cases/login-user.usecase';
-import { RegisterUserUseCase } from './application/use-cases/register-user.usecase';
+import {
+  GetUserProfile,
+  LoginUserUseCase,
+  RegisterUserUseCase,
+  UpdateUserProfileUseCase,
+} from './application/use-cases';
 import { JwtGuard } from './infrastructure/guards/jwt.guard';
 import { JwtStrategy } from './infrastructure/jwt.strategy';
 import { AuthController } from './presentation/controllers/auth.controller';
@@ -29,6 +32,8 @@ import { AuthController } from './presentation/controllers/auth.controller';
     LoginUserUseCase,
     RegisterUserUseCase,
     GetUserProfile,
+    UpdateUserProfileUseCase,
+
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

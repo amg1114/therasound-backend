@@ -1,14 +1,23 @@
 import { ApiEndpoint } from '@common/infrastructure/decorators';
-import { GetUserProfile } from '@modules/auth/application/use-cases/get-user-profile.usecase';
-import { LoginUserUseCase } from '@modules/auth/application/use-cases/login-user.usecase';
-import { RegisterUserUseCase } from '@modules/auth/application/use-cases/register-user.usecase';
-import { CurrentUser } from '@modules/auth/infrastructure/decorators/current-user.decorator';
+import {
+  GetUserProfile,
+  LoginUserUseCase,
+  RegisterUserUseCase,
+  UpdateUserProfileUseCase,
+} from '@modules/auth/application/use-cases';
+
+import {
+  CurrentUser,
+  CurrentUserId,
+} from '@modules/auth/infrastructure/decorators/current-user.decorator';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
 import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 import { AuthMapper } from '@modules/auth/infrastructure/mappers/auth.mapper';
 import { UserEntity } from '@modules/users/domain/entities';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { UserMapper } from '@modules/users/infrastructure/mappers';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UpdateUserProfileDto } from '../dto/requests';
 import { LoginRequestDto } from '../dto/requests/login-request.dto';
 import { RegisterRequestDto } from '../dto/requests/register-request.dto';
 import { AuthResponseDto } from '../dto/responses/auth-response.dto';
@@ -21,6 +30,7 @@ export class AuthController {
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly getCurrentUserUseCase: GetUserProfile,
+    private readonly updateUserProfileUseCase: UpdateUserProfileUseCase,
   ) {}
 
   @PublicRoute()
@@ -103,5 +113,45 @@ export class AuthController {
   async getCurrentUser(@CurrentUser() currentUser: UserEntity) {
     const result = await this.getCurrentUserUseCase.execute(currentUser.id!);
     return AuthMapper.toUserProfileResponse(result);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Patch('me')
+  @ApiEndpoint({
+    summary: 'Update current user profile',
+    description:
+      'Update the profile information of the currently authenticated user',
+    body: {
+      type: UpdateUserProfileDto,
+      description: 'Data for updating user profile',
+      required: true,
+    },
+    responses: [
+      {
+        status: 200,
+        description: 'Perfil del usuario actualizado exitosamente',
+        type: ProfileResponseDto,
+      },
+      {
+        status: 400,
+        description: 'Datos de actualización inválidos',
+      },
+      {
+        status: 401,
+        description: 'No autorizado, token inválido o expirado',
+      },
+      {
+        status: 404,
+        description: 'Usuario no encontrado',
+      },
+    ],
+  })
+  async updateCurrentUser(
+    @CurrentUserId() userId: string,
+    @Body() body: UpdateUserProfileDto,
+  ) {
+    const result = await this.updateUserProfileUseCase.execute(userId, body);
+    return UserMapper.toResponseDto(result);
   }
 }

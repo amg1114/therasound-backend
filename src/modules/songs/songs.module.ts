@@ -66,6 +66,7 @@ import { SongsController } from './presentation/controllers/songs.controller';
   ],
   exports: [
     SONG_REPOSITORY,
+    SpotifyService,
     AcrCloudMusicService,
     AudioProcessingService,
     SongProcessingService,

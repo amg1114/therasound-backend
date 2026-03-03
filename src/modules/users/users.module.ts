@@ -17,7 +17,7 @@ import {
   USER_STATISTICS_REPOSITORY,
 } from './domain/repositories';
 import {
-  UserEntityORM,
+  MongoUserEntity,
   UserPreferencesEntityORM,
   UserPreferencesSchema,
   UserSchema,
@@ -25,8 +25,8 @@ import {
   UserStatisticsSchema,
 } from './infrastructure/orm/entities';
 import {
+  MongoUserRepository,
   UserPreferencesRepositoryImpl,
-  UserRepositoryImpl,
   UserStatisticsRepositoryImpl,
 } from './infrastructure/orm/repositories';
 import {
@@ -38,7 +38,7 @@ import {
   imports: [
     MongooseModule.forFeature([
       {
-        name: UserEntityORM.name,
+        name: MongoUserEntity.name,
         schema: UserSchema,
       },
       {
@@ -59,7 +59,7 @@ import {
   providers: [
     {
       provide: USER_REPOSITORY,
-      useClass: UserRepositoryImpl,
+      useClass: MongoUserRepository,
     },
     {
       provide: USER_PREFERENCES_REPOSITORY,

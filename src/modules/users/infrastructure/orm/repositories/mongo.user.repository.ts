@@ -1,5 +1,5 @@
 import { UserEntity } from '@modules/users/domain/entities';
-import { IUserRepository } from '@modules/users/domain/repositories/user-repository.interface';
+import { UserRepository } from '@modules/users/domain/repositories/user.repository.interface';
 import {
   ConflictException,
   Injectable,
@@ -8,7 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserMapper } from '../../mappers/user.mapper';
-import { UserEntityORM } from '../entities/user-entity.orm';
+import { MongoUserEntity } from '../entities/mongo.user.entity';
 
 /**
  * Implementation of the User Repository using Mongoose ORM.
@@ -17,17 +17,17 @@ import { UserEntityORM } from '../entities/user-entity.orm';
  * including creation, retrieval, update, and deletion (CRUD operations).
  * It maps between domain entities and ORM entities using the UserMapper.
  *
- * @implements {IUserRepository}
+ * @implements {UserRepository}
  */
 @Injectable()
-export class UserRepositoryImpl implements IUserRepository {
+export class MongoUserRepository implements UserRepository {
   constructor(
-    @InjectModel(UserEntityORM.name)
-    private readonly model: Model<UserEntityORM>,
+    @InjectModel(MongoUserEntity.name)
+    private readonly model: Model<MongoUserEntity>,
   ) {}
 
   async create(user: UserEntity): Promise<UserEntity> {
-    const ormData = UserMapper.toORM(user);
+    const ormData = UserMapper.toMongo(user);
 
     let createdUser = new this.model(ormData);
 
@@ -69,8 +69,8 @@ export class UserRepositoryImpl implements IUserRepository {
     return UserMapper.toDomain(ormEntity);
   }
 
-  async update(user: UserEntity): Promise<UserEntity> {
-    const ormData = UserMapper.toORM(user);
+  async save(user: UserEntity): Promise<UserEntity> {
+    const ormData = UserMapper.toMongo(user);
 
     if (ormData.email) {
       const existingUser = await this.model.exists({

@@ -125,7 +125,7 @@ export class AuthController {
     ],
   })
   async getCurrentUser(@CurrentUser() currentUser: UserEntity) {
-    const result = await this.getCurrentUserUseCase.execute(currentUser.id!);
+    const result = await this.getCurrentUserUseCase.execute(currentUser.id);
     return AuthMapper.toUserProfileResponse(result);
   }
 

@@ -4,7 +4,7 @@ import {
   UserPasswordMismatchException,
 } from '@modules/users/domain/exceptions/user.exceptions';
 import {
-  type IUserRepository,
+  type UserRepository,
   USER_REPOSITORY,
 } from '@modules/users/domain/repositories';
 import { Inject, Injectable } from '@nestjs/common';
@@ -14,7 +14,7 @@ import * as bcrypt from 'bcrypt';
 export class ChangePasswordUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
-    private readonly userRepository: IUserRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   async execute(
@@ -36,6 +36,6 @@ export class ChangePasswordUseCase {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
 
-    await this.userRepository.update(user);
+    await this.userRepository.save(user);
   }
 }

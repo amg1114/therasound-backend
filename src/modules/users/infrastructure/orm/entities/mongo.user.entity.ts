@@ -5,7 +5,7 @@ import { Document, Types } from 'mongoose';
   collection: 'users',
   timestamps: true,
 })
-export class UserEntityORM extends Document {
+export class MongoUserEntity extends Document {
   declare _id: Types.ObjectId;
 
   @Prop({ required: true })
@@ -16,9 +16,9 @@ export class UserEntityORM extends Document {
 
   @Prop({ required: true })
   password: string;
-  @Prop({ required: true, alias: 'bornAt' })
-  birthDate: Date;
+
+  @Prop({ required: true })
   bornAt: Date;
 }
 
-export const UserSchema = SchemaFactory.createForClass(UserEntityORM);
+export const UserSchema = SchemaFactory.createForClass(MongoUserEntity);

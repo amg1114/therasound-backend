@@ -1,7 +1,7 @@
 import { UpdateUserProfileDto } from '@modules/auth/presentation/dto/requests';
 import { UserEntity } from '@modules/users/domain/entities';
 import {
-  type IUserRepository,
+  type UserRepository,
   USER_REPOSITORY,
 } from '@modules/users/domain/repositories';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
@@ -10,7 +10,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 export class UpdateUserProfileUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
-    private readonly userRepository: IUserRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   async execute(
@@ -26,7 +26,7 @@ export class UpdateUserProfileUseCase {
     user.email = dto.email ?? user.email;
     user.bornAt = dto.bornAt ? new Date(dto.bornAt) : user.bornAt;
 
-    await this.userRepository.update(user);
+    await this.userRepository.save(user);
     return user;
   }
 }

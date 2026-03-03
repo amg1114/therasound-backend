@@ -1,6 +1,7 @@
 import { ApiEndpoint } from '@common/infrastructure/decorators';
 import {
   ChangePasswordUseCase,
+  DeleteAccountUseCase,
   GetUserProfile,
   LoginUserUseCase,
   RegisterUserUseCase,
@@ -45,6 +46,7 @@ export class AuthController {
     private readonly getCurrentUserUseCase: GetUserProfile,
     private readonly updateUserProfileUseCase: UpdateUserProfileUseCase,
     private readonly changePasswordUseCase: ChangePasswordUseCase,
+    private readonly deleteAccountUseCase: DeleteAccountUseCase,
   ) {}
 
   @PublicRoute()
@@ -206,5 +208,32 @@ export class AuthController {
     @Body() body: ChangePasswordRequestDto,
   ) {
     return await this.changePasswordUseCase.execute(userId, body);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('delete-account')
+  @ApiEndpoint({
+    summary: 'Delete user account',
+    description:
+      'Allows the authenticated user to delete their account permanently.',
+    responses: [
+      {
+        status: 204,
+        description: 'Cuenta eliminada exitosamente',
+      },
+      {
+        status: 401,
+        description: 'No autorizado, token inválido o expirado',
+      },
+      {
+        status: 404,
+        description: 'Usuario no encontrado',
+      },
+    ],
+  })
+  async deleteAccount(@CurrentUserId() userId: string): Promise<void> {
+    await this.deleteAccountUseCase.execute(userId);
   }
 }

@@ -1,10 +1,13 @@
-import { UserStatisticsEntity } from '@modules/users/domain/entities';
-import { IUserStatisticsRepository } from '@modules/users/domain/repositories';
+import {
+  CreateUserStatisticsProps,
+  UserStatisticsEntity,
+} from '@modules/users/domain/entities';
+import { UserStatisticsRepository } from '@modules/users/domain/repositories';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UserStatisticsMapper } from '../../mappers';
-import { UserStatisticsEntityORM } from '../entities';
+import { MongoUserStatisticsEntity } from '../entities';
 
 /**
  * Implementation of the User Statistics Repository using Mongoose ORM.
@@ -13,19 +16,19 @@ import { UserStatisticsEntityORM } from '../entities';
  * including creation, retrieval, and update operations.
  * It maps between domain entities and ORM entities using the UserStatisticsMapper.
  *
- * @implements {IUserStatisticsRepository}
+ * @implements {UserStatisticsRepository}
  */
 @Injectable()
-export class UserStatisticsRepositoryImpl implements IUserStatisticsRepository {
+export class MongoStatisticsRepository implements UserStatisticsRepository {
   constructor(
-    @InjectModel(UserStatisticsEntityORM.name)
-    private readonly model: Model<UserStatisticsEntityORM>,
+    @InjectModel(MongoUserStatisticsEntity.name)
+    private readonly model: Model<MongoUserStatisticsEntity>,
   ) {}
 
   async create(
-    userStatistics: Partial<UserStatisticsEntity>,
+    userStatistics: CreateUserStatisticsProps,
   ): Promise<UserStatisticsEntity> {
-    const ormData = UserStatisticsMapper.toORM(userStatistics);
+    const ormData = UserStatisticsMapper.toPersistence(userStatistics);
 
     let createdStatistics = new this.model(ormData);
 
@@ -69,7 +72,7 @@ export class UserStatisticsRepositoryImpl implements IUserStatisticsRepository {
   async update(
     userStatistics: UserStatisticsEntity,
   ): Promise<UserStatisticsEntity> {
-    const ormData = UserStatisticsMapper.toORM(userStatistics);
+    const ormData = UserStatisticsMapper.toPersistence(userStatistics);
 
     const updatedOrmEntity = await this.model.findByIdAndUpdate(
       userStatistics.id,
@@ -82,5 +85,9 @@ export class UserStatisticsRepositoryImpl implements IUserStatisticsRepository {
     }
 
     return UserStatisticsMapper.toDomain(updatedOrmEntity);
+  }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteOne({ userId: new Types.ObjectId(userId) }).exec();
   }
 }

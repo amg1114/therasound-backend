@@ -4,10 +4,10 @@ import {
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { SongMapper } from '@modules/songs/infrastructure/mappers';
 import {
-  type IUserStatisticsRepository,
   USER_PREFERENCES_REPOSITORY,
   USER_STATISTICS_REPOSITORY,
   type UserPreferencesRepository,
+  type UserStatisticsRepository,
 } from '@modules/users/domain/repositories';
 import { HistorySongVO } from '@modules/users/domain/value-objects/history-song.vo';
 import { RegisterListenedSongDto } from '@modules/users/presentation/dto/requests/statistics/register-listened-song.dto';
@@ -22,7 +22,7 @@ import {
 export class RegisterListenedSongUseCase {
   constructor(
     @Inject(USER_STATISTICS_REPOSITORY)
-    private readonly statisticsRepository: IUserStatisticsRepository,
+    private readonly statisticsRepository: UserStatisticsRepository,
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly preferencesRepository: UserPreferencesRepository,
     @Inject(SONG_REPOSITORY)

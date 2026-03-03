@@ -14,7 +14,7 @@ import {
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import {
   USER_STATISTICS_REPOSITORY,
-  type IUserStatisticsRepository,
+  type UserStatisticsRepository,
 } from '@modules/users/domain/repositories';
 import {
   USER_PREFERENCES_REPOSITORY,
@@ -42,7 +42,7 @@ export class GeneratePlaylistUseCase {
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly userPreferencesRepository: UserPreferencesRepository,
     @Inject(USER_STATISTICS_REPOSITORY)
-    private readonly statisticsRepository: IUserStatisticsRepository,
+    private readonly statisticsRepository: UserStatisticsRepository,
   ) {}
 
   async execute(

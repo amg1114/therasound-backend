@@ -19,15 +19,15 @@ import {
 import {
   MongoUserEntity,
   MongoUserPreferencesEntity,
+  MongoUserStatisticsEntity,
   UserPreferencesSchema,
   UserSchema,
-  UserStatisticsEntityORM,
   UserStatisticsSchema,
 } from './infrastructure/orm/entities';
 import {
+  MongoStatisticsRepository,
   MongoUserPreferencesRepository,
   MongoUserRepository,
-  UserStatisticsRepositoryImpl,
 } from './infrastructure/orm/repositories';
 import {
   UserPreferencesController,
@@ -46,7 +46,7 @@ import {
         schema: UserPreferencesSchema,
       },
       {
-        name: UserStatisticsEntityORM.name,
+        name: MongoUserStatisticsEntity.name,
         schema: UserStatisticsSchema,
       },
     ]),
@@ -67,7 +67,7 @@ import {
     },
     {
       provide: USER_STATISTICS_REPOSITORY,
-      useClass: UserStatisticsRepositoryImpl,
+      useClass: MongoStatisticsRepository,
     },
 
     UserProfileService,

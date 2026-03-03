@@ -8,6 +8,8 @@ interface UserStatisticsEntityProps {
   streakActivationDate: Date | null;
 }
 
+export type CreateUserStatisticsProps = Omit<UserStatisticsEntityProps, 'id'>;
+
 export class UserStatisticsEntity implements UserStatisticsEntityProps {
   id: string;
   userId: string;
@@ -27,7 +29,7 @@ export class UserStatisticsEntity implements UserStatisticsEntityProps {
     this.streakActivationDate = props.streakActivationDate;
   }
 
-  static create(userId: string): Partial<UserStatisticsEntity> {
+  static create(userId: string): CreateUserStatisticsProps {
     return {
       userId,
       totalPlaylists: 0,

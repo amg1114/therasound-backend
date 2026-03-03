@@ -1,9 +1,12 @@
-import { UserStatisticsEntity } from '@modules/users/domain/entities';
+import {
+  CreateUserStatisticsProps,
+  UserStatisticsEntity,
+} from '@modules/users/domain/entities';
 import { Types } from 'mongoose';
-import { UserStatisticsEntityORM } from '../orm/entities';
+import { MongoUserStatisticsEntity } from '../orm/entities';
 
 export class UserStatisticsMapper {
-  static toDomain(ormEntity: UserStatisticsEntityORM): UserStatisticsEntity {
+  static toDomain(ormEntity: MongoUserStatisticsEntity): UserStatisticsEntity {
     const domainEntity = UserStatisticsEntity.reconstitute({
       id: ormEntity._id.toString(),
       userId: ormEntity.userId.toString(),
@@ -17,16 +20,15 @@ export class UserStatisticsMapper {
     return domainEntity;
   }
 
-  static toORM(
-    domainEntity: Partial<UserStatisticsEntity>,
-  ): Partial<UserStatisticsEntityORM> {
+  static toPersistence(
+    domainEntity: CreateUserStatisticsProps,
+  ): Partial<MongoUserStatisticsEntity> {
     return {
-      _id: new Types.ObjectId(domainEntity.id),
       userId: new Types.ObjectId(domainEntity.userId),
       lastListeningDate: domainEntity.lastListeningDate,
       streakActivationDate: domainEntity.streakActivationDate,
-      totalListeningTimeMs: domainEntity.totalListeningTimeMs,
       totalSongsListened: domainEntity.totalSongsListened,
+      totalListeningTimeMs: domainEntity.totalListeningTimeMs,
       totalPlaylists: domainEntity.totalPlaylists,
     };
   }

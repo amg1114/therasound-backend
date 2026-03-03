@@ -5,7 +5,7 @@ import { Types } from 'mongoose';
   collection: 'user_statistics',
   timestamps: true,
 })
-export class UserStatisticsEntityORM {
+export class MongoUserStatisticsEntity {
   declare _id: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'users', unique: true })
@@ -28,5 +28,5 @@ export class UserStatisticsEntityORM {
 }
 
 export const UserStatisticsSchema = SchemaFactory.createForClass(
-  UserStatisticsEntityORM,
+  MongoUserStatisticsEntity,
 );

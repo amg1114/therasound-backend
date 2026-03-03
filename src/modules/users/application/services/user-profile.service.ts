@@ -9,8 +9,8 @@ import {
 import {
   USER_PREFERENCES_REPOSITORY,
   USER_STATISTICS_REPOSITORY,
-  type IUserStatisticsRepository,
   type UserPreferencesRepository,
+  type UserStatisticsRepository,
 } from '@modules/users/domain/repositories';
 import { Inject, Injectable } from '@nestjs/common';
 import {
@@ -24,7 +24,7 @@ export class UserProfileService {
     @Inject(USER_PREFERENCES_REPOSITORY)
     private readonly preferencesRepository: UserPreferencesRepository,
     @Inject(USER_STATISTICS_REPOSITORY)
-    private readonly statisticsRepository: IUserStatisticsRepository,
+    private readonly statisticsRepository: UserStatisticsRepository,
     @Inject(PLAYLIST_REPOSITORY)
     private readonly playlistRepository: IPlaylistRepository,
   ) {}

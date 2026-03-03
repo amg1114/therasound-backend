@@ -1,10 +1,10 @@
-import { UserStatisticsEntity } from '../entities';
+import { CreateUserStatisticsProps, UserStatisticsEntity } from '../entities';
 
 export const USER_STATISTICS_REPOSITORY = 'USER_STATISTICS_REPOSITORY';
 
-export interface IUserStatisticsRepository {
+export interface UserStatisticsRepository {
   create(
-    userStatistics: Partial<UserStatisticsEntity>,
+    userStatistics: CreateUserStatisticsProps,
   ): Promise<UserStatisticsEntity>;
 
   findById(id: string): Promise<UserStatisticsEntity | null>;
@@ -12,4 +12,6 @@ export interface IUserStatisticsRepository {
   findByUserId(userId: string): Promise<UserStatisticsEntity | null>;
 
   update(userStatistics: UserStatisticsEntity): Promise<UserStatisticsEntity>;
+
+  deleteByUserId(userId: string): Promise<void>;
 }

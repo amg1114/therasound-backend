@@ -1,4 +1,5 @@
 export * from './change-password.usecase';
+export * from './delete-account.usecase';
 export * from './get-user-profile.usecase';
 export * from './interfaces/auth.usecase.interface';
 export * from './interfaces/profile.usecase.interface';

@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import {
   ChangePasswordUseCase,
+  DeleteAccountUseCase,
   GetUserProfile,
   LoginUserUseCase,
   RegisterUserUseCase,
@@ -30,11 +31,14 @@ import { AuthController } from './presentation/controllers/auth.controller';
   ],
   providers: [
     JwtStrategy,
+
     LoginUserUseCase,
     RegisterUserUseCase,
     GetUserProfile,
     UpdateUserProfileUseCase,
     ChangePasswordUseCase,
+    DeleteAccountUseCase,
+
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

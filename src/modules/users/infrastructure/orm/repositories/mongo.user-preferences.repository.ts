@@ -1,10 +1,10 @@
 import { UserPreferencesEntity } from '@modules/users/domain/entities';
-import { IUserPreferencesRepository } from '@modules/users/domain/repositories/user-preferences-repository.interface';
+import { UserPreferencesRepository } from '@modules/users/domain/repositories/user-preferences.repository.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UserPreferencesMapper } from '../../mappers/user-preferences.mapper';
-import { UserPreferencesEntityORM } from '../entities/user-preferences-entity.orm';
+import { MongoUserPreferencesEntity } from '../entities/mongo.user-preferences.entity';
 
 /**
  * Implementation of the User Preferences Repository using Mongoose ORM.
@@ -13,19 +13,19 @@ import { UserPreferencesEntityORM } from '../entities/user-preferences-entity.or
  * including creation, retrieval, and update operations.
  * It maps between domain entities and ORM entities using the UserPreferencesMapper.
  *
- * @implements {IUserPreferencesRepository}
+ * @implements {UserPreferencesRepository}
  */
 @Injectable()
-export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository {
+export class MongoUserPreferencesRepository implements UserPreferencesRepository {
   constructor(
-    @InjectModel(UserPreferencesEntityORM.name)
-    private readonly model: Model<UserPreferencesEntityORM>,
+    @InjectModel(MongoUserPreferencesEntity.name)
+    private readonly model: Model<MongoUserPreferencesEntity>,
   ) {}
 
   async create(
     userPreferences: UserPreferencesEntity,
   ): Promise<UserPreferencesEntity> {
-    const ormData = UserPreferencesMapper.toORM(userPreferences);
+    const ormData = UserPreferencesMapper.toPersistence(userPreferences);
 
     let createdPreferences = new this.model(ormData);
 
@@ -66,10 +66,10 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
     return UserPreferencesMapper.toDomain(ormEntity);
   }
 
-  async update(
+  async save(
     userPreferences: UserPreferencesEntity,
   ): Promise<UserPreferencesEntity> {
-    const ormData = UserPreferencesMapper.toORM(userPreferences);
+    const ormData = UserPreferencesMapper.toPersistence(userPreferences);
 
     const updatedOrmEntity = await this.model.findByIdAndUpdate(
       userPreferences.id,
@@ -82,5 +82,9 @@ export class UserPreferencesRepositoryImpl implements IUserPreferencesRepository
     }
 
     return UserPreferencesMapper.toDomain(updatedOrmEntity);
+  }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.model.deleteOne({ userId: new Types.ObjectId(userId) }).exec();
   }
 }

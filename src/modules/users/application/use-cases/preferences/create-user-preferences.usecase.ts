@@ -1,15 +1,15 @@
 import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import {
-  type IUserPreferencesRepository,
+  type UserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,
-} from '@modules/users/domain/repositories/user-preferences-repository.interface';
+} from '@modules/users/domain/repositories/user-preferences.repository.interface';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CreateUserPreferencesUseCase {
   constructor(
     @Inject(USER_PREFERENCES_REPOSITORY)
-    private readonly userPreferencesRepository: IUserPreferencesRepository,
+    private readonly userPreferencesRepository: UserPreferencesRepository,
   ) {}
 
   async execute(userId: string): Promise<UserPreferencesEntity> {

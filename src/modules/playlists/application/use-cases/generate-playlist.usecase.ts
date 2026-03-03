@@ -18,8 +18,8 @@ import {
 } from '@modules/users/domain/repositories';
 import {
   USER_PREFERENCES_REPOSITORY,
-  type IUserPreferencesRepository,
-} from '@modules/users/domain/repositories/user-preferences-repository.interface';
+  type UserPreferencesRepository,
+} from '@modules/users/domain/repositories/user-preferences.repository.interface';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EmotionMapper } from '../../../../common/infrastructure/mappers/emotion.mapper';
 import { PlaylistBuilderService } from '../services/playlist-builder.service';
@@ -40,7 +40,7 @@ export class GeneratePlaylistUseCase {
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
     @Inject(USER_PREFERENCES_REPOSITORY)
-    private readonly userPreferencesRepository: IUserPreferencesRepository,
+    private readonly userPreferencesRepository: UserPreferencesRepository,
     @Inject(USER_STATISTICS_REPOSITORY)
     private readonly statisticsRepository: IUserStatisticsRepository,
   ) {}

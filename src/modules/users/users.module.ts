@@ -18,15 +18,15 @@ import {
 } from './domain/repositories';
 import {
   MongoUserEntity,
-  UserPreferencesEntityORM,
+  MongoUserPreferencesEntity,
   UserPreferencesSchema,
   UserSchema,
   UserStatisticsEntityORM,
   UserStatisticsSchema,
 } from './infrastructure/orm/entities';
 import {
+  MongoUserPreferencesRepository,
   MongoUserRepository,
-  UserPreferencesRepositoryImpl,
   UserStatisticsRepositoryImpl,
 } from './infrastructure/orm/repositories';
 import {
@@ -42,7 +42,7 @@ import {
         schema: UserSchema,
       },
       {
-        name: UserPreferencesEntityORM.name,
+        name: MongoUserPreferencesEntity.name,
         schema: UserPreferencesSchema,
       },
       {
@@ -63,7 +63,7 @@ import {
     },
     {
       provide: USER_PREFERENCES_REPOSITORY,
-      useClass: UserPreferencesRepositoryImpl,
+      useClass: MongoUserPreferencesRepository,
     },
     {
       provide: USER_STATISTICS_REPOSITORY,

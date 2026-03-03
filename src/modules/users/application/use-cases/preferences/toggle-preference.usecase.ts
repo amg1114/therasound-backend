@@ -16,8 +16,8 @@ import {
   PreferenceType,
 } from '@modules/users/domain/entities/types/content-preference.type';
 import {
-  type IUserPreferencesRepository,
   USER_PREFERENCES_REPOSITORY,
+  type UserPreferencesRepository,
 } from '@modules/users/domain/repositories';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -26,7 +26,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 export class TogglePreferenceUseCase {
   constructor(
     @Inject(USER_PREFERENCES_REPOSITORY)
-    private readonly userPreferencesRepository: IUserPreferencesRepository,
+    private readonly userPreferencesRepository: UserPreferencesRepository,
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
     @Inject(GENRE_REPOSITORY)
@@ -95,6 +95,6 @@ export class TogglePreferenceUseCase {
       userPreferences.toggleArtistPreference(contentId, preferenceType);
     }
 
-    return this.userPreferencesRepository.update(userPreferences);
+    return this.userPreferencesRepository.save(userPreferences);
   }
 }

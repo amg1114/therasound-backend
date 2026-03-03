@@ -2,7 +2,7 @@ import { CreateUserPreferencesProps, UserPreferencesEntity } from '../entities';
 
 export const USER_PREFERENCES_REPOSITORY = 'USER_PREFERENCES_REPOSITORY';
 
-export interface IUserPreferencesRepository {
+export interface UserPreferencesRepository {
   create(
     userPreferences: CreateUserPreferencesProps,
   ): Promise<UserPreferencesEntity>;
@@ -11,7 +11,7 @@ export interface IUserPreferencesRepository {
 
   findByUserId(userId: string): Promise<UserPreferencesEntity | null>;
 
-  update(
-    userPreferences: UserPreferencesEntity,
-  ): Promise<UserPreferencesEntity>;
+  save(userPreferences: UserPreferencesEntity): Promise<UserPreferencesEntity>;
+
+  deleteByUserId(userId: string): Promise<void>;
 }

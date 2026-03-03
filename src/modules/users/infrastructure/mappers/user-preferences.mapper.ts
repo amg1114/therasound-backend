@@ -1,10 +1,12 @@
 import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import { UserPreferencesResponseDto } from '@modules/users/presentation/dto/responses/user-preferences-response.dto';
 import { Types } from 'mongoose';
-import { UserPreferencesEntityORM } from '../orm/entities/user-preferences-entity.orm';
+import { MongoUserPreferencesEntity } from '../orm/entities/mongo.user-preferences.entity';
 
 export class UserPreferencesMapper {
-  static toDomain(ormEntity: UserPreferencesEntityORM): UserPreferencesEntity {
+  static toDomain(
+    ormEntity: MongoUserPreferencesEntity,
+  ): UserPreferencesEntity {
     const domainEntity = UserPreferencesEntity.reconstruct({
       id: ormEntity._id.toString(),
       userId: ormEntity.userId.toString(),
@@ -16,9 +18,9 @@ export class UserPreferencesMapper {
     return domainEntity;
   }
 
-  static toORM(
+  static toPersistence(
     domainEntity: UserPreferencesEntity,
-  ): Partial<UserPreferencesEntityORM> {
+  ): Partial<MongoUserPreferencesEntity> {
     return {
       userId: new Types.ObjectId(domainEntity.userId),
       likes: domainEntity.likes,

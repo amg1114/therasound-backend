@@ -4,10 +4,10 @@ import {
 } from '@modules/songs/domain/repositories/song-repository.interface';
 import { SongMapper } from '@modules/songs/infrastructure/mappers';
 import {
-  type IUserPreferencesRepository,
   type IUserStatisticsRepository,
   USER_PREFERENCES_REPOSITORY,
   USER_STATISTICS_REPOSITORY,
+  type UserPreferencesRepository,
 } from '@modules/users/domain/repositories';
 import { HistorySongVO } from '@modules/users/domain/value-objects/history-song.vo';
 import { RegisterListenedSongDto } from '@modules/users/presentation/dto/requests/statistics/register-listened-song.dto';
@@ -24,7 +24,7 @@ export class RegisterListenedSongUseCase {
     @Inject(USER_STATISTICS_REPOSITORY)
     private readonly statisticsRepository: IUserStatisticsRepository,
     @Inject(USER_PREFERENCES_REPOSITORY)
-    private readonly preferencesRepository: IUserPreferencesRepository,
+    private readonly preferencesRepository: UserPreferencesRepository,
     @Inject(SONG_REPOSITORY)
     private readonly songRepository: ISongRepository,
   ) {}
@@ -95,7 +95,7 @@ export class RegisterListenedSongUseCase {
       song.playCount;
 
     await Promise.all([
-      this.preferencesRepository.update(preferences),
+      this.preferencesRepository.save(preferences),
       this.statisticsRepository.update(statistics),
       this.songRepository.save(song),
     ]);

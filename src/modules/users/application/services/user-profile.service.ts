@@ -9,8 +9,8 @@ import {
 import {
   USER_PREFERENCES_REPOSITORY,
   USER_STATISTICS_REPOSITORY,
-  type IUserPreferencesRepository,
   type IUserStatisticsRepository,
+  type UserPreferencesRepository,
 } from '@modules/users/domain/repositories';
 import { Inject, Injectable } from '@nestjs/common';
 import {
@@ -22,7 +22,7 @@ import {
 export class UserProfileService {
   constructor(
     @Inject(USER_PREFERENCES_REPOSITORY)
-    private readonly preferencesRepository: IUserPreferencesRepository,
+    private readonly preferencesRepository: UserPreferencesRepository,
     @Inject(USER_STATISTICS_REPOSITORY)
     private readonly statisticsRepository: IUserStatisticsRepository,
     @Inject(PLAYLIST_REPOSITORY)

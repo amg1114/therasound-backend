@@ -7,7 +7,7 @@ import { Document, Types } from 'mongoose';
   collection: 'user_preferences',
   timestamps: true,
 })
-export class UserPreferencesEntityORM extends Document {
+export class MongoUserPreferencesEntity extends Document {
   declare _id: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'users', unique: true })
@@ -24,5 +24,5 @@ export class UserPreferencesEntityORM extends Document {
 }
 
 export const UserPreferencesSchema = SchemaFactory.createForClass(
-  UserPreferencesEntityORM,
+  MongoUserPreferencesEntity,
 );

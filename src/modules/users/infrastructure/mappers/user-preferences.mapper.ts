@@ -1,7 +1,7 @@
 import { UserPreferencesEntity } from '@modules/users/domain/entities';
 import { UserPreferencesResponseDto } from '@modules/users/presentation/dto/responses/user-preferences-response.dto';
 import { Types } from 'mongoose';
-import { MongoUserPreferencesEntity } from '../orm/entities/mongo.user-preferences.entity';
+import { MongoUserPreferencesEntity } from '../mongo/entities/mongo.user-preferences.entity';
 
 export class UserPreferencesMapper {
   static toDomain(

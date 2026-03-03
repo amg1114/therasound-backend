@@ -23,12 +23,12 @@ import {
   UserPreferencesSchema,
   UserSchema,
   UserStatisticsSchema,
-} from './infrastructure/orm/entities';
+} from './infrastructure/mongo/entities';
 import {
   MongoStatisticsRepository,
   MongoUserPreferencesRepository,
   MongoUserRepository,
-} from './infrastructure/orm/repositories';
+} from './infrastructure/mongo/repositories';
 import {
   UserPreferencesController,
   UserStatisticsController,

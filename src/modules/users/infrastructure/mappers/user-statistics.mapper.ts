@@ -3,7 +3,7 @@ import {
   UserStatisticsEntity,
 } from '@modules/users/domain/entities';
 import { Types } from 'mongoose';
-import { MongoUserStatisticsEntity } from '../orm/entities';
+import { MongoUserStatisticsEntity } from '../mongo/entities';
 
 export class UserStatisticsMapper {
   static toDomain(ormEntity: MongoUserStatisticsEntity): UserStatisticsEntity {

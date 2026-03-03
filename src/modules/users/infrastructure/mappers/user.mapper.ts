@@ -3,7 +3,7 @@ import {
   UserEntity,
 } from '@modules/users/domain/entities';
 import { UserResponseDto } from '@modules/users/presentation/dto/responses/user-response.dto';
-import { MongoUserEntity } from '../orm/entities/mongo.user.entity';
+import { MongoUserEntity } from '../mongo/entities/mongo.user.entity';
 
 export class UserMapper {
   static toDomain(ormEntity: MongoUserEntity): UserEntity {

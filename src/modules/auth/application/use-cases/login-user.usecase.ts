@@ -6,15 +6,15 @@ import { IJwtPayload } from '@modules/auth/infrastructure/interfaces/jwt-payload
 import { LoginRequestDto } from '@modules/auth/presentation/dto/requests/login-request.dto';
 import {
   USER_REPOSITORY,
-  type IUserRepository,
-} from '@modules/users/domain/repositories/user-repository.interface';
+  type UserRepository,
+} from '@modules/users/domain/repositories/user.repository.interface';
 import { IAuthUseCaseResult } from './interfaces';
 
 @Injectable()
 export class LoginUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
-    private readonly userRepository: IUserRepository,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -34,7 +34,7 @@ export class LoginUserUseCase {
     }
 
     const payload: IJwtPayload = {
-      sub: user.id!,
+      sub: user.id,
       email: user.email,
       name: user.name,
     };

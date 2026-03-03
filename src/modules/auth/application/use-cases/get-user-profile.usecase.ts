@@ -1,8 +1,8 @@
 import { UserProfileService } from '@modules/users/application/services/user-profile.service';
 import {
-  type IUserRepository,
+  type UserRepository,
   USER_REPOSITORY,
-} from '@modules/users/domain/repositories/user-repository.interface';
+} from '@modules/users/domain/repositories/user.repository.interface';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IUserProfileUseCaseResult } from './interfaces';
 
@@ -10,7 +10,7 @@ import { IUserProfileUseCaseResult } from './interfaces';
 export class GetUserProfile {
   constructor(
     @Inject(USER_REPOSITORY)
-    private readonly userRepository: IUserRepository,
+    private readonly userRepository: UserRepository,
     private readonly profileService: UserProfileService,
   ) {}
 

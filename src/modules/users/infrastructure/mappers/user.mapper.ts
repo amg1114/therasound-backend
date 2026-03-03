@@ -1,10 +1,13 @@
-import { UserEntity } from '@modules/users/domain/entities';
+import {
+  CreateUserEntityProps,
+  UserEntity,
+} from '@modules/users/domain/entities';
 import { UserResponseDto } from '@modules/users/presentation/dto/responses/user-response.dto';
-import { UserEntityORM } from '../orm/entities/user-entity.orm';
+import { MongoUserEntity } from '../orm/entities/mongo.user.entity';
 
 export class UserMapper {
-  static toDomain(ormEntity: UserEntityORM): UserEntity {
-    const domainEntity = UserEntity.create({
+  static toDomain(ormEntity: MongoUserEntity): UserEntity {
+    const domainEntity = UserEntity.reconstruct({
       id: ormEntity._id.toString(),
       name: ormEntity.name,
       email: ormEntity.email,
@@ -15,7 +18,9 @@ export class UserMapper {
     return domainEntity;
   }
 
-  static toORM(domainEntity: UserEntity): Partial<UserEntityORM> {
+  static toMongo(
+    domainEntity: CreateUserEntityProps,
+  ): Partial<MongoUserEntity> {
     return {
       name: domainEntity.name,
       email: domainEntity.email,
@@ -27,7 +32,7 @@ export class UserMapper {
   static toResponseDto(domainEntity: UserEntity) {
     const response = new UserResponseDto();
 
-    response.id = domainEntity.id!;
+    response.id = domainEntity.id;
     response.name = domainEntity.name;
     response.email = domainEntity.email;
     response.bornAt = domainEntity.bornAt;

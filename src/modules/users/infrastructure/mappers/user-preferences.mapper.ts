@@ -32,7 +32,7 @@ export class UserPreferencesMapper {
   ): UserPreferencesResponseDto {
     const response = new UserPreferencesResponseDto();
 
-    response.id = domainEntity.id!;
+    response.id = domainEntity.id;
     response.likes = domainEntity.likes;
     response.dislikes = domainEntity.dislikes;
     response.listenedHistory = domainEntity.listenedHistory;

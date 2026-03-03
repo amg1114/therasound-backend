@@ -4,8 +4,8 @@ import { UserProfileService } from '@modules/users/application/services/user-pro
 import { UserEntity } from '@modules/users/domain/entities';
 import {
   USER_REPOSITORY,
-  type IUserRepository,
-} from '@modules/users/domain/repositories/user-repository.interface';
+  type UserRepository,
+} from '@modules/users/domain/repositories/user.repository.interface';
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -15,7 +15,7 @@ import { IAuthUseCaseResult } from './interfaces';
 export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
-    private readonly userRepository: IUserRepository,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly profileService: UserProfileService,
   ) {}
@@ -37,12 +37,12 @@ export class RegisterUserUseCase {
     const user = await this.userRepository.create(userData);
 
     const payload: IJwtPayload = {
-      sub: user.id!,
+      sub: user.id,
       email: user.email,
       name: user.name,
     };
 
-    await this.profileService.createUserProfile(user.id!);
+    await this.profileService.createUserProfile(user.id);
 
     return {
       accessToken: this.jwtService.sign(payload),

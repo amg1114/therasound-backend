@@ -20,6 +20,7 @@ import { UserMapper } from '@modules/users/infrastructure/mappers';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -213,7 +214,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Post('delete-account')
+  @Delete('me')
   @ApiEndpoint({
     summary: 'Delete user account',
     description:

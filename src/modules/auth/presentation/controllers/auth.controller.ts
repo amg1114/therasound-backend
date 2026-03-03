@@ -1,5 +1,6 @@
 import { ApiEndpoint } from '@common/infrastructure/decorators';
 import {
+  ChangePasswordUseCase,
   GetUserProfile,
   LoginUserUseCase,
   RegisterUserUseCase,
@@ -15,9 +16,21 @@ import { JwtGuard } from '@modules/auth/infrastructure/guards/jwt.guard';
 import { AuthMapper } from '@modules/auth/infrastructure/mappers/auth.mapper';
 import { UserEntity } from '@modules/users/domain/entities';
 import { UserMapper } from '@modules/users/infrastructure/mappers';
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UpdateUserProfileDto } from '../dto/requests';
+import {
+  ChangePasswordRequestDto,
+  UpdateUserProfileDto,
+} from '../dto/requests';
 import { LoginRequestDto } from '../dto/requests/login-request.dto';
 import { RegisterRequestDto } from '../dto/requests/register-request.dto';
 import { AuthResponseDto } from '../dto/responses/auth-response.dto';
@@ -31,6 +44,7 @@ export class AuthController {
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly getCurrentUserUseCase: GetUserProfile,
     private readonly updateUserProfileUseCase: UpdateUserProfileUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
   ) {}
 
   @PublicRoute()
@@ -153,5 +167,44 @@ export class AuthController {
   ) {
     const result = await this.updateUserProfileUseCase.execute(userId, body);
     return UserMapper.toResponseDto(result);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Patch('change-password')
+  @ApiEndpoint({
+    summary: 'Change user password',
+    description:
+      'Allows the authenticated user to change their password by providing the current and new passwords.',
+    body: {
+      type: ChangePasswordRequestDto,
+      description: 'Data for changing user password',
+      required: true,
+    },
+    responses: [
+      {
+        status: 204,
+        description: 'Contraseña cambiada exitosamente',
+      },
+      {
+        status: 400,
+        description: 'Datos de cambio de contraseña inválidos',
+      },
+      {
+        status: 401,
+        description: 'No autorizado, token inválido o expirado',
+      },
+      {
+        status: 404,
+        description: 'Usuario no encontrado',
+      },
+    ],
+  })
+  async changePassword(
+    @CurrentUserId() userId: string,
+    @Body() body: ChangePasswordRequestDto,
+  ) {
+    return await this.changePasswordUseCase.execute(userId, body);
   }
 }

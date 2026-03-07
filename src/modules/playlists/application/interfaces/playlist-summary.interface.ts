@@ -6,5 +6,6 @@ export interface IPlaylistSummary {
   initialEmotion: EmotionType;
   targetEmotion: EmotionType;
   songCount: number;
+  durationMs: number;
   createdAt: Date;
 }

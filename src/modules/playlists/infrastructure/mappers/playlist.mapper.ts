@@ -2,7 +2,6 @@ import { EmotionVO } from '@common/domain/value-objects/emotion.vo';
 import { IPlaylistSummary } from '@modules/playlists/application/interfaces';
 import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.entity';
 import { PlaylistResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-response.dto';
-import { PlaylistSummaryResponseDto } from '@modules/playlists/presentation/dto/responses/playlist-summary-response.dto';
 import { Types } from 'mongoose';
 import { PlaylistEntityORM } from '../orm/entities/playlist-entity.orm';
 
@@ -48,23 +47,13 @@ export class PlaylistMapper {
     };
   }
 
-  static toSummaryDto(entity: PlaylistEntity): PlaylistSummaryResponseDto {
-    return {
-      id: entity.id,
-      title: entity.title,
-      initialEmotion: entity.initialEmotion.getValue(),
-      targetEmotion: entity.targetEmotion.getValue(),
-      songCount: entity.songs.length,
-      createdAt: entity.createdAt,
-    };
-  }
-
   static toSummary(entity: PlaylistEntity): IPlaylistSummary {
     return {
       id: entity.id,
       title: entity.title,
       initialEmotion: entity.initialEmotion.getValue(),
       targetEmotion: entity.targetEmotion.getValue(),
+      durationMs: entity.durationMs,
       songCount: entity.songs.length,
       createdAt: entity.createdAt,
     };

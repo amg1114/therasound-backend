@@ -13,9 +13,11 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GeneratePlaylistRequestDto } from '../dto/requests/generate-playlist-request.dto';
 import { PlaylistResponseDto } from '../dto/responses/playlist-response.dto';
+import { PlaylistSummaryResponseDto } from '../dto/responses/playlist-summary-response.dto';
 
 @ApiTags('playlists')
 @ApiBearerAuth()
@@ -66,7 +68,7 @@ export class PlaylistsController {
     description: 'Retrieves all playlists created by the authenticated user',
     responses: [
       {
-        type: PlaylistResponseDto,
+        type: PlaylistSummaryResponseDto,
         status: 200,
         description: 'Playlists retrieved successfully',
         isArray: true,
@@ -78,11 +80,9 @@ export class PlaylistsController {
     ],
   })
   @Get()
-  async getUserPlaylists(
-    @CurrentUserId() userId: string,
-  ): Promise<PlaylistResponseDto[]> {
+  async getUserPlaylists(@CurrentUserId() userId: string) {
     const playlists = await this.getUserPlaylistsUseCase.execute(userId);
-    return playlists.map((playlist) => PlaylistMapper.toResponseDto(playlist));
+    return playlists.map((playlist) => PlaylistMapper.toSummary(playlist));
   }
 
   @ApiEndpoint({
@@ -111,7 +111,9 @@ export class PlaylistsController {
     ],
   })
   @Get(':id')
-  async getPlaylistById(@Param('id') id: string): Promise<PlaylistResponseDto> {
+  async getPlaylistById(
+    @Param('id', new ParseObjectIdPipe()) id: string,
+  ): Promise<PlaylistResponseDto> {
     const playlist = await this.getPlaylistByIdUseCase.execute(id);
     return PlaylistMapper.toResponseDto(playlist);
   }

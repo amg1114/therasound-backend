@@ -44,4 +44,8 @@ export class PlaylistEntity implements PlaylistProps {
   static reconstruct(props: PlaylistProps): PlaylistEntity {
     return new PlaylistEntity(props);
   }
+
+  getDurationMS(): number {
+    return this.songs.reduce((total, song) => total + song.durationMs, 0);
+  }
 }

@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PlaylistSummaryResponseDto {
   @ApiProperty({
@@ -7,11 +7,11 @@ export class PlaylistSummaryResponseDto {
   })
   id: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Título de la lista de reproducción',
     example: 'Playlist #abc123',
   })
-  title?: string;
+  title: string;
 
   @ApiProperty({
     description: 'Emoción inicial de la lista de reproducción',

@@ -43,7 +43,7 @@ export class PlaylistRepositoryImpl implements IPlaylistRepository {
 
   async findByUserId(userId: string): Promise<PlaylistEntity[]> {
     const ormEntities = await this.model
-      .find({ userId })
+      .find({ userId: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 });
 
     return ormEntities.map((entity) => PlaylistMapper.toDomain(entity));

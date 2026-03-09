@@ -70,6 +70,7 @@ export class SongMapper {
     response.id = entity.id;
     response.spotifyId = entity.spotifyId;
     response.title = entity.title;
+    response.artists = entity.artists;
     response.emotion = entity.emotion.getValue();
     response.durationMs = entity.durationMs;
     response.spotifyUrl = entity.spotifyUrl;

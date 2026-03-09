@@ -26,13 +26,11 @@ export class MongoListeningSessionRepository implements ListeningSessionReposito
     listeningSession: ListeningSessionEntity,
   ): Promise<ListeningSessionEntity> {
     const ormData = ListeningSessionMapper.toMongo(listeningSession);
-    const updated = await this.model.findByIdAndUpdate(
-      listeningSession.id,
-      ormData,
-      {
+    const updated = await this.model
+      .findByIdAndUpdate(listeningSession.id, ormData, {
         new: true,
-      },
-    );
+      })
+      .exec();
 
     if (!updated) {
       throw new NotFoundException(

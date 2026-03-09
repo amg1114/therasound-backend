@@ -27,7 +27,7 @@ import { PlaylistsController } from './presentation/controllers/playlists.contro
     ChatbotModule,
     forwardRef(() => SongsModule),
     forwardRef(() => UsersModule),
-    ListeningSessionsModule,
+    forwardRef(() => ListeningSessionsModule),
   ],
   controllers: [PlaylistsController],
   providers: [

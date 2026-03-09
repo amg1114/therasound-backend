@@ -22,6 +22,9 @@ export class ListeningSessionMapper {
       userId: new Types.ObjectId(data.userId),
       playlistId: new Types.ObjectId(data.playlistId),
       initialAnxietyLevel: data.initialAnxietyLevel,
+      finalAnxietyLevel: data.finalAnxietyLevel,
+      completionRate: data.completionRate,
+      abandoned: data.abandoned,
     };
   }
 }

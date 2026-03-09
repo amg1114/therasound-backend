@@ -11,13 +11,13 @@ export class MongoListeningSessionEntity extends Document {
   @Prop({ required: true })
   playlistId: Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Number })
   initialAnxietyLevel: number;
 
-  @Prop({ default: null })
+  @Prop({ default: null, required: false, type: Number })
   finalAnxietyLevel: number | null;
 
-  @Prop({ default: null })
+  @Prop({ default: null, required: false, type: Number })
   completionRate: number | null;
 
   @Prop({ default: false })

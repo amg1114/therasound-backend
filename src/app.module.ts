@@ -12,6 +12,7 @@ import { PlaylistsModule } from './modules/playlists/playlists.module';
 import { SongsModule } from './modules/songs/songs.module';
 import { UsersModule } from './modules/users/users.module';
 import { ArtistsModule } from './modules/artists/artists.module';
+import { ListeningSessionsModule } from './modules/listening-sessions/listening-sessions.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ArtistsModule } from './modules/artists/artists.module';
     AdminModule,
     CommonModule,
     ArtistsModule,
+    ListeningSessionsModule,
   ],
   controllers: [],
   providers: [],

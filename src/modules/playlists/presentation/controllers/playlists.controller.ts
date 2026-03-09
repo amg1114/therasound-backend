@@ -16,6 +16,7 @@ import {
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GeneratePlaylistRequestDto } from '../dto/requests/generate-playlist-request.dto';
+import { GeneratePlaylistResponseDto } from '../dto/responses/generate-playlist-response.dto';
 import { PlaylistResponseDto } from '../dto/responses/playlist-response.dto';
 import { PlaylistSummaryResponseDto } from '../dto/responses/playlist-summary-response.dto';
 
@@ -58,9 +59,14 @@ export class PlaylistsController {
   async generatePlaylist(
     @CurrentUserId() userId: string,
     @Body() body: GeneratePlaylistRequestDto,
-  ): Promise<PlaylistResponseDto> {
-    const playlist = await this.generatePlaylistUseCase.execute(userId, body);
-    return PlaylistMapper.toResponseDto(playlist);
+  ): Promise<GeneratePlaylistResponseDto> {
+    const result = await this.generatePlaylistUseCase.execute(userId, body);
+
+    const response = new GeneratePlaylistResponseDto();
+    response.playlist = PlaylistMapper.toResponseDto(result.playlist);
+    response.sessionId = result.sessionId;
+
+    return response;
   }
 
   @ApiEndpoint({

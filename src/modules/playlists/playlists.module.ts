@@ -1,4 +1,5 @@
 import { ChatbotModule } from '@modules/chatbot/chatbot.module';
+import { ListeningSessionsModule } from '@modules/listening-sessions/listening-sessions.module';
 import { SongsModule } from '@modules/songs/songs.module';
 import { UsersModule } from '@modules/users/users.module';
 import { forwardRef, Module } from '@nestjs/common';
@@ -26,6 +27,7 @@ import { PlaylistsController } from './presentation/controllers/playlists.contro
     ChatbotModule,
     forwardRef(() => SongsModule),
     forwardRef(() => UsersModule),
+    ListeningSessionsModule,
   ],
   controllers: [PlaylistsController],
   providers: [

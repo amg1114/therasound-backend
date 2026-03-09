@@ -2,7 +2,11 @@ import {
   CHATBOT_SERVICE_TOKEN,
   type IChatbotService,
 } from '@modules/chatbot/infrastructure/services/chatbot-service.interface';
-import { PlaylistEntity } from '@modules/playlists/domain/entities/playlist.entity';
+import { ListeningSessionEntity } from '@modules/listening-sessions/domain/entities';
+import {
+  LISTENING_SESSION_REPOSITORY,
+  type ListeningSessionRepository,
+} from '@modules/listening-sessions/domain/repositories/listening-session.repository.interface';
 import {
   PLAYLIST_REPOSITORY,
   type IPlaylistRepository,
@@ -23,6 +27,7 @@ import {
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EmotionMapper } from '../../../../common/infrastructure/mappers/emotion.mapper';
 import { PlaylistBuilderService } from '../services/playlist-builder.service';
+import { GeneratePlaylistResult } from './types';
 
 const MIN_SONGS_THRESHOLD = 20;
 
@@ -43,15 +48,20 @@ export class GeneratePlaylistUseCase {
     private readonly userPreferencesRepository: UserPreferencesRepository,
     @Inject(USER_STATISTICS_REPOSITORY)
     private readonly statisticsRepository: UserStatisticsRepository,
+    @Inject(LISTENING_SESSION_REPOSITORY)
+    private readonly listeningSessionRepository: ListeningSessionRepository,
   ) {}
 
   async execute(
     userId: string,
     { conversationHistory }: GeneratePlaylistRequestDto,
-  ): Promise<PlaylistEntity> {
+  ): Promise<GeneratePlaylistResult> {
     // 1. Analyze emotion from conversation history
-    const { emotion: emotionAnalysis, playlistTitle } =
-      await this.chatbotService.getEmotionAnalysis(conversationHistory);
+    const {
+      emotion: emotionAnalysis,
+      playlistTitle,
+      anxietyLevel,
+    } = await this.chatbotService.getEmotionAnalysis(conversationHistory);
 
     // 2. Map analyzed emotion to song emotion
     const currentEmotion = EmotionMapper.analysisToCurrent(emotionAnalysis);
@@ -98,6 +108,14 @@ export class GeneratePlaylistUseCase {
       await this.statisticsRepository.update(statistics);
     }
 
-    return playlist;
+    const newSession = ListeningSessionEntity.create({
+      userId,
+      playlistId: playlist.id,
+      initialAnxietyLevel: anxietyLevel,
+    });
+
+    const session = await this.listeningSessionRepository.create(newSession);
+
+    return { playlist, sessionId: session.id };
   }
 }

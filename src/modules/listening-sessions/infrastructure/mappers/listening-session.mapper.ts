@@ -1,7 +1,4 @@
-import {
-  CreateListeningSessionProps,
-  ListeningSessionEntity,
-} from '@modules/listening-sessions/domain/entities';
+import { ListeningSessionEntity } from '@modules/listening-sessions/domain/entities';
 import { Types } from 'mongoose';
 import { MongoListeningSessionEntity } from '../mongo/entities';
 
@@ -19,7 +16,7 @@ export class ListeningSessionMapper {
   }
 
   static toMongo(
-    data: CreateListeningSessionProps,
+    data: ListeningSessionEntity,
   ): Partial<MongoListeningSessionEntity> {
     return {
       userId: new Types.ObjectId(data.userId),

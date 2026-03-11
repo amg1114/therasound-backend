@@ -1,0 +1,47 @@
+import { SongEntity } from '../entities/song.entity';
+
+export const SONG_REPOSITORY = 'SONG_REPOSITORY';
+
+export interface SongFilters {
+  excludedSongIds?: string[];
+  excludedArtists?: string[];
+  excludedGenres?: string[];
+  deseableGenres?: string[];
+  deseableArtists?: string[];
+}
+
+export interface ISongRepository {
+  findPlaylistCandidates(
+    limit?: number,
+    maxDistance?: number,
+  ): Promise<SongEntity[]>;
+
+  findById(id: string): Promise<SongEntity | null>;
+
+  findManyBySpotifyIds(spotifyIds: string[]): Promise<SongEntity[]>;
+
+  findManyByReccoBeatsIds(reccoBeatsIds: string[]): Promise<SongEntity[]>;
+
+  findPopular(limit: number, filters?: SongFilters): Promise<SongEntity[]>;
+
+  findAll(): Promise<SongEntity[]>;
+
+  findPaginated(skip: number, limit: number): Promise<SongEntity[]>;
+
+  create(song: Partial<SongEntity>): Promise<SongEntity>;
+  save(song: SongEntity): Promise<SongEntity>;
+
+  createMany(songs: Partial<SongEntity>[]): Promise<SongEntity[]>;
+
+  incrementLikesCount(songId: string): Promise<void>;
+
+  decrementLikesCount(songId: string): Promise<void>;
+
+  existsByReccoBeatsId(reccoBeatsId: string): Promise<boolean>;
+
+  existsBySpotifyId(spotifyId: string): Promise<boolean>;
+
+  countByGenre(genre: string): Promise<number>;
+
+  countByArtistId(artistId: string): Promise<number>;
+}

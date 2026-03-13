@@ -21,8 +21,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.getOrThrow<number>('app.port');
+  const corsOrigins = configService.getOrThrow<string[]>('cors_origins');
 
   app.setGlobalPrefix('api');
+  app.enableCors({
+    origin: corsOrigins.includes('*') ? true : corsOrigins,
+    credentials: true,
+  });
 
   // Global exception filter for logging
   app.useGlobalFilters(new HttpExceptionFilter());

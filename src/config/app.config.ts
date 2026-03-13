@@ -38,6 +38,7 @@ export type AppConfig = {
   };
 
   default_seed_recommendations: string;
+  cors_origins: string[];
 };
 
 let emotionWeightsCache: EmotionFeatureValues | null = null;
@@ -86,6 +87,7 @@ export const APP_CONFIG_SCHEMA = Joi.object({
   ACR_CLOUD_ACCESS_KEY: Joi.string().required(),
   SPOTIFY_CLIENT_ID: Joi.string().required(),
   SPOTIFY_CLIENT_SECRET: Joi.string().required(),
+  CORS_ORIGINS: Joi.string().required(),
 });
 
 const DEFAULT_PORT = 3000;
@@ -122,4 +124,7 @@ export const appConfig = (): AppConfig => ({
     weights: loadEmotionWeights(),
   },
   default_seed_recommendations: process.env.DEFAULT_SEED_RECOMMENDATIONS!,
+  cors_origins: process.env.CORS_ORIGINS?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean) ?? ['*'],
 });

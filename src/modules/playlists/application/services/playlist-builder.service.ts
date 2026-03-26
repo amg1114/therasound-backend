@@ -33,7 +33,7 @@ interface ScoredCandidate {
 export class PlaylistBuilderService {
   private readonly logger = new Logger(PlaylistBuilderService.name);
   private readonly config: BuilderConfig = {
-    minDurationMs: 30 * 60 * 1000, // 30 min
+    minDurationMs: 15 * 60 * 1000, // 15 min
     maxStepIncrement: 0.05,
     initialMaxStep: 0.15,
     maxTotalIterations: 1000, // Prevent runaway loops

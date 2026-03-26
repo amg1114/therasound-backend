@@ -2,6 +2,7 @@ import { ApiEndpoint } from '@common/infrastructure/decorators';
 import { UpdateArtistsDetails } from '@modules/admin/application/use-cases';
 import { RecalculateSongEmotionUseCase } from '@modules/admin/application/use-cases/recalculate-transition-scoring.usecase';
 import { SeedFromLocalUseCase } from '@modules/admin/application/use-cases/seed-from-local.usecase';
+import { RebuildGenresAndArtistsUseCase } from '@modules/admin/application/use-cases/rebuild-genres-and-artists.usecase';
 import { PublicRoute } from '@modules/auth/infrastructure/decorators/public-route.decorator';
 import { Controller, Patch, Post, Query } from '@nestjs/common';
 import { SeedLocalQueryDto } from '../dto/queries/seed-queries.dto';
@@ -12,6 +13,7 @@ export class AdminController {
     private readonly seedFromLocalUseCase: SeedFromLocalUseCase,
     private readonly recalculateSongEmotionUseCase: RecalculateSongEmotionUseCase,
     private readonly updateArtistsDetailsUseCase: UpdateArtistsDetails,
+    private readonly rebuildGenresAndArtistsUseCase: RebuildGenresAndArtistsUseCase,
   ) {}
 
   @ApiEndpoint({
@@ -92,5 +94,26 @@ export class AdminController {
   @PublicRoute()
   async updateArtistsDetails() {
     return this.updateArtistsDetailsUseCase.execute();
+  }
+
+  @ApiEndpoint({
+    summary: 'Rebuild genres and artists documents',
+    description:
+      'Rebuilds the genres and artists documents by scanning all songs in the database. Extracts all genres and artists, deduplicates them (case-insensitive), and creates or updates their corresponding records with accurate song counts.',
+    responses: [
+      {
+        status: 200,
+        description: 'Rebuild completed successfully',
+      },
+      {
+        status: 500,
+        description: 'Error during rebuild process',
+      },
+    ],
+  })
+  @Patch('/rebuild-genres-and-artists')
+  @PublicRoute()
+  async rebuildGenresAndArtists() {
+    return this.rebuildGenresAndArtistsUseCase.execute();
   }
 }

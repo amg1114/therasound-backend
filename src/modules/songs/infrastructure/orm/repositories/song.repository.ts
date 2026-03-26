@@ -10,6 +10,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryFilter, Types } from 'mongoose';
 import { SongMapper } from '../../mappers/song.mapper';
 import { SongEntityORM } from '../entities/song-entity.orm';
+import { ContentPreferences } from '@modules/users/domain/entities/types/content-preference.type';
 
 @Injectable()
 export class SongRepositoryImpl implements ISongRepository {
@@ -119,26 +120,80 @@ export class SongRepositoryImpl implements ISongRepository {
   async findPlaylistCandidates(
     limitPerEmotion = 125,
     initialMaxDistance = 0.35,
+    preferences?: { likes: ContentPreferences; dislikes: ContentPreferences },
   ): Promise<SongEntity[]> {
     const emotions = EmotionVO.SONG_EMOTIONS;
+
+    // Filtros de exclusión (dislikes)
+    const excludeFilter: Record<string, any> = {};
+    if (preferences?.dislikes) {
+      const { songs, genres, artists } = preferences.dislikes;
+      if (songs?.length)
+        excludeFilter.spotifyId = { $nin: songs.map((s) => s.spotifyId) };
+      if (genres?.length) excludeFilter.genres = { $nin: genres };
+      if (artists?.length) excludeFilter['artists.name'] = { $nin: artists };
+    }
+
+    excludeFilter.durationMs = { $lte: 300000 }; // Asegurar que no se incluyan canciones sin duración válida
+
+    const likedGenres = preferences?.likes?.genres ?? [];
+    const likedArtists = preferences?.likes?.artists ?? [];
+    const hasPreferences = likedGenres.length > 0 || likedArtists.length > 0;
+
+    const preferenceFilter = hasPreferences
+      ? {
+          $or: [
+            { genres: { $in: likedGenres } },
+            { 'artists.name': { $in: likedArtists } },
+          ],
+        }
+      : null;
+
+    const preferredLimit = Math.ceil(limitPerEmotion * 0.6); // 60% preferencias
+    const fillLimit = limitPerEmotion; // resto sin restricción
 
     const results = await Promise.all(
       emotions.map(async (emotion) => {
         let maxDistance = initialMaxDistance;
-        let songs: any[] = [];
+        let songs: SongEntityORM[] = [];
 
-        // Relajar distancia hasta tener suficientes canciones
         while (songs.length < limitPerEmotion && maxDistance <= 1.0) {
-          songs = await this.model
-            .aggregate([
+          const emotionFilter = {
+            [`emotionDistances.${emotion}`]: { $lte: maxDistance },
+            ...excludeFilter,
+          };
+
+          let preferred: SongEntityORM[] = [];
+
+          // Intentar traer canciones de preferencias
+          if (preferenceFilter) {
+            preferred = await this.model
+              .aggregate<SongEntityORM>([
+                { $match: { ...emotionFilter, ...preferenceFilter } },
+                { $sample: { size: preferredLimit } },
+              ])
+              .exec();
+          }
+
+          // Complementar con canciones sin restricción de preferencias
+          const remaining = fillLimit - preferred.length;
+          const preferredIds = preferred.map(
+            (s: { spotifyId: string }) => s.spotifyId,
+          );
+
+          const fill = await this.model
+            .aggregate<SongEntityORM>([
               {
                 $match: {
-                  [`emotionDistances.${emotion}`]: { $lte: maxDistance },
+                  ...emotionFilter,
+                  spotifyId: { $nin: preferredIds },
                 },
               },
-              { $sample: { size: limitPerEmotion } },
+              { $sample: { size: remaining } },
             ])
             .exec();
+
+          songs = [...preferred, ...fill];
 
           if (songs.length < limitPerEmotion) {
             maxDistance += 0.1;

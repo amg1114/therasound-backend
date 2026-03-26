@@ -70,8 +70,10 @@ export class UserStatisticsEntity implements UserStatisticsEntityProps {
         (1000 * 60 * 60 * 24),
     );
 
-    if (daysSinceLastListening > 1 && this.streakActivationDate) {
-      this.streakActivationDate = now; // Reset streak if more than 1 day has passed since last listening
+    if (daysSinceLastListening > 1) {
+      this.streakActivationDate = now;
+      this.lastListeningDate = now;
+      return;
     }
 
     this.lastListeningDate = now;
